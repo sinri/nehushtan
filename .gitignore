@@ -263,6 +263,9 @@ fabric.properties
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
 
+# Project Level Ignoration
+.idea/
 debug/
 log/
 runtime/
+tests/config.py

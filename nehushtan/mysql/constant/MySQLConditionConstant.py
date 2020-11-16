@@ -1,7 +1,4 @@
-#  Copyright (c) 2020. The Source Data Mining Group, Technology & Product Department, Leqee Ltd.
-
-# VERSION 1.11.0, 2020-11-12
-# WARNING: DO NOT MODIFY THIS FILE, JUST FOLLOW THE SHOVEL STANDARD!
+#  Copyright (c) 2020. Sinri Edogawa
 
 MYSQL_CONDITION_OP_EQ = "="
 MYSQL_CONDITION_OP_GT = ">"

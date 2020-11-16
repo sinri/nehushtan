@@ -1,8 +1,4 @@
-#  Copyright (c) 2020. The Source Data Mining Group, Technology & Product Department, Leqee Ltd.
-
-# VERSION 1.11.1, 2020-11-16
-# WARNING: DO NOT MODIFY THIS FILE, JUST FOLLOW THE SHOVEL STANDARD!
-
+#  Copyright (c) 2020. Sinri Edogawa
 
 from typing import Callable
 

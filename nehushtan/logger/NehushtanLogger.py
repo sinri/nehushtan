@@ -1,12 +1,10 @@
-#  Copyright (c) 2020. The Source Data Mining Group, Technology & Product Department, Leqee Ltd.
-
-# VERSION 1.11.0, 2020-11-11
-# WARNING: DO NOT MODIFY THIS FILE, JUST FOLLOW THE SHOVEL STANDARD!
+#  Copyright (c) 2020. Sinri Edogawa
 
 import json
 import logging
 import logging.handlers
 import sys
+
 
 class NehushtanLogger:
     """
@@ -100,24 +98,6 @@ class NehushtanLogger:
         return f_handler
 
     def ensure_extra_as_dict(self, extra):
-        """
-        @since 1.3
-            Changed from static to dynamic,
-            Add `shovel_name` to be printed as logger name, along with `json_string`
-        :param extra:
-        :return:
-        """
-
-        # def ddd(inner_x):
-        #     s = inner_x.__str__()
-        #     # if dir(x).__contains__('__dict__'):
-        #     #     s+=" __dict__: "
-        #     #     for key,value in x.__dict__.items():
-        #     #         s+=key+"->"+ddd(value)+";"
-        #     return s
-
-        # since 1.11.0, 2020-11-11, use lambda instead
-
         return {
             "json_string": json.dumps(extra, default=lambda inner_x: inner_x.__str__()),
             "shovel_name": self.logger.name
@@ -179,7 +159,7 @@ if __name__ == '__main__':
     Test Shovel Logger
     """
 
-    test_log_store='/Users/sinri/code/Pycharm/nehushtan/log'
+    test_log_store = '/Users/sinri/code/Pycharm/nehushtan/log'
 
     shovel_logger = NehushtanLogger(
         logger_name="runner",

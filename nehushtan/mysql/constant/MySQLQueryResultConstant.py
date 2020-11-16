@@ -1,4 +1,4 @@
-#  Copyright (c) 2020. The Source Data Mining Group, Technology & Product Department, Leqee Ltd.
+#  Copyright (c) 2020. Sinri Edogawa
 
 MYSQL_QUERY_STATUS_INIT = "INIT"
 MYSQL_QUERY_STATUS_QUERIED = "QUERIED"

@@ -1,7 +1,4 @@
-#  Copyright (c) 2020. The Source Data Mining Group, Technology & Product Department, Leqee Ltd.
-
-# VERSION 1.11.1, 2020-11-16
-# WARNING: DO NOT MODIFY THIS FILE, JUST FOLLOW THE SHOVEL STANDARD!
+#  Copyright (c) 2020. Sinri Edogawa
 
 import time
 from abc import ABC
@@ -9,13 +6,13 @@ from abc import ABC
 import pymysql
 
 from nehushtan.mysql import constant
-from nehushtan.mysql import MySQLCondition
-from nehushtan.mysql import MySQLQueryResult
+from nehushtan.mysql.MySQLCondition import MySQLCondition
+from nehushtan.mysql.MySQLQueryResult import MySQLQueryResult
 from nehushtan.mysql.MySQLTableExistence import MySQLTableExistence
 from nehushtan.mysql.MySQLTableSelection import MySQLTableSelection
 
 
-class BaseShovelMySQLTableModelCore(MySQLTableExistence, ABC):
+class MySQLTableMixin(MySQLTableExistence, ABC):
 
     @staticmethod
     def now() -> str:

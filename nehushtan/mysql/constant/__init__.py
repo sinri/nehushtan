@@ -1,4 +1,4 @@
-#  Copyright (c) 2020. The Source Data Mining Group, Technology & Product Department, Leqee Ltd.
+#  Copyright (c) 2020. Sinri Edogawa
 
-from nehushtan.mysql.constant import *
-from nehushtan.mysql.constant import *
+from nehushtan.mysql.constant.MySQLConditionConstant import *
+from nehushtan.mysql.constant.MySQLQueryResultConstant import *

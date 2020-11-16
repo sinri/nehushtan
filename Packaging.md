@@ -12,8 +12,13 @@ In venv, no `--user` needed for PIP.
     0. Ensure ` ~/.pypirc` with token.
     1. `python3 -m pip install --upgrade setuptools wheel`
     2. `python3 setup.py sdist bdist_wheel`
-4. Upload the `dist` files with Twine.
+4. Upload the `dist` files with Twine to [testpypi](https://test.pypi.org/project/nehushtan/).
     1. `python3 -m pip install --upgrade twine`
     2. Upload to Test.Pypi: `python3 -m twine upload --repository testpypi dist/*`
 5. Test installing.
     1. `python3 -m pip install --index-url https://test.pypi.org/simple/ --upgrade nehushtan`
+6. Publish to [pypi](https://pypi.org/project/nehushtan/)
+    1. `python3 -m twine upload dist/*`
+7. Installing.
+    1. `pip3 install nehushtan`
+

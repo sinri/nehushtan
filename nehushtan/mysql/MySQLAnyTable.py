@@ -1,10 +1,7 @@
-#  Copyright (c) 2020. The Source Data Mining Group, Technology & Product Department, Leqee Ltd.
+#  Copyright (c) 2020. Sinri Edogawa
 
-# VERSION 1.11.0, 2020-11-16
-# WARNING: DO NOT MODIFY THIS FILE, JUST FOLLOW THE SHOVEL STANDARD!
-
-from nehushtan.mysql import MySQLTableMixin
 from nehushtan.mysql.MySQLKit import MySQLKit
+from nehushtan.mysql.MySQLTableMixin import MySQLTableMixin
 
 
 class MySQLAnyTable(MySQLTableMixin):
