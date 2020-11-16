@@ -2,6 +2,8 @@
 
 A toolkit for projects in Python
 
+<img src="https://github.com/sinri/nehushtan/blob/master/icon.png?raw=true" width="64" height="64"></img>
+
 > ipse dissipavit excelsa et contrivit statuas et succidit lucos confregitque serpentem aeneum quem fecerat Moses siquidem usque ad illud tempus filii Israhel adolebant ei incensum vocavitque eum Naasthan
 
 # History in Brief
