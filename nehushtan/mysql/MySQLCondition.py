@@ -136,7 +136,7 @@ class MySQLCondition:
         return MySQLCondition('', constant.MYSQL_CONDITION_MACRO_RAW_EXPRESSION, condition_sql)
 
     def __str__(self):
-        return self.make_condition_sql()
+        return self.organize_to_sql()
 
     def organize_to_sql(self) -> str:
         """
