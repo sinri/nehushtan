@@ -1,4 +1,5 @@
 #  Copyright (c) 2020. Sinri Edogawa
+from typing import Iterable
 
 from nehushtan.mysql import constant
 from nehushtan.mysql.MySQLKit import MySQLKit
@@ -115,19 +116,19 @@ class MySQLCondition:
         return MySQLCondition(field, constant.MYSQL_CONDITION_MACRO_IS_NOT_NULL_NOR_EMPTY_STRING, None)
 
     @staticmethod
-    def make_and(conditions: list or tuple):
+    def make_and(conditions: Iterable["MySQLCondition"]):
         return MySQLCondition.make_intersection_of_conditions(conditions)
 
     @staticmethod
-    def make_intersection_of_conditions(conditions: list or tuple):
+    def make_intersection_of_conditions(conditions: Iterable["MySQLCondition"]):
         return MySQLCondition('', constant.MYSQL_CONDITION_OP_PARENTHESES_AND, conditions)
 
     @staticmethod
-    def make_or(conditions: list or tuple):
+    def make_or(conditions: Iterable["MySQLCondition"]):
         return MySQLCondition.make_union_of_conditions(conditions)
 
     @staticmethod
-    def make_union_of_conditions(conditions: list or tuple):
+    def make_union_of_conditions(conditions: Iterable["MySQLCondition"]):
         return MySQLCondition('', constant.MYSQL_CONDITION_OP_PARENTHESES_OR, conditions)
 
     @staticmethod
@@ -138,6 +139,18 @@ class MySQLCondition:
         return self.make_condition_sql()
 
     def make_condition_sql(self) -> str:
+        """
+        Deprecated since 0.1.4
+        Use `organize_to_sql` instead
+        :return:
+        """
+        return self.organize_to_sql()
+
+    def organize_to_sql(self) -> str:
+        """
+        Since 0.1.4
+        :return:
+        """
         if (
                 constant.MYSQL_CONDITION_OP_EQ,
                 constant.MYSQL_CONDITION_OP_GT,
@@ -235,7 +248,7 @@ class MySQLCondition:
             raise Exception("CANNOT OPERATE UNKNOWN TYPE!")
 
     @staticmethod
-    def build_sql_component(conditions: (tuple or list)):
+    def build_sql_component(conditions: Iterable["MySQLCondition"]):
         parts = []
         if isinstance(conditions, (tuple, list)):
             for condition in conditions:

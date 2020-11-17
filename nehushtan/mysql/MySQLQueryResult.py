@@ -9,15 +9,18 @@ class MySQLQueryResult:
     _sql: str
     _status: str
     _error: str
-    _last_inserted_id: int
-    _affected_rows: int
-    _result_rows: list
-    _result_stream: Cursor or None  # do not know how to implement it in python now
+
+    # The beneath properties would be initialized for each instance when needed
+    # _last_inserted_id: int
+    # _affected_rows: int
+    # _result_rows: list
+    # _result_stream: Cursor  # do not know how to implement it in python now
 
     def __init__(self):
         self._sql = ''
         self._status = constant.MYSQL_QUERY_STATUS_INIT
         self._error = ''
+
         self._last_inserted_id = -1
         self._affected_rows = -1
         self._result_rows = []
@@ -101,7 +104,7 @@ class MySQLQueryResult:
         if row is None:
             self._status = constant.MYSQL_QUERY_STATUS_STREAMED
             self._result_stream.close()
-            self._result_stream = None
+            del self._result_stream
             return None
         return row
 

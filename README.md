@@ -10,3 +10,4 @@ A toolkit for projects in Python
 
 * 0.1.2: First version on PYPI with MySQL Toolkit.
 * 0.1.3: Add CLI Helper, Logger, SMTP.
+* 0.1.4: Changed a lot for projects.

@@ -1,4 +1,5 @@
 #  Copyright (c) 2020. Sinri Edogawa
+from typing import Iterable
 
 import pymysql
 from pymysql.cursors import SSCursor, SSDictCursor
@@ -63,7 +64,7 @@ class MySQLTableSelection:
         self._select_fields.append(s)
         return self
 
-    def add_select_field_name_list(self, field_name_array: (tuple or list)):
+    def add_select_field_name_list(self, field_name_array: Iterable[str]):
         """
 
         :param field_name_array: ["F1","F2", ...] or ("F1","F2", ...)
@@ -77,7 +78,7 @@ class MySQLTableSelection:
         self._conditions.append(condition)
         return self
 
-    def add_conditions(self, conditions: (tuple or list)):
+    def add_conditions(self, conditions: Iterable[MySQLCondition]):
         """
 
         :param conditions: array of MySQLCondition
@@ -102,7 +103,7 @@ class MySQLTableSelection:
                 self.add_condition(MySQLCondition.make_equal(k, v))
         return self
 
-    def set_group_by_fields(self, group_by_fields: (tuple or list)):
+    def set_group_by_fields(self, group_by_fields: list):
         self._group_by_fields = group_by_fields
         return self
 

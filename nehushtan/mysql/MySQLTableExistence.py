@@ -6,9 +6,10 @@ from nehushtan.mysql.MySQLKit import MySQLKit
 
 
 class MySQLTableExistence(ABC):
-    _mysql_kit: MySQLKit or None
+    _mysql_kit: MySQLKit
 
     def __init__(self):
+        # Must initialize `_mysql_kit` in overriding method here
         pass
 
     def get_mysql_kit(self) -> MySQLKit:

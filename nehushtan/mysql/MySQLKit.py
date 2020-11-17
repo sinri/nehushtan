@@ -6,6 +6,7 @@ import pymysql
 from pymysql.connections import Connection
 from pymysql.cursors import DictCursor
 
+from mysql.MySQLKitConfig import MySQLKitConfig
 from nehushtan.mysql import constant
 
 
@@ -15,31 +16,24 @@ class MySQLKit:
     Shovel 项目相关的所有 MySQL 连接应当使用此方法进行。
     """
 
-    _mysql_config: dict
+    _mysql_config: MySQLKitConfig
     _auto_commit_default: bool
     _connection: Connection or None
 
-    def __init__(self, mysql_config: dict):
+    def __init__(self, mysql_config: MySQLKitConfig = None):
         """
-        获取一个字典并根据此字典包含配置立即建立一个新的数据库连接。
+        Since 0.1.4 入参类型变化
+        获取一个MySQLKitConfig类的实例，并根据此类设置的配置立即建立一个新的数据库连接。
         PYMYSQL 默认不自动递交。在实际场景中，建议设置成默认自动递交并仅在需要时手动开启事务。
-        :param mysql_config: 字典，样本参见配置文件标准示例中 `mysql_database`.`sample` 项
+        :param mysql_config: 获取一个MySQLKitConfig类的实例，可用字典构建，样本参见配置文件标准示例中 `mysql_database`.`sample` 项
         """
+        if mysql_config is None:
+            mysql_config = MySQLKitConfig()
         self._mysql_config = mysql_config
-        self._auto_commit_default = self._mysql_config.get('auto_commit', False)
+        self._auto_commit_default = self._mysql_config.get_auto_commit()
         self._connection = None
-        if len(self._mysql_config.items()) > 0:
+        if len(self._mysql_config.get_host()) > 0:
             self.connect()
-
-    # @staticmethod
-    # def make_instance_from_config(target: str):
-    #     """
-    #     根据配置文件中 `mysql_database`.`[target]` 项来生成本类实例。
-    #     :param target: 配置文件中标示的数据库连接名
-    #     :return: 本类实例
-    #     """
-    #     config = ShovelHelper.read_config_for_mysql(target, {})
-    #     return MySQLKit(config)
 
     @staticmethod
     def make_instance_from_pymysql_connection(connection: Connection):
@@ -49,7 +43,7 @@ class MySQLKit:
         :param connection:
         :return: 本类实例
         """
-        kit = MySQLKit({})
+        kit = MySQLKit()
         kit._connection = connection
         kit._auto_commit_default = connection.get_autocommit()
         return kit
@@ -60,7 +54,7 @@ class MySQLKit:
         """
         return self._connection
 
-    def connect(self) -> "MySQLKit":
+    def connect(self):
         """
         It may raise Exception if connection failed, as I viewed the document
         :return: MySQLKit the instance itself
@@ -68,19 +62,19 @@ class MySQLKit:
 
         self.disconnect()
 
-        self._auto_commit_default = self._mysql_config.get('auto_commit', False)
+        self._auto_commit_default = self._mysql_config.get_auto_commit()
         self._connection = pymysql.connect(
-            host=self._mysql_config.get('host', ''),  # '172.16.1.52',
-            port=int(self._mysql_config.get('port', '3306')),  # 3306,
-            user=self._mysql_config.get('user', ''),
-            password=self._mysql_config.get('password', ''),
-            db=self._mysql_config.get('db', ''),
-            charset=self._mysql_config.get('charset', ''),
+            host=self._mysql_config.get_host(),  # '172.16.1.52',
+            port=self._mysql_config.get_port(),  # 3306,
+            user=self._mysql_config.get_user(),
+            password=self._mysql_config.get_password(),
+            db=self._mysql_config.get_db(),
+            charset=self._mysql_config.get_charset(),
             autocommit=self._auto_commit_default,
         )
         return self
 
-    def disconnect(self) -> "MySQLKit":
+    def disconnect(self):
         if self._connection is not None:
             self._connection.close()
         self._connection = None

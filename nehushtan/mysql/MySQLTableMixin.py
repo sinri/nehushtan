@@ -1,25 +1,18 @@
 #  Copyright (c) 2020. Sinri Edogawa
 
-import time
+
 from abc import ABC
+from typing import Tuple, Iterable
 
 import pymysql
 
+from mysql.MySQLViewMixin import MySQLViewMixin
 from nehushtan.mysql import constant
 from nehushtan.mysql.MySQLCondition import MySQLCondition
 from nehushtan.mysql.MySQLQueryResult import MySQLQueryResult
-from nehushtan.mysql.MySQLTableExistence import MySQLTableExistence
-from nehushtan.mysql.MySQLTableSelection import MySQLTableSelection
 
 
-class MySQLTableMixin(MySQLTableExistence, ABC):
-
-    @staticmethod
-    def now() -> str:
-        return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-
-    def select_in_table(self):
-        return MySQLTableSelection(model=self)
+class MySQLTableMixin(MySQLViewMixin, ABC):
 
     def insert_one_row(self, row_dict: dict, commit_immediately: bool = False):
         return self._write_one_row(row_dict, 'INSERT', commit_immediately)
@@ -39,21 +32,21 @@ class MySQLTableMixin(MySQLTableExistence, ABC):
 
         return self._modify_with_sql(sql, commit_immediately)
 
-    def insert_many_rows_with_dicts(self, row_dicts: tuple or list, commit_immediately: bool = False):
+    def insert_many_rows_with_dicts(self, row_dicts: Tuple[dict], commit_immediately: bool = False):
         return self._write_many_rows_with_dicts(
             row_dict_array=row_dicts,
             write_type='INSERT',
             commit_immediately=commit_immediately
         )
 
-    def replace_many_rows_with_dicts(self, row_dicts: tuple or list, commit_immediately: bool = False):
+    def replace_many_rows_with_dicts(self, row_dicts: Tuple[dict], commit_immediately: bool = False):
         return self._write_many_rows_with_dicts(
             row_dict_array=row_dicts,
             write_type='REPLACE',
             commit_immediately=commit_immediately
         )
 
-    def insert_many_rows_with_matrix(self, fields: tuple, row_matrix: tuple or list, commit_immediately: bool = False):
+    def insert_many_rows_with_matrix(self, fields: tuple, row_matrix: Tuple[tuple], commit_immediately: bool = False):
         return self._write_many_rows_with_matrix(
             fields=fields,
             row_matrix=row_matrix,
@@ -61,7 +54,7 @@ class MySQLTableMixin(MySQLTableExistence, ABC):
             commit_immediately=commit_immediately
         )
 
-    def replace_many_rows_with_matrix(self, fields: tuple, row_matrix: tuple or list, commit_immediately: bool = False):
+    def replace_many_rows_with_matrix(self, fields: tuple, row_matrix: Tuple[tuple], commit_immediately: bool = False):
         return self._write_many_rows_with_matrix(
             fields=fields,
             row_matrix=row_matrix,
@@ -71,7 +64,7 @@ class MySQLTableMixin(MySQLTableExistence, ABC):
 
     def _write_many_rows_with_dicts(
             self,
-            row_dict_array: (tuple or list),
+            row_dict_array: Tuple[dict],
             write_type: str,
             commit_immediately: bool = False
     ):
@@ -100,8 +93,8 @@ class MySQLTableMixin(MySQLTableExistence, ABC):
 
     def _write_many_rows_with_matrix(
             self,
-            fields: tuple,
-            row_matrix: (tuple or list),
+            fields: Tuple[str],
+            row_matrix: Tuple[tuple],
             write_type: str,
             commit_immediately: bool = False
     ):
@@ -146,7 +139,7 @@ class MySQLTableMixin(MySQLTableExistence, ABC):
                 cursor.close()
             return result
 
-    def update_rows(self, conditions: tuple or list, modifications: dict, commit_immediately: bool = False):
+    def update_rows(self, conditions: Iterable[MySQLCondition], modifications: dict, commit_immediately: bool = False):
         condition_sql = MySQLCondition.build_sql_component(conditions)
 
         modify_pairs = []
@@ -158,7 +151,7 @@ class MySQLTableMixin(MySQLTableExistence, ABC):
 
         return self._modify_with_sql(sql, commit_immediately)
 
-    def delete_rows(self, conditions: tuple or list, commit_immediately: bool = False):
+    def delete_rows(self, conditions: Iterable[MySQLCondition], commit_immediately: bool = False):
         condition_sql = MySQLCondition.build_sql_component(conditions)
 
         sql = f"DELETE FROM {self.get_table_expression()} WHERE {condition_sql}"
