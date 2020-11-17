@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from mail.SMTPAgent import SMTPAgent
+from nehushtan.mail.SMTPAgent import SMTPAgent
 from tests.config import SMTP_CONFIG
 
 now = datetime.now()

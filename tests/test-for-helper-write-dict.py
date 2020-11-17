@@ -1,4 +1,4 @@
-from helper.CommonHelper import CommonHelper
+from nehushtan.helper.CommonHelper import CommonHelper
 
 dictionary = {}
 

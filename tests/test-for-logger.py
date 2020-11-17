@@ -1,6 +1,6 @@
 import logging
 
-from logger.NehushtanLogger import NehushtanLogger
+from nehushtan.logger.NehushtanLogger import NehushtanLogger
 from tests.config import test_log_store
 
 shovel_logger = NehushtanLogger(

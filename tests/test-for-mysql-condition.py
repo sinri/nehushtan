@@ -1,7 +1,8 @@
-from mysql.MySQLCondition import MySQLCondition
+from nehushtan.mysql.MySQLCondition import MySQLCondition
 
 # Static Type Checking for Python, especially in PyCharm, is not so smart.
 # If you mix a correct one into list, even others are wrong, the whole is right.
+
 result = MySQLCondition.make_and(
     [
         2,
