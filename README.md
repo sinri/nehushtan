@@ -11,3 +11,4 @@ A toolkit for projects in Python
 * 0.1.2: First version on PYPI with MySQL Toolkit.
 * 0.1.3: Add CLI Helper, Logger, SMTP.
 * 0.1.4: Changed a lot for projects.
+* 0.1.5: Rename `NehushtanArgumentParser`. Revoke the declaration of source root to rebuild the import package.

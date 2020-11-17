@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='nehushtan',
-    version='0.1.4',
+    version='0.1.5',
     packages=find_packages(),
     url='https://github.com/sinri/nehushtan',
     license='MIT',

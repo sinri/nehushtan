@@ -138,14 +138,6 @@ class MySQLCondition:
     def __str__(self):
         return self.make_condition_sql()
 
-    def make_condition_sql(self) -> str:
-        """
-        Deprecated since 0.1.4
-        Use `organize_to_sql` instead
-        :return:
-        """
-        return self.organize_to_sql()
-
     def organize_to_sql(self) -> str:
         """
         Since 0.1.4

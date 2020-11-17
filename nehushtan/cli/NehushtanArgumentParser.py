@@ -1,7 +1,7 @@
 import re
 
 
-class NehushtanCLIHelper:
+class NehushtanArgumentParser:
     _sys_arg_list: list
     _argument_dict: dict
 

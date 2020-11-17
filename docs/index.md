@@ -2,4 +2,14 @@
 
 A set of Python Toolkits
 
-To be constructed...
+## CLI 
+
+Class `NehushtanArgumentParser` can parse command line arguments to dict.
+
+`python3 any.py -s a --long b --prefix-c d`
+
+would be finally parsed into 
+
+```
+{"s":"a","long":"b","prefix":{"c":"d"}}
+```

@@ -6,7 +6,7 @@ from typing import Tuple, Iterable
 
 import pymysql
 
-from mysql.MySQLViewMixin import MySQLViewMixin
+from nehushtan.mysql.MySQLViewMixin import MySQLViewMixin
 from nehushtan.mysql import constant
 from nehushtan.mysql.MySQLCondition import MySQLCondition
 from nehushtan.mysql.MySQLQueryResult import MySQLQueryResult

@@ -6,7 +6,7 @@ import pymysql
 from pymysql.connections import Connection
 from pymysql.cursors import DictCursor
 
-from mysql.MySQLKitConfig import MySQLKitConfig
+from nehushtan.mysql.MySQLKitConfig import MySQLKitConfig
 from nehushtan.mysql import constant
 
 

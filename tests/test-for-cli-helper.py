@@ -1,8 +1,8 @@
 import sys
 
-from cli.NehushtanCLIHelper import NehushtanCLIHelper
+from nehushtan.cli.NehushtanArgumentParser import NehushtanArgumentParser
 
-cli = NehushtanCLIHelper(sys.argv[1:]) \
+cli = NehushtanArgumentParser(sys.argv[1:]) \
     .add_option(key='Shovel Name', desc="The name of Shovel", short='s', long='shovel') \
     .add_option(key='Task ID', desc='The Task ID', short='t', long='task') \
     .add_option(key='Extra', desc='Extra Options', prefix='extra') \

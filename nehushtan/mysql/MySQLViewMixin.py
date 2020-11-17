@@ -1,7 +1,7 @@
 import time
 from abc import ABC
 
-from mysql.MySQLTableExistence import MySQLTableExistence
+from nehushtan.mysql.MySQLTableExistence import MySQLTableExistence
 from nehushtan.mysql.MySQLTableSelection import MySQLTableSelection
 
 
