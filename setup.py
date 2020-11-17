@@ -5,9 +5,9 @@ with open("README.md", "r") as fh:
 
 setup(
     name='nehushtan',
-    version='0.1.5',
+    version='0.1.6',
     packages=find_packages(),
-    url='https://github.com/sinri/nehushtan',
+    url='https://sinri.github.io/nehushtan/',
     license='MIT',
     author='Sinri Edogawa',
     author_email='e.joshua.s.e@gmail.com',
