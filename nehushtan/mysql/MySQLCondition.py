@@ -217,7 +217,7 @@ class MySQLCondition:
                 parts = []
                 for sub_condition in self._value:
                     if isinstance(sub_condition, MySQLCondition):
-                        parts.append(sub_condition.make_condition_sql())
+                        parts.append(sub_condition.organize_to_sql())
                     else:
                         raise Exception("NOT A MySQLCondition INSTANCE!")
                 if len(parts) <= 0:
@@ -245,7 +245,7 @@ class MySQLCondition:
         if isinstance(conditions, (tuple, list)):
             for condition in conditions:
                 if isinstance(condition, MySQLCondition):
-                    parts.append(condition.make_condition_sql())
+                    parts.append(condition.organize_to_sql())
         # if not follow the rule, just ignore
         if len(parts) <= 0:
             return "1=1"

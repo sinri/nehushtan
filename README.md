@@ -13,3 +13,4 @@ A toolkit for projects in Python
 * 0.1.4: Changed a lot for projects.
 * 0.1.5: Rename `NehushtanArgumentParser`. Revoke the declaration of source root to rebuild the import package.
 * 0.1.6: Fix packaging issue.
+* 0.1.7: Fix bug, `make_condition_sql` should be replaced.
