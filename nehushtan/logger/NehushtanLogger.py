@@ -103,48 +103,48 @@ class NehushtanLogger:
             "shovel_name": self.logger.name
         }
 
-    @staticmethod
-    def get_shovel_logger_for_runner(logger_name: str):
-        """
-        Just output to STDERR
-        :param logger_name:
-        :return:
-        """
-        return NehushtanLogger(
-            logger_name=logger_name,
-            handlers=[NehushtanLogger.make_stderr_handler()]
-        )
-
-    @staticmethod
-    def get_shovel_logger_for_job(logger_name: str):
-        """
-        Just output to STDOUT
-        :param logger_name:
-        :return:
-        """
-        return NehushtanLogger(
-            logger_name=logger_name,
-            handlers=[NehushtanLogger.make_stdout_handler()]
-        )
-
-    @staticmethod
-    def get_shovel_logger_for_detail(logger_name: str, file_name: str, backup_count=7, logger_level=logging.DEBUG):
-        """
-        Just output to a rotating file
-        :param logger_name:
-        :param file_name:
-        :param backup_count:
-        :param logger_level:
-        :return:
-        """
-        return NehushtanLogger(
-            logger_name=logger_name,
-            handlers=[
-                NehushtanLogger.make_timed_rotating_file_handler(
-                    file_name=file_name, backup_count=backup_count, logger_level=logger_level
-                )
-            ]
-        )
+    # @staticmethod
+    # def get_shovel_logger_for_runner(logger_name: str):
+    #     """
+    #     Just output to STDERR
+    #     :param logger_name:
+    #     :return:
+    #     """
+    #     return NehushtanLogger(
+    #         logger_name=logger_name,
+    #         handlers=[NehushtanLogger.make_stderr_handler()]
+    #     )
+    #
+    # @staticmethod
+    # def get_shovel_logger_for_job(logger_name: str):
+    #     """
+    #     Just output to STDOUT
+    #     :param logger_name:
+    #     :return:
+    #     """
+    #     return NehushtanLogger(
+    #         logger_name=logger_name,
+    #         handlers=[NehushtanLogger.make_stdout_handler()]
+    #     )
+    #
+    # @staticmethod
+    # def get_shovel_logger_for_detail(logger_name: str, file_name: str, backup_count=7, logger_level=logging.DEBUG):
+    #     """
+    #     Just output to a rotating file
+    #     :param logger_name:
+    #     :param file_name:
+    #     :param backup_count:
+    #     :param logger_level:
+    #     :return:
+    #     """
+    #     return NehushtanLogger(
+    #         logger_name=logger_name,
+    #         handlers=[
+    #             NehushtanLogger.make_timed_rotating_file_handler(
+    #                 file_name=file_name, backup_count=backup_count, logger_level=logger_level
+    #             )
+    #         ]
+    #     )
 
     @staticmethod
     def get_silent_logger(logger_name: str):

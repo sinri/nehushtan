@@ -14,3 +14,4 @@ A toolkit for projects in Python
 * 0.1.5: Rename `NehushtanArgumentParser`. Revoke the declaration of source root to rebuild the import package.
 * 0.1.6: Fix packaging issue.
 * 0.1.7: Fix bug, `make_condition_sql` should be replaced.
+* 0.1.8: Remove shovel related static maker methods from logger class.
