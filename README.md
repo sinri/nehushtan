@@ -18,8 +18,10 @@ A toolkit for projects in Python
 * 0.1.7: Fix bug, `make_condition_sql` should be replaced.
 * 0.1.8: Remove shovel related static maker methods from logger class. Fix MySQL Toolkit Bug.
 * 0.1.9: Fix loose throw policy in condition sql making. That has been proved very dangerous.
+* 0.1.10: Support MySQL Deep Functions for one table, such as
+    [INSERT ... ON DUPLICATE KEY UPDATE Statement](https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html), 
+    etc.
 
 ## Developing
 
-* 0.1.10: 
-    Support MySQL [INSERT ... ON DUPLICATE KEY UPDATE Statement](https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html);
+* 0.1.11: Pending

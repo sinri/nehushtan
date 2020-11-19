@@ -14,9 +14,14 @@ from nehushtan.mysql.MySQLViewMixin import MySQLViewMixin
 
 class MySQLTableMixin(MySQLViewMixin, ABC):
 
-    def insert_one_row(self, row_dict: dict, commit_immediately: bool = False,
-                       on_duplicate_key_update_rows: dict = None):
-        return self._write_one_row(row_dict, 'INSERT', commit_immediately, on_duplicate_key_update_rows)
+    def insert_one_row(
+            self,
+            row_dict: dict,
+            commit_immediately: bool = False,
+            on_duplicate_key_update_rows: dict = None,
+            with_ignore: bool = False
+    ):
+        return self._write_one_row(row_dict, 'INSERT', commit_immediately, on_duplicate_key_update_rows, with_ignore)
 
     def replace_one_row(self, row_dict: dict, commit_immediately: bool = False):
         return self._write_one_row(row_dict, 'REPLACE', commit_immediately)
@@ -34,7 +39,8 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
             row_dict: dict,
             write_type: str,
             commit_immediately: bool = False,
-            on_duplicate_key_update_rows: dict = None
+            on_duplicate_key_update_rows: dict = None,
+            with_ignore: bool = False
     ):
         fields = []
         values = []
@@ -43,7 +49,10 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
             values.append(self.get_mysql_kit().quote(v))
         fields = ",".join(fields)
         values = ",".join(values)
-        sql = f"{write_type} INTO {self.get_table_expression()} ({fields}) VALUES ({values})"
+        ignore = ''
+        if with_ignore:
+            ignore = ' IGNORE'
+        sql = f"{write_type}{ignore} INTO {self.get_table_expression()} ({fields}) VALUES ({values})"
 
         if type(on_duplicate_key_update_rows) is dict:
             sql_parts = self._build_on_duplicate_key_update_sql(on_duplicate_key_update_rows)
@@ -55,13 +64,15 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
             self,
             row_dicts: List[dict],
             commit_immediately: bool = False,
-            on_duplicate_key_update_rows: dict = None
+            on_duplicate_key_update_rows: dict = None,
+            with_ignore: bool = False
     ):
         return self._write_many_rows_with_dicts(
             row_dict_array=row_dicts,
             write_type='INSERT',
             commit_immediately=commit_immediately,
-            on_duplicate_key_update_rows=on_duplicate_key_update_rows
+            on_duplicate_key_update_rows=on_duplicate_key_update_rows,
+            with_ignore=with_ignore
         )
 
     def replace_many_rows_with_dicts(self, row_dicts: List[dict], commit_immediately: bool = False):
@@ -76,14 +87,16 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
             fields: Iterable[str],
             row_matrix: Iterable[Iterable],
             commit_immediately: bool = False,
-            on_duplicate_key_update_rows: dict = None
+            on_duplicate_key_update_rows: dict = None,
+            with_ignore: bool = False
     ):
         return self._write_many_rows_with_matrix(
             fields=fields,
             row_matrix=row_matrix,
             write_type='INSERT',
             commit_immediately=commit_immediately,
-            on_duplicate_key_update_rows=on_duplicate_key_update_rows
+            on_duplicate_key_update_rows=on_duplicate_key_update_rows,
+            with_ignore=with_ignore
         )
 
     def replace_many_rows_with_matrix(
@@ -104,7 +117,8 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
             row_dict_array: List[dict],
             write_type: str,
             commit_immediately: bool = False,
-            on_duplicate_key_update_rows: dict = None
+            on_duplicate_key_update_rows: dict = None,
+            with_ignore: bool = False
     ):
         if len(row_dict_array) <= 0:
             return MySQLQueryResult.create_error_result('Rows Empty')
@@ -125,7 +139,11 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
             row_sql.append(f'({values})')
         row_sql = ",".join(row_sql)
 
-        sql = f"{write_type} INTO {self.get_table_expression()} ({fields}) VALUES {row_sql}"
+        ignore = ''
+        if with_ignore:
+            ignore = ' IGNORE'
+
+        sql = f"{write_type}{ignore} INTO {self.get_table_expression()} ({fields}) VALUES {row_sql}"
 
         if type(on_duplicate_key_update_rows) is dict:
             sql_parts = self._build_on_duplicate_key_update_sql(on_duplicate_key_update_rows)
@@ -139,7 +157,8 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
             row_matrix: Iterable[Iterable],
             write_type: str,
             commit_immediately: bool = False,
-            on_duplicate_key_update_rows: dict = None
+            on_duplicate_key_update_rows: dict = None,
+            with_ignore: bool = False
     ):
         fields_sql = ",".join(fields)
         row_sql = []
@@ -151,7 +170,48 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
             row_sql.append(f'({values})')
         row_sql = ",".join(row_sql)
 
-        sql = f"{write_type} INTO {self.get_table_expression()} ({fields_sql}) VALUES {row_sql}"
+        ignore = ''
+        if with_ignore:
+            ignore = ' IGNORE'
+
+        sql = f"{write_type}{ignore} INTO {self.get_table_expression()} ({fields_sql}) VALUES {row_sql}"
+
+        if type(on_duplicate_key_update_rows) is dict:
+            sql_parts = self._build_on_duplicate_key_update_sql(on_duplicate_key_update_rows)
+            sql = f'{sql} {sql_parts}'
+
+        return self._modify_with_sql(sql, commit_immediately)
+
+    def write_rows_with_raw_selection_sql(
+            self,
+            write_type: str,
+            fields: Iterable[str],
+            selection_sql: str,
+            with_ignore: bool = False,
+            on_duplicate_key_update_rows: dict = None,
+            commit_immediately: bool = False
+    ):
+        """
+        < Experimental Method, Since 0.1.10>
+        It is a low level method for
+        [INSERT ... SELECT Statement](https://dev.mysql.com/doc/refman/8.0/en/insert-select.html)
+        and [REPLACE Statement](https://dev.mysql.com/doc/refman/8.0/en/replace.html)
+        Be Careful when use this.
+        :param write_type: INSERT or REPLACE
+        :param fields:
+        :param selection_sql: 'SELECT ...' If select from one table, you may use MySQLTableSelection::generate_sql()
+        :param with_ignore:
+        :param on_duplicate_key_update_rows:
+        :param commit_immediately:
+        :return:
+        """
+        ignore = ''
+        if with_ignore:
+            ignore = ' IGNORE'
+
+        fields_sql = ",".join(fields)
+
+        sql = f"{write_type}{ignore} INTO {self.get_table_expression()} ({fields_sql}) {selection_sql}"
 
         if type(on_duplicate_key_update_rows) is dict:
             sql_parts = self._build_on_duplicate_key_update_sql(on_duplicate_key_update_rows)
@@ -186,7 +246,25 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
                 cursor.close()
             return result
 
-    def update_rows(self, conditions: Iterable[MySQLCondition], modifications: dict, commit_immediately: bool = False):
+    def update_rows(
+            self,
+            conditions: Iterable[MySQLCondition],
+            modifications: dict,
+            commit_immediately: bool = False,
+            with_ignore: bool = False,
+            sort_expression: str = '',
+            limit: int = 0
+    ):
+        """
+        [UPDATE Statement](https://dev.mysql.com/doc/refman/8.0/en/update.html)
+        :param conditions:
+        :param modifications:
+        :param commit_immediately:
+        :param with_ignore:
+        :param sort_expression:
+        :param limit:
+        :return:
+        """
         condition_sql = MySQLCondition.build_sql_component(conditions)
 
         modify_pairs = []
@@ -194,13 +272,49 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
             modify_pairs.append(f'`{k}`=' + self.get_mysql_kit().quote(v))
         modify_pairs = ",".join(modify_pairs)
 
-        sql = f"UPDATE {self.get_table_expression()} SET {modify_pairs} WHERE {condition_sql}"
+        ignore = ''
+        if with_ignore:
+            ignore = ' IGNORE'
+
+        sql = f"UPDATE{ignore} {self.get_table_expression()} SET {modify_pairs} WHERE {condition_sql}"
+
+        if len(sort_expression) > 0:
+            sql = f"{sql} ORDER BY {sort_expression}"
+
+        if limit > 0:
+            sql = f"{sql} LIMIT {limit}"
 
         return self._modify_with_sql(sql, commit_immediately)
 
-    def delete_rows(self, conditions: Iterable[MySQLCondition], commit_immediately: bool = False):
+    def delete_rows(
+            self,
+            conditions: Iterable[MySQLCondition],
+            commit_immediately: bool = False,
+            with_ignore: bool = False,
+            sort_expression: str = '',
+            limit: int = 0
+    ):
+        """
+        [DELETE Statement](https://dev.mysql.com/doc/refman/8.0/en/delete.html)
+        :param conditions:
+        :param commit_immediately:
+        :param with_ignore:
+        :param sort_expression:
+        :param limit:
+        :return:
+        """
         condition_sql = MySQLCondition.build_sql_component(conditions)
 
-        sql = f"DELETE FROM {self.get_table_expression()} WHERE {condition_sql}"
+        ignore = ''
+        if with_ignore:
+            ignore = ' IGNORE'
+
+        sql = f"DELETE{ignore} FROM {self.get_table_expression()} WHERE {condition_sql}"
+
+        if len(sort_expression) > 0:
+            sql = f"{sql} ORDER BY {sort_expression}"
+
+        if limit > 0:
+            sql = f"{sql} LIMIT {limit}"
 
         return self._modify_with_sql(sql, commit_immediately)
