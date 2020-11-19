@@ -6,8 +6,8 @@ import pymysql
 from pymysql.connections import Connection
 from pymysql.cursors import DictCursor
 
-from nehushtan.mysql.MySQLKitConfig import MySQLKitConfig
 from nehushtan.mysql import constant
+from nehushtan.mysql.MySQLKitConfig import MySQLKitConfig
 
 
 class MySQLKit:
@@ -227,7 +227,8 @@ class MySQLKit:
                 x.append(self.quote(item))
             return tuple(x)
         elif type(value) == int or type(value) == float:
-            return value
+            # Fixed in 0.1.8: if number is returned, the str plus would fail
+            return f"{value}"
         elif value is None:
             return constant.MYSQL_CONDITION_CONST_NULL
         elif value is True:

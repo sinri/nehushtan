@@ -2,14 +2,14 @@
 
 
 from abc import ABC
-from typing import Tuple, Iterable
+from typing import Iterable, List
 
 import pymysql
 
-from nehushtan.mysql.MySQLViewMixin import MySQLViewMixin
 from nehushtan.mysql import constant
 from nehushtan.mysql.MySQLCondition import MySQLCondition
 from nehushtan.mysql.MySQLQueryResult import MySQLQueryResult
+from nehushtan.mysql.MySQLViewMixin import MySQLViewMixin
 
 
 class MySQLTableMixin(MySQLViewMixin, ABC):
@@ -32,21 +32,26 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
 
         return self._modify_with_sql(sql, commit_immediately)
 
-    def insert_many_rows_with_dicts(self, row_dicts: Tuple[dict], commit_immediately: bool = False):
+    def insert_many_rows_with_dicts(self, row_dicts: List[dict], commit_immediately: bool = False):
         return self._write_many_rows_with_dicts(
             row_dict_array=row_dicts,
             write_type='INSERT',
             commit_immediately=commit_immediately
         )
 
-    def replace_many_rows_with_dicts(self, row_dicts: Tuple[dict], commit_immediately: bool = False):
+    def replace_many_rows_with_dicts(self, row_dicts: List[dict], commit_immediately: bool = False):
         return self._write_many_rows_with_dicts(
             row_dict_array=row_dicts,
             write_type='REPLACE',
             commit_immediately=commit_immediately
         )
 
-    def insert_many_rows_with_matrix(self, fields: tuple, row_matrix: Tuple[tuple], commit_immediately: bool = False):
+    def insert_many_rows_with_matrix(
+            self,
+            fields: Iterable[str],
+            row_matrix: Iterable[Iterable],
+            commit_immediately: bool = False
+    ):
         return self._write_many_rows_with_matrix(
             fields=fields,
             row_matrix=row_matrix,
@@ -54,7 +59,12 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
             commit_immediately=commit_immediately
         )
 
-    def replace_many_rows_with_matrix(self, fields: tuple, row_matrix: Tuple[tuple], commit_immediately: bool = False):
+    def replace_many_rows_with_matrix(
+            self,
+            fields: Iterable[str],
+            row_matrix: Iterable[Iterable],
+            commit_immediately: bool = False
+    ):
         return self._write_many_rows_with_matrix(
             fields=fields,
             row_matrix=row_matrix,
@@ -64,7 +74,7 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
 
     def _write_many_rows_with_dicts(
             self,
-            row_dict_array: Tuple[dict],
+            row_dict_array: List[dict],
             write_type: str,
             commit_immediately: bool = False
     ):
@@ -93,8 +103,8 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
 
     def _write_many_rows_with_matrix(
             self,
-            fields: Tuple[str],
-            row_matrix: Tuple[tuple],
+            fields: Iterable[str],
+            row_matrix: Iterable[Iterable],
             write_type: str,
             commit_immediately: bool = False
     ):
