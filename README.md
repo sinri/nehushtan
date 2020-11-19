@@ -15,3 +15,4 @@ A toolkit for projects in Python
 * 0.1.6: Fix packaging issue.
 * 0.1.7: Fix bug, `make_condition_sql` should be replaced.
 * 0.1.8: Remove shovel related static maker methods from logger class. Fix MySQL Toolkit Bug.
+* 0.1.9: Fix loose throw policy in condition sql making. That has been proved very dangerous.

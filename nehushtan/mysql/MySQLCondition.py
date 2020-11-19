@@ -242,10 +242,12 @@ class MySQLCondition:
     @staticmethod
     def build_sql_component(conditions: Iterable["MySQLCondition"]):
         parts = []
-        if isinstance(conditions, (tuple, list)):
-            for condition in conditions:
-                if isinstance(condition, MySQLCondition):
-                    parts.append(condition.organize_to_sql())
+        # Fixed in 0.1.9: If conditions have type error... RAISE!
+        # The fucking Python design and PyCharm cannot deal with such check.
+        for condition in conditions:
+            if not isinstance(condition, MySQLCondition):
+                raise TypeError("You must give an instance of MySQLCondition here!")
+            parts.append(condition.organize_to_sql())
         # if not follow the rule, just ignore
         if len(parts) <= 0:
             return "1=1"
