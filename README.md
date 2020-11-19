@@ -8,6 +8,8 @@ A toolkit for projects in Python
 
 # History in Brief
 
+## Released
+
 * 0.1.2: First version on PYPI with MySQL Toolkit.
 * 0.1.3: Add CLI Helper, Logger, SMTP.
 * 0.1.4: Changed a lot for projects.
@@ -16,3 +18,8 @@ A toolkit for projects in Python
 * 0.1.7: Fix bug, `make_condition_sql` should be replaced.
 * 0.1.8: Remove shovel related static maker methods from logger class. Fix MySQL Toolkit Bug.
 * 0.1.9: Fix loose throw policy in condition sql making. That has been proved very dangerous.
+
+## Developing
+
+* 0.1.10: 
+    Support MySQL [INSERT ... ON DUPLICATE KEY UPDATE Statement](https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html);

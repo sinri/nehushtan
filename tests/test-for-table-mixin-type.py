@@ -17,11 +17,11 @@ print(result.get_status(), result.get_error(), result.get_sql())
 
 dicts = [{'id': 2, 'data': '55'}, {'id': 4, 'data': 3.3}]
 
-result = table.replace_many_rows_with_dicts(dicts)
+result = table.insert_many_rows_with_dicts(dicts, on_duplicate_key_update_rows={'data': 'data+1'})
 print(result.get_status(), result.get_error(), result.get_sql())
 
-result = table.update_rows(conditions=[MySQLCondition.make_equal('id', 3), 3], modifications={"data": 4})
-print(result.get_status(), result.get_error(), result.get_sql())
-
-result = table.update_rows(conditions=MySQLCondition.make_equal('id', 3), modifications={"data": 4})
-print(result.get_status(), result.get_error(), result.get_sql())
+# result = table.update_rows(conditions=[MySQLCondition.make_equal('id', 3), 3], modifications={"data": 4})
+# print(result.get_status(), result.get_error(), result.get_sql())
+#
+# result = table.update_rows(conditions=MySQLCondition.make_equal('id', 3), modifications={"data": 4})
+# print(result.get_status(), result.get_error(), result.get_sql())

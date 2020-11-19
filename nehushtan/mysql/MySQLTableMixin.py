@@ -14,13 +14,28 @@ from nehushtan.mysql.MySQLViewMixin import MySQLViewMixin
 
 class MySQLTableMixin(MySQLViewMixin, ABC):
 
-    def insert_one_row(self, row_dict: dict, commit_immediately: bool = False):
-        return self._write_one_row(row_dict, 'INSERT', commit_immediately)
+    def insert_one_row(self, row_dict: dict, commit_immediately: bool = False,
+                       on_duplicate_key_update_rows: dict = None):
+        return self._write_one_row(row_dict, 'INSERT', commit_immediately, on_duplicate_key_update_rows)
 
     def replace_one_row(self, row_dict: dict, commit_immediately: bool = False):
         return self._write_one_row(row_dict, 'REPLACE', commit_immediately)
 
-    def _write_one_row(self, row_dict: dict, write_type: str, commit_immediately: bool = False):
+    @staticmethod
+    def _build_on_duplicate_key_update_sql(on_duplicate_key_update_rows: dict):
+        sql_parts = []
+        for field, value in on_duplicate_key_update_rows.items():
+            sql_parts.append(f'{field}={value}')
+        sql_parts = ", ".join(sql_parts)
+        return f'ON DUPLICATE KEY UPDATE {sql_parts}'
+
+    def _write_one_row(
+            self,
+            row_dict: dict,
+            write_type: str,
+            commit_immediately: bool = False,
+            on_duplicate_key_update_rows: dict = None
+    ):
         fields = []
         values = []
         for k, v in row_dict.items():
@@ -30,13 +45,23 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
         values = ",".join(values)
         sql = f"{write_type} INTO {self.get_table_expression()} ({fields}) VALUES ({values})"
 
+        if type(on_duplicate_key_update_rows) is dict:
+            sql_parts = self._build_on_duplicate_key_update_sql(on_duplicate_key_update_rows)
+            sql = f'{sql} {sql_parts}'
+
         return self._modify_with_sql(sql, commit_immediately)
 
-    def insert_many_rows_with_dicts(self, row_dicts: List[dict], commit_immediately: bool = False):
+    def insert_many_rows_with_dicts(
+            self,
+            row_dicts: List[dict],
+            commit_immediately: bool = False,
+            on_duplicate_key_update_rows: dict = None
+    ):
         return self._write_many_rows_with_dicts(
             row_dict_array=row_dicts,
             write_type='INSERT',
-            commit_immediately=commit_immediately
+            commit_immediately=commit_immediately,
+            on_duplicate_key_update_rows=on_duplicate_key_update_rows
         )
 
     def replace_many_rows_with_dicts(self, row_dicts: List[dict], commit_immediately: bool = False):
@@ -50,13 +75,15 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
             self,
             fields: Iterable[str],
             row_matrix: Iterable[Iterable],
-            commit_immediately: bool = False
+            commit_immediately: bool = False,
+            on_duplicate_key_update_rows: dict = None
     ):
         return self._write_many_rows_with_matrix(
             fields=fields,
             row_matrix=row_matrix,
             write_type='INSERT',
-            commit_immediately=commit_immediately
+            commit_immediately=commit_immediately,
+            on_duplicate_key_update_rows=on_duplicate_key_update_rows
         )
 
     def replace_many_rows_with_matrix(
@@ -76,7 +103,8 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
             self,
             row_dict_array: List[dict],
             write_type: str,
-            commit_immediately: bool = False
+            commit_immediately: bool = False,
+            on_duplicate_key_update_rows: dict = None
     ):
         if len(row_dict_array) <= 0:
             return MySQLQueryResult.create_error_result('Rows Empty')
@@ -99,6 +127,10 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
 
         sql = f"{write_type} INTO {self.get_table_expression()} ({fields}) VALUES {row_sql}"
 
+        if type(on_duplicate_key_update_rows) is dict:
+            sql_parts = self._build_on_duplicate_key_update_sql(on_duplicate_key_update_rows)
+            sql = f'{sql} {sql_parts}'
+
         return self._modify_with_sql(sql, commit_immediately)
 
     def _write_many_rows_with_matrix(
@@ -106,7 +138,8 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
             fields: Iterable[str],
             row_matrix: Iterable[Iterable],
             write_type: str,
-            commit_immediately: bool = False
+            commit_immediately: bool = False,
+            on_duplicate_key_update_rows: dict = None
     ):
         fields_sql = ",".join(fields)
         row_sql = []
@@ -119,6 +152,10 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
         row_sql = ",".join(row_sql)
 
         sql = f"{write_type} INTO {self.get_table_expression()} ({fields_sql}) VALUES {row_sql}"
+
+        if type(on_duplicate_key_update_rows) is dict:
+            sql_parts = self._build_on_duplicate_key_update_sql(on_duplicate_key_update_rows)
+            sql = f'{sql} {sql_parts}'
 
         return self._modify_with_sql(sql, commit_immediately)
 
