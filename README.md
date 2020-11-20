@@ -21,10 +21,11 @@ A toolkit for projects in Python
 * 0.1.10: Support MySQL Deep Functions for one table, such as
     [INSERT ... ON DUPLICATE KEY UPDATE Statement](https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html), 
     etc.
+* 0.1.11: Remove declarations of the class variables which would be initialized with instances.
 
 ### Developing
 
-* 0.1.11: Remove declarations of the class variables which would be initialized with instances.
+* 0.1.12: pending
 
 ## Notice
 
