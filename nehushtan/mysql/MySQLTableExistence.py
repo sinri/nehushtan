@@ -23,9 +23,9 @@ class MySQLTableExistence(ABC):
     def mapping_table_name(self) -> str:
         pass
 
-    # noinspection PyMethodMayBeStatic
+    @abstractmethod
     def mapping_schema_name(self) -> str:
-        return ''
+        pass
 
     def get_table_expression(self) -> str:
         e = ''

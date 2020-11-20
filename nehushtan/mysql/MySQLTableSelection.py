@@ -150,7 +150,7 @@ class MySQLTableSelection:
         if self._limit > 0:
             sql += f"LIMIT {self._limit} "
             if self._offset > 0:
-                sql += f"OFFSET {self._offset}"
+                sql += f"OFFSET {self._offset} "
 
         if self._for_update:
             sql += " FOR UPDATE "

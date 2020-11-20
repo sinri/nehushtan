@@ -25,7 +25,7 @@ A toolkit for projects in Python
 
 ### Developing
 
-* 0.1.12: pending
+* 0.1.12: Raise Exception when tries to get result from MySQLQueryResult but actually not generated yet [GitHub Issue #1](https://github.com/sinri/nehushtan/issues/1)
 
 ## Notice
 

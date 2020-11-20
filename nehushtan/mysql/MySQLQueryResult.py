@@ -1,4 +1,6 @@
 #  Copyright (c) 2020. Sinri Edogawa
+import warnings
+from typing import Iterable
 
 from pymysql.cursors import Cursor
 
@@ -19,7 +21,7 @@ class MySQLQueryResult:
     def __init__(self):
         self._sql = ''
         self._status = constant.MYSQL_QUERY_STATUS_INIT
-        self._error = ''
+        self._error = 'Not executed yet!'
 
         self._last_inserted_id = -1
         self._affected_rows = -1
@@ -77,7 +79,7 @@ class MySQLQueryResult:
         self._error = error
         return self
 
-    def append_result_rows(self, rows: (tuple or list)):
+    def append_result_rows(self, rows: Iterable):
         """
 
         :param rows: Array (list ot tuple) of result rows, each row would be a dict or tuple
@@ -109,9 +111,14 @@ class MySQLQueryResult:
         return row
 
     def get_result(self):
+        warnings.warn('Deprecated since 0.1.12. Use `get_fetched_rows_as_tuple` instead.', DeprecationWarning)
+        if self._status != constant.MYSQL_QUERY_STATUS_QUERIED:
+            raise Exception('Cannot fetch query result as status is not QUERIED.')
         return self._result_rows
 
     def get_fetched_rows_as_tuple(self):
+        if self._status != constant.MYSQL_QUERY_STATUS_QUERIED:
+            raise Exception('Cannot fetch query result as status is not QUERIED.')
         return tuple(self._result_rows)
 
     @staticmethod
