@@ -7,20 +7,21 @@ from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import parseaddr, formataddr
+import warnings
 from typing import Iterable
 
 
 class SMTPAgent:
-    __smtp_server: str
-    __smtp_port: int
-
-    __password: str
-
-    _sender: str
-    _receivers: Iterable[str]
-    _subject: str
-    _content: str
-    _attachments: Iterable[str]
+    # __smtp_server: str
+    # __smtp_port: int
+    #
+    # __password: str
+    #
+    # _sender: str
+    # _receivers: Iterable[str]
+    # _subject: str
+    # _content: str
+    # _attachments: Iterable[str]
 
     def __init__(self, sender: str, password: str, smtp_server: str, smtp_port: int):
         self.__smtp_server = smtp_server
@@ -34,7 +35,21 @@ class SMTPAgent:
         self._attachments = []
 
     def set_receivers(self, receivers: Iterable[str]):
-        self._receivers = receivers
+        warnings.warn("Deprecated since 0.1.11. Use `reset_receivers` or `add-` methods instead!", DeprecationWarning)
+        return self.reset_receivers(receivers)
+
+    def reset_receivers(self, receivers: Iterable[str]):
+        self._receivers = []
+        self.add_receivers(receivers)
+        return self
+
+    def add_receivers(self, receivers: Iterable[str]):
+        for receiver in receivers:
+            self.add_receiver(receiver)
+        return self
+
+    def add_receiver(self, receiver: str):
+        self._receivers.append(receiver)
         return self
 
     def set_subject(self, subject: str):
@@ -46,7 +61,21 @@ class SMTPAgent:
         return self
 
     def set_attachments(self, attachments: Iterable[str]):
-        self._attachments = attachments
+        warnings.warn("Deprecated since 0.1.11. Use `reset_attachments` or `add-` methods instead!", DeprecationWarning)
+        return self.reset_attachments(attachments)
+
+    def reset_attachments(self, attachments: Iterable[str]):
+        self._attachments = []
+        self.add_attachments(attachments)
+        return self
+
+    def add_attachment(self, attachment_file_path: str):
+        self._attachments.append(attachment_file_path)
+        return self
+
+    def add_attachments(self, attachment_file_path_array: Iterable[str]):
+        for attachment_file_path in attachment_file_path_array:
+            self.add_attachment(attachment_file_path)
         return self
 
     @staticmethod

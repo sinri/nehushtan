@@ -6,9 +6,9 @@ from nehushtan.mysql.MySQLKit import MySQLKit
 
 
 class MySQLCondition:
-    _operate: str
-    _field: str
-    _value: any
+    # _operate: str
+    # _field: str
+    # _value: any
 
     def __init__(self, field: str, operate: str, value: any, addition: any = None):
         self._field = field

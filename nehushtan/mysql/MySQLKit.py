@@ -16,9 +16,9 @@ class MySQLKit:
     Shovel 项目相关的所有 MySQL 连接应当使用此方法进行。
     """
 
-    _mysql_config: MySQLKitConfig
-    _auto_commit_default: bool
-    _connection: Connection or None
+    # _mysql_config: MySQLKitConfig
+    # _auto_commit_default: bool
+    # _connection: Connection or None
 
     def __init__(self, mysql_config: MySQLKitConfig = None):
         """
@@ -52,6 +52,8 @@ class MySQLKit:
         """
         :return: 封装的 PYMYSQL 原生 CONNECTION 实例
         """
+        if self._connection is None:
+            raise RuntimeError("Connection Property of MySQLKit Instance is not set.")
         return self._connection
 
     def connect(self):

@@ -6,9 +6,9 @@ A toolkit for projects in Python
 
 > ipse dissipavit excelsa et contrivit statuas et succidit lucos confregitque serpentem aeneum quem fecerat Moses siquidem usque ad illud tempus filii Israhel adolebant ei incensum vocavitque eum Naasthan
 
-# History in Brief
+## History in Brief
 
-## Released
+### Released
 
 * 0.1.2: First version on PYPI with MySQL Toolkit.
 * 0.1.3: Add CLI Helper, Logger, SMTP.
@@ -22,6 +22,11 @@ A toolkit for projects in Python
     [INSERT ... ON DUPLICATE KEY UPDATE Statement](https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html), 
     etc.
 
-## Developing
+### Developing
 
-* 0.1.11: Pending
+* 0.1.11: Remove declarations of the class variables which would be initialized with instances.
+
+## Notice
+
+* [Pythonのクラスの変数に潜む地雷](https://qiita.com/sinri/items/368a489412c78cb9d4e3)
+    > Python的class变量声明也不是不能当动态变量用，安全起见一定要在初始化的时候彻底初始化一下，避免id固化。

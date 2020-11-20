@@ -6,9 +6,9 @@ from nehushtan.mysql import constant
 
 
 class MySQLQueryResult:
-    _sql: str
-    _status: str
-    _error: str
+    # _sql: str
+    # _status: str
+    # _error: str
 
     # The beneath properties would be initialized for each instance when needed
     # _last_inserted_id: int

@@ -11,17 +11,17 @@ from nehushtan.mysql.MySQLTableExistence import MySQLTableExistence
 
 
 class MySQLTableSelection:
-    _model: MySQLTableExistence
-    _select_fields: list
-    _conditions: list
-    _group_by_fields: list
-    _sort_expression: str
-    _limit: int
-    _offset: int
-    _use_indices: list
-    _force_indices: list
-    _ignore_indices: list
-    _for_update: bool
+    # _model: MySQLTableExistence
+    # _select_fields: list
+    # _conditions: list
+    # _group_by_fields: list
+    # _sort_expression: str
+    # _limit: int
+    # _offset: int
+    # _use_indices: list
+    # _force_indices: list
+    # _ignore_indices: list
+    # _for_update: bool
 
     def __init__(self, model: MySQLTableExistence):
         self._model = model

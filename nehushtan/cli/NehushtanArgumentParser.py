@@ -2,15 +2,6 @@ import re
 
 
 class NehushtanArgumentParser:
-    _sys_arg_list: list
-    _argument_dict: dict
-
-    _options_short: dict
-    _options_long: dict
-    _options_prefix: dict
-
-    _result_dict: dict
-    _usage_dict: dict
 
     def __init__(self, sys_arg_list: list):
         """
