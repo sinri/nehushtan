@@ -4,6 +4,7 @@ import json
 import logging
 import logging.handlers
 import sys
+from typing import Iterable
 
 
 class NehushtanLogger:
@@ -11,7 +12,7 @@ class NehushtanLogger:
     A Logger Class For Shovel
     """
 
-    def __init__(self, logger_name: str, handlers=(), universal_log_level=logging.DEBUG):
+    def __init__(self, logger_name: str, handlers: Iterable[logging.Handler], universal_log_level=logging.DEBUG):
         self.logger = logging.getLogger(logger_name)
         self.logger.setLevel(universal_log_level)
         for handler in handlers:
