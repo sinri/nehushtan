@@ -27,10 +27,13 @@ A toolkit for projects in Python
     [INSERT ... ON DUPLICATE KEY UPDATE Statement](https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html), 
     etc.
 * 0.1.11: Remove declarations of the class variables which would be initialized with instances.
+* 0.1.12: MySQL Package Refines. 
+    1. Raise Exception when tries to get result from MySQLQueryResult but actually not generated yet [GitHub Issue #1](https://github.com/sinri/nehushtan/issues/1)
+    2. Add Grave sign to writer methods in `MySQLTableMixin`. (Reported by Leqee Staff) 
 
 ### Developing
 
-* 0.1.12: Raise Exception when tries to get result from MySQLQueryResult but actually not generated yet [GitHub Issue #1](https://github.com/sinri/nehushtan/issues/1)
+* 0.1.13 Pending
 
 ## Notice
 

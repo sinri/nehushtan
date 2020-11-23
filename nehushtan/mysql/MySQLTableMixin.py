@@ -45,7 +45,7 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
         fields = []
         values = []
         for k, v in row_dict.items():
-            fields.append(k)
+            fields.append('`' + k + '`')
             values.append(self.get_mysql_kit().quote(v))
         fields = ",".join(fields)
         values = ",".join(values)
@@ -127,7 +127,7 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
 
         fields = []
         for k, v in sample_row.items():
-            fields.append(k)
+            fields.append(f'`{k}`')
         fields = ",".join(fields)
 
         row_sql = []
@@ -160,7 +160,7 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
             on_duplicate_key_update_rows: dict = None,
             with_ignore: bool = False
     ):
-        fields_sql = ",".join(fields)
+        fields_sql = ",".join([f"`{x}`" for x in fields])
         row_sql = []
         for row in row_matrix:
             values = []
@@ -209,7 +209,7 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
         if with_ignore:
             ignore = ' IGNORE'
 
-        fields_sql = ",".join(fields)
+        fields_sql = ",".join([f'`{x}`' for x in fields])
 
         sql = f"{write_type}{ignore} INTO {self.get_table_expression()} ({fields_sql}) {selection_sql}"
 
