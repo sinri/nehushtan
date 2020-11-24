@@ -20,3 +20,5 @@ See [Nehushtan Logger Package](./logger).
 ## MySQL
 
 See [Nehushtan MySQL Package](./mysql).
+
+## [About the Naming](./naming)
