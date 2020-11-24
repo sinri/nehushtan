@@ -4,6 +4,7 @@ import json
 import logging
 import logging.handlers
 import sys
+# import threading
 from typing import Iterable
 
 
@@ -12,12 +13,30 @@ class NehushtanLogger:
     A Logger Class For Shovel
     """
 
-    def __init__(self, logger_name: str, handlers: Iterable[logging.Handler], universal_log_level=logging.DEBUG):
+    def __init__(
+            self,
+            logger_name: str,
+            handlers: Iterable[logging.Handler],
+            universal_log_level=logging.DEBUG,
+            with_process_info=False,
+            with_thread_info=False
+    ):
+        self.with_process_info = with_process_info
+        self.with_thread_info = with_thread_info
         self.logger = logging.getLogger(logger_name)
         self.logger.setLevel(universal_log_level)
         for handler in handlers:
+            # https://docs.python.org/3/library/logging.html#formatter-objects
+
+            format_string = "%(asctime)s <%(name)s> [%(levelname)s]"
+            if self.with_process_info:
+                format_string += " <%(process)d:%(processName)s>"
+            if self.with_thread_info:
+                format_string += " <%(thread)d:%(threadName)s>"
+            format_string += " %(message)s | %(json_string)s"
+
             handler.setFormatter(
-                logging.Formatter("%(asctime)s <%(shovel_name)s> [%(levelname)s] %(message)s | %(json_string)s")
+                logging.Formatter(format_string)
             )
             self.logger.addHandler(handler)
 
@@ -101,7 +120,6 @@ class NehushtanLogger:
     def ensure_extra_as_dict(self, extra):
         return {
             "json_string": json.dumps(extra, default=lambda inner_x: inner_x.__str__()),
-            "shovel_name": self.logger.name
         }
 
     @staticmethod
