@@ -30,10 +30,11 @@ A toolkit for projects in Python
 * 0.1.12: MySQL Package Refines. 
     1. Raise Exception when tries to get result from MySQLQueryResult but actually not generated yet [GitHub Issue #1](https://github.com/sinri/nehushtan/issues/1)
     2. Add Grave sign to writer methods in `MySQLTableMixin`. (Reported by Leqee Staff) 
+* 0.1.13: Standardize logger keys. MySQL Auto Reconnection. Database Error Display.
 
 ### Developing
 
-* 0.1.13 Pending
+* 0.1.14: Pending
 
 ## Notice
 

@@ -14,6 +14,7 @@ class MySQLKit:
     """
     MySQL 连接基础工具类，封装了 PYMYSQL 库的实例。
     Shovel 项目相关的所有 MySQL 连接应当使用此方法进行。
+    Since 0.1.13 Added Auto Reconnection (PING)
     """
 
     # _mysql_config: MySQLKitConfig
@@ -54,6 +55,7 @@ class MySQLKit:
         """
         if self._connection is None:
             raise RuntimeError("Connection Property of MySQLKit Instance is not set.")
+        self._connection.ping(reconnect=True)
         return self._connection
 
     def connect(self):
@@ -89,7 +91,8 @@ class MySQLKit:
         :param args: 参数
         :return: 生成的 SQL 语句
         """
-        cursor = self._connection.cursor()
+        connection = self.get_raw_connection()
+        cursor = connection.cursor()
         sql = cursor.mogrify(sql, args)
         cursor.close()
         return sql
@@ -101,7 +104,8 @@ class MySQLKit:
         :param args:
         :return:
         """
-        cursor = self._connection.cursor()
+        connection = self.get_raw_connection()
+        cursor = connection.cursor()
         cursor.execute(sql, args)
         rows_tuple = cursor.fetchall()
         cursor.close()
@@ -114,7 +118,8 @@ class MySQLKit:
         :param args:
         :return:
         """
-        cursor = self._connection.cursor(DictCursor)
+        connection = self.get_raw_connection()
+        cursor = connection.cursor()
         cursor.execute(sql, args)
         rows_tuple = cursor.fetchall()
         cursor.close()
@@ -128,12 +133,13 @@ class MySQLKit:
         :param commit_immediately:
         :return:
         """
-        cursor = self._connection.cursor()
+        connection = self.get_raw_connection()
+        cursor = connection.cursor()
         afx = cursor.execute(sql, args)
         if commit_immediately is None:
             commit_immediately = self._auto_commit_default
         if commit_immediately:
-            self._connection.commit()
+            connection.commit()
         cursor.close()
         return afx
 
@@ -145,13 +151,14 @@ class MySQLKit:
         :param commit_immediately:
         :return:
         """
-        cursor = self._connection.cursor()
+        connection = self.get_raw_connection()
+        cursor = connection.cursor()
         cursor.execute(sql, args)
         last_row_id = cursor.lastrowid
         if commit_immediately is None:
             commit_immediately = self._auto_commit_default
         if commit_immediately:
-            self._connection.commit()
+            connection.commit()
         cursor.close()
         return last_row_id
 
@@ -163,12 +170,13 @@ class MySQLKit:
         :param commit_immediately:
         :return:
         """
-        cursor = self._connection.cursor()
+        connection = self.get_raw_connection()
+        cursor = connection.cursor()
         afx = cursor.executemany(sql, args)
         if commit_immediately is None:
             commit_immediately = self._auto_commit_default
         if commit_immediately:
-            self._connection.commit()
+            connection.commit()
         cursor.close()
         return afx
 
@@ -180,13 +188,14 @@ class MySQLKit:
         :param commit_immediately:
         :return:
         """
-        cursor = self._connection.cursor()
+        connection = self.get_raw_connection()
+        cursor = connection.cursor()
         cursor.executemany(sql, args)
         last_row_id = cursor.lastrowid
         if commit_immediately is None:
             commit_immediately = self._auto_commit_default
         if commit_immediately:
-            self._connection.commit()
+            connection.commit()
         cursor.close()
         return last_row_id
 
@@ -196,7 +205,7 @@ class MySQLKit:
         :param transaction_callable: 事务处理具体代码所在的闭包，可以使用lambda表达式或者def方法，参数为本类实例，并返回结果
         :return: 返回闭包的返回值
         """
-        self._connection.begin()
+        self.get_raw_connection().begin()
         try:
             result = transaction_callable(self)
             print('to commit', result)
@@ -218,6 +227,8 @@ class MySQLKit:
         """
         if self._connection is None:
             return self.quote_offline(value)
+        self._connection.ping(True)
+
         if type(value) == list:
             x = []
             for item in value:

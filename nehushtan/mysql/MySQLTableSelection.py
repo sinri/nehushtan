@@ -170,10 +170,10 @@ class MySQLTableSelection:
             result.append_result_rows(matrix)
         except pymysql.MySQLError as e:
             result.set_status(constant.MYSQL_QUERY_STATUS_ERROR)
-            result.set_error(f"MySQL Error [{e.args[0]}] {e.args[1]}")
+            result.set_error(f"MySQL Error {e.__class__} [{e.args[0]}] {e.args[1]}")
         except Exception as pe:
             result.set_status(constant.MYSQL_QUERY_STATUS_ERROR)
-            result.set_error(f"Python Error: {pe}")
+            result.set_error(f"Python Error {pe.__class__}: {pe}")
         finally:
             return result
 
@@ -198,10 +198,10 @@ class MySQLTableSelection:
             return result
         except pymysql.MySQLError as e:
             result.set_status(constant.MYSQL_QUERY_STATUS_ERROR)
-            result.set_error(f"MySQL Error [{e.args[0]}] {e.args[1]}")
+            result.set_error(f"MySQL Error {e.__class__} [{e.args[0]}] {e.args[1]}")
         except Exception as pe:
             result.set_status(constant.MYSQL_QUERY_STATUS_ERROR)
-            result.set_error(f"Python Error: {pe}")
+            result.set_error(f"Python Error {pe.__class__}: {pe}")
         finally:
             return result
 
