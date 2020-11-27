@@ -137,6 +137,8 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
                 values.append(self.get_mysql_kit().quote(v))
             values = ",".join(values)
             row_sql.append(f'({values})')
+        if len(row_sql) <= 0:
+            raise ValueError("You are trying to write zero rows!")
         row_sql = ",".join(row_sql)
 
         ignore = ''
@@ -168,6 +170,8 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
                 values.append(self.get_mysql_kit().quote(v))
             values = ",".join(values)
             row_sql.append(f'({values})')
+        if len(row_sql) <= 0:
+            raise ValueError("You are trying to write zero rows!")
         row_sql = ",".join(row_sql)
 
         ignore = ''
