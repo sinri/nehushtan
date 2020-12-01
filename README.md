@@ -31,10 +31,11 @@ A toolkit for projects in Python
     1. Raise Exception when tries to get result from MySQLQueryResult but actually not generated yet [GitHub Issue #1](https://github.com/sinri/nehushtan/issues/1)
     2. Add Grave sign to writer methods in `MySQLTableMixin`. (Reported by Leqee Staff) 
 * 0.1.13: Standardize logger keys. MySQL Auto Reconnection. Database Error Display.
+* 0.1.14: Fix a bug in `raw_query_for_all_dict_rows`.
 
 ### Developing
 
-* 0.1.14: Pending
+* 0.1.15: Pending
 
 ## Notice
 

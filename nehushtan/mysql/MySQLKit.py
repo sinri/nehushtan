@@ -119,7 +119,7 @@ class MySQLKit:
         :return:
         """
         connection = self.get_raw_connection()
-        cursor = connection.cursor()
+        cursor = connection.cursor(DictCursor)
         cursor.execute(sql, args)
         rows_tuple = cursor.fetchall()
         cursor.close()
