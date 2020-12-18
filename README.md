@@ -32,10 +32,11 @@ A toolkit for projects in Python
     2. Add Grave sign to writer methods in `MySQLTableMixin`. (Reported by Leqee Staff) 
 * 0.1.13: Standardize logger keys. MySQL Auto Reconnection. Database Error Display.
 * 0.1.14: Fix a bug in `raw_query_for_all_dict_rows`.
+* 0.1.15: Reusable `NehushtanLogger` instance by name.
 
 ### Developing
 
-* 0.1.15: Pending
+* 0.1.16: Pending
 
 ## Notice
 

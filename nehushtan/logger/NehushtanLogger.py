@@ -15,29 +15,35 @@ class NehushtanLogger:
     def __init__(
             self,
             logger_name: str,
-            handlers: Iterable[logging.Handler],
+            handlers: Iterable[logging.Handler] = None,
             universal_log_level=logging.DEBUG,
             with_process_info=False,
             with_thread_info=False
     ):
+        """
+        Reusable Logger, determined by name
+        If parameter `handlers` provided and not None, all previous handlers would be cleared and newly given ones set.
+        """
         self.with_process_info = with_process_info
         self.with_thread_info = with_thread_info
         self.logger = logging.getLogger(logger_name)
         self.logger.setLevel(universal_log_level)
-        for handler in handlers:
-            # https://docs.python.org/3/library/logging.html#formatter-objects
+        if handlers is not None:
+            self.logger.handlers = []
+            for handler in handlers:
+                # https://docs.python.org/3/library/logging.html#formatter-objects
 
-            format_string = "%(asctime)s <%(name)s> [%(levelname)s]"
-            if self.with_process_info:
-                format_string += " <%(process)d:%(processName)s>"
-            if self.with_thread_info:
-                format_string += " <%(thread)d:%(threadName)s>"
-            format_string += " %(message)s | %(json_string)s"
+                format_string = "%(asctime)s <%(name)s> [%(levelname)s]"
+                if self.with_process_info:
+                    format_string += " <%(process)d:%(processName)s>"
+                if self.with_thread_info:
+                    format_string += " <%(thread)d:%(threadName)s>"
+                format_string += " %(message)s | %(json_string)s"
 
-            handler.setFormatter(
-                logging.Formatter(format_string)
-            )
-            self.logger.addHandler(handler)
+                handler.setFormatter(
+                    logging.Formatter(format_string)
+                )
+                self.logger.addHandler(handler)
 
     def debug(self, message: str, extra=None):
         self.logger.debug(
