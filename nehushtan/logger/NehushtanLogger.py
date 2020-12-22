@@ -123,8 +123,11 @@ class NehushtanLogger:
         return f_handler
 
     def ensure_extra_as_dict(self, extra):
+        """
+        Since 0.1.16, add ensure_ascii as False to allow unicode chars
+        """
         return {
-            "json_string": json.dumps(extra, default=lambda inner_x: inner_x.__str__()),
+            "json_string": json.dumps(extra, default=lambda inner_x: inner_x.__str__(), ensure_ascii=False),
         }
 
     @staticmethod
