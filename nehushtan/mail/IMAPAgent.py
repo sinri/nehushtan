@@ -88,6 +88,7 @@ class IMAPAgent:
         """
 
         :param box:
+        :param readonly:
         :return: The Number of Total Mails
         """
         response_code, data = self._connection.select(box, readonly)

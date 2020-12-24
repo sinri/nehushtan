@@ -11,7 +11,7 @@ sm = SMTPAgent(
     smtp_server=SMTP_CONFIG['smtp_server'],
     smtp_port=SMTP_CONFIG['smtp_port']
 ) \
-    .set_receivers(['no-reply@anonymous.com']) \
+    .reset_receivers(['no-reply@anonymous.com']) \
     .set_subject('Test SMTP Agent') \
     .set_content(f'<h1>SMTP Agent</h1><p>It is a test mail</p><p>On {now}</p>') \
     .set_attachments(['test-for-smtp.py']) \

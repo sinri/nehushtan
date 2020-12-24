@@ -24,19 +24,21 @@ A toolkit for projects in Python
 * 0.1.8: Remove shovel related static maker methods from logger class. Fix MySQL Toolkit Bug.
 * 0.1.9: Fix loose throw policy in condition sql making. That has been proved very dangerous.
 * 0.1.10: Support MySQL Deep Functions for one table, such as
-    [INSERT ... ON DUPLICATE KEY UPDATE Statement](https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html), 
-    etc.
+  [INSERT ... ON DUPLICATE KEY UPDATE Statement](https://dev.mysql.com/doc/refman/8.0/en/insert-on-duplicate.html), etc.
 * 0.1.11: Remove declarations of the class variables which would be initialized with instances.
-* 0.1.12: MySQL Package Refines. 
-    1. Raise Exception when tries to get result from MySQLQueryResult but actually not generated yet [GitHub Issue #1](https://github.com/sinri/nehushtan/issues/1)
-    2. Add Grave sign to writer methods in `MySQLTableMixin`. (Reported by Leqee Staff) 
+* 0.1.12: MySQL Package Refines.
+    1. Raise Exception when tries to get result from MySQLQueryResult but actually not generated
+       yet [GitHub Issue #1](https://github.com/sinri/nehushtan/issues/1)
+    2. Add Grave sign to writer methods in `MySQLTableMixin`. (Reported by Leqee Staff)
 * 0.1.13: Standardize logger keys. MySQL Auto Reconnection. Database Error Display.
 * 0.1.14: Fix a bug in `raw_query_for_all_dict_rows`.
 * 0.1.15: Reusable `NehushtanLogger` instance by name.
+* 0.1.16: Unicode JSON in Logger
+* 0.1.17: Execute Many
 
 ### Developing
 
-* 0.1.16: Pending
+* 0.1.18: Pending
 
 ## Notice
 

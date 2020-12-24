@@ -4,15 +4,19 @@ class MySQLKitConfig:
     Since 0.1.4
     """
 
-    # _host: str
-    # _port: int
-    # _user: str
-    # _password: str
-    # _db: str
-    # _charset: str
-    # _auto_commit: bool
-
     def __init__(self, config_dict: dict = None):
+        """
+        Parameter `config_dict` is like:
+        {
+            'host': '',
+            'port': 3306,
+            'user': '',
+            'password': '',
+            'db': '',
+            'charset': 'utf8',
+            'auto_commit': True,
+        }
+        """
         if config_dict is None:
             config_dict = {}
 
