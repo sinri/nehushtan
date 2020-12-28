@@ -117,7 +117,7 @@ class NehushtanQueue:
                 return x
             else:
                 # wait for processes to die
-                self.get_logger().debug(f'Waiting for pool space: {x} / {self.get_pool_capacity()}')
+                self.get_logger().debug(f'Waiting for pool space. Now {x} out of {self.get_pool_capacity()} running.')
                 time.sleep(2)
                 return self._refresh_count_of_current_workers(wait_till_less_than=wait_till_less_than)
 

@@ -35,10 +35,11 @@ A toolkit for projects in Python
 * 0.1.15: Reusable `NehushtanLogger` instance by name.
 * 0.1.16: Unicode JSON in Logger
 * 0.1.17: Execute Many
+* 0.1.18: Queue based on multiprocessing pool
 
 ### Developing
 
-* 0.1.18: Pending
+* 0.1.19: Pending
 
 ## Notice
 

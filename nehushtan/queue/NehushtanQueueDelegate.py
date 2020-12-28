@@ -10,9 +10,9 @@ class NehushtanQueueDelegate:
     QUEUE_RUNTIME_COMMAND_PAUSE = "PAUSE"
     QUEUE_RUNTIME_COMMAND_CONTINUE = "CONTINUE"
     QUEUE_RUNTIME_COMMAND_STOP = "STOP"
-    QUEUE_RUNTIME_COMMAND_FORCE_STOP = "FORCE-STOP"
-    QUEUE_RUNTIME_COMMAND_RESTART = "RESTART"
-    QUEUE_RUNTIME_COMMAND_FORCE_RESTART = "FORCE-RESTART"
+    # QUEUE_RUNTIME_COMMAND_FORCE_STOP = "FORCE-STOP"
+    # QUEUE_RUNTIME_COMMAND_RESTART = "RESTART"
+    # QUEUE_RUNTIME_COMMAND_FORCE_RESTART = "FORCE-RESTART"
 
     CONFIG_KEY_POOL_CAPACITY = 'POOL_CAPACITY'
 
@@ -30,11 +30,19 @@ class NehushtanQueueDelegate:
             )
         self.logger = logger
 
+        self.latest_command = self.read_latest_command()
+
     def read_config_of_delegate(self, keychain: tuple, default):
         return CommonHelper.read_dictionary(self.config_dictionary, keychain, default)
 
     def get_configured_pool_capacity(self) -> int:
         return self.read_config_of_delegate((NehushtanQueueDelegate.CONFIG_KEY_POOL_CAPACITY,), 1)
+
+    def read_latest_command(self) -> str:
+        """
+        Override this to fetch command from real pipe.
+        """
+        return self.QUEUE_RUNTIME_COMMAND_CONTINUE
 
     def when_loop_starts(self):
         """
@@ -46,19 +54,22 @@ class NehushtanQueueDelegate:
     def when_loop_reports_error(self, error_message: str):
         pass
 
-    @abstractmethod
     def is_runnable(self):
         """
         If not runnable, the daemon loop would sleep.
         """
-        pass
+        return self.latest_command == self.QUEUE_RUNTIME_COMMAND_CONTINUE
 
-    @abstractmethod
     def should_terminate(self):
         """
         Tell daemon loop to exit.
         """
-        pass
+        return (
+            self.QUEUE_RUNTIME_COMMAND_STOP,
+            # self.QUEUE_RUNTIME_COMMAND_FORCE_STOP,
+            # self.QUEUE_RUNTIME_COMMAND_RESTART,
+            # self.QUEUE_RUNTIME_COMMAND_FORCE_RESTART,
+        ).__contains__(self.latest_command)
 
     @abstractmethod
     def when_loop_terminates(self):
