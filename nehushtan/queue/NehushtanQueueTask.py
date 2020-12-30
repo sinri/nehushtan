@@ -19,14 +19,23 @@ class NehushtanQueueTask:
         pass
 
     def before_execute(self):
+        """
+        This works in MASTER
+        """
         self.ready_to_execute = True
         return self.ready_to_execute
 
     @abstractmethod
     def execute(self):
+        """
+        This works in WORKER
+        """
         pass
 
     def after_execute(self):
+        """
+        This works in WORKER
+        """
         self.ready_to_finish = True
         return self.ready_to_finish
 
@@ -41,6 +50,8 @@ class NehushtanQueueTask:
         Determine if this task should be run in Exclusive Mode,
         which would wait for other all tasks stopped before starts,
         and never run other tasks until it ends.
+
+        This works in MASTER
         """
         return False
 

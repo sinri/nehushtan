@@ -29,6 +29,8 @@ class NehushtanQueue:
                 # Check existed workers' status before generate new workers
                 self._refresh_count_of_current_workers()
 
+                self.delegate.read_latest_command()
+
                 # Check Command
                 if self.delegate.should_terminate():
                     if self.delegate.should_wait_for_all_workers_before_terminating():
@@ -123,6 +125,9 @@ class NehushtanQueue:
 
     @staticmethod
     def embedded_task_execute(embedded_task: NehushtanQueueTask, delegate: NehushtanQueueDelegate):
+        """
+        This works in WORKER
+        """
         delegate.when_to_execute_task(embedded_task)
         try:
             embedded_task.execute()
