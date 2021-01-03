@@ -30,7 +30,7 @@ class NehushtanQueueDelegate:
             )
         self.logger = logger
 
-        self.latest_command = self.read_latest_command()
+        self.latest_command = NehushtanQueueDelegate.QUEUE_RUNTIME_COMMAND_CONTINUE
 
     def read_config_of_delegate(self, keychain: tuple, default):
         return CommonHelper.read_dictionary(self.config_dictionary, keychain, default)

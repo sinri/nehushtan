@@ -37,10 +37,11 @@ A toolkit for projects in Python
 * 0.1.17: Execute Many
 * 0.1.18: Queue based on multiprocessing pool
 * 0.1.19: Nehushtan Queue Refine
+* 0.1.20: Fix Queue Command Initialization
 
 ### Developing
 
-* 0.1.20: Pending
+* 0.1.21: Pending
 
 ## Notice
 
