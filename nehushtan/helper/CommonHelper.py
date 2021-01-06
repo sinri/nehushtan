@@ -71,15 +71,16 @@ class CommonHelper:
         return CommonHelper.write_dictionary(target_dict[current_key], keychain[1:], value)
 
     @staticmethod
-    def class_with_class_path(class_path: str):
+    def class_with_class_path(module_path: str, class_name: str):
         """
-        Since 0.1.21
+        Since 0.1.22
         For a/b.py -> class b
         class_with_namespace is like 'package.sub_package.class', 'a.b'
+        class_name is 'b'
         return a CLASS definition, to be used with parameters to make instance
         """
-        module = importlib.import_module(class_path)
-        a_class = getattr(module, class_path)
+        module = importlib.import_module(module_path)
+        a_class = getattr(module, class_name)
         return a_class
 
     @staticmethod
