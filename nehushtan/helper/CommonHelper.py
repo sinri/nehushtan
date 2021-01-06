@@ -1,3 +1,6 @@
+import importlib
+
+
 class CommonHelper:
     def __init__(self):
         pass
@@ -66,3 +69,27 @@ class CommonHelper:
         if target_dict.get(current_key) is None:
             target_dict[current_key] = {}
         return CommonHelper.write_dictionary(target_dict[current_key], keychain[1:], value)
+
+    @staticmethod
+    def class_with_class_path(class_path: str):
+        """
+        Since 0.1.21
+        For a/b.py -> class b
+        class_with_namespace is like 'package.sub_package.class', 'a.b'
+        return a CLASS definition, to be used with parameters to make instance
+        """
+        module = importlib.import_module(class_path)
+        a_class = getattr(module, class_path)
+        return a_class
+
+    @staticmethod
+    def class_with_module_and_name(module_base: str, sub_module_name: str):
+        """
+        Since 0.1.21
+        For a/b.py -> class b
+        module_base is a
+        sub_module_name is b
+        """
+        module = __import__(module_base)
+        a_class = getattr(module, sub_module_name)
+        return a_class
