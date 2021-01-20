@@ -73,7 +73,7 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
         value_placeholders = []
         values = []
         for k, v in row_dict.items():
-            field_names.append(k)
+            field_names.append(f'`{k}`')
             value_placeholders.append("%s")
             values.append(v)
 
@@ -99,7 +99,7 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
         value_placeholders = []
         values = []
         for k, v in row_dict.items():
-            field_names.append(k)
+            field_names.append(f'`{k}`')
             value_placeholders.append("%s")
             values.append(v)
 
@@ -132,7 +132,7 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
 
         first_row = row_dicts[0]
         for k, v in first_row.items():
-            field_names.append(k)
+            field_names.append(f'`{k}`')
             placeholders.append("%s")
 
         for row_dict in row_dicts:
@@ -165,7 +165,7 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
 
         first_row = row_dicts[0]
         for k, v in first_row.items():
-            field_names.append(k)
+            field_names.append(f'`{k}`')
             placeholders.append("%s")
 
         for row_dict in row_dicts:
@@ -198,7 +198,7 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
 
         table_expression = self.get_table_expression()
 
-        field_names = ",".join(fields)
+        field_names = ",".join([f'`{k}`' for k in fields])
         placeholders = ["%s"] * len(fields)
         placeholders = ",".join(placeholders)
 
@@ -222,7 +222,7 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
     ):
         table_expression = self.get_table_expression()
 
-        field_names = ",".join(fields)
+        field_names = ",".join([f'`{k}`' for k in fields])
         placeholders = ["%s"] * len(fields)
         placeholders = ",".join(placeholders)
 
@@ -261,7 +261,7 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
         if with_ignore:
             ignore_part = ' IGNORE'
 
-        fields_sql = ",".join(fields)
+        fields_sql = ",".join([f'`{k}`' for k in fields])
 
         on_duplicate_key_update_rows_part = ''
         if type(on_duplicate_key_update_rows) is dict:
