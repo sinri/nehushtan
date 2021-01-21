@@ -38,10 +38,13 @@ A toolkit for projects in Python
 * 0.1.18: Queue based on multiprocessing pool
 * 0.1.19: Nehushtan Queue Refine
 * 0.1.20: Fix Queue Command Initialization
+* 0.1.22: Import Helper
+* 0.1.23: Refine NoNextTaskSituation and Add grave accent to fields in writing.
+* 0.1.24: Add `pid` to NehushtanQueueDelegate's two methods.
 
 ### Developing
 
-* 0.1.21: Pending
+* 0.1.25: Pending
 
 ## Notice
 

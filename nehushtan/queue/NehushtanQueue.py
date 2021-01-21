@@ -1,3 +1,4 @@
+import os
 import time
 from multiprocessing import Pool
 
@@ -128,9 +129,9 @@ class NehushtanQueue:
         """
         This works in WORKER
         """
-        delegate.when_to_execute_task(embedded_task)
+        delegate.when_to_execute_task(embedded_task, os.getpid())
         try:
             embedded_task.execute()
         except Exception as e:
             delegate.when_task_raised_exception(embedded_task, e)
-        delegate.when_task_executed(embedded_task)
+        delegate.when_task_executed(embedded_task, os.getpid())
