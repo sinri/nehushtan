@@ -8,6 +8,7 @@ import time
 class NehushtanFileLogger:
     """
     @since 0.1.25
+    Another solution for logging, just use raw writing method to target file.
     """
 
     def __init__(self, title='default', log_dir=None, log_level=logging.DEBUG):
@@ -16,20 +17,25 @@ class NehushtanFileLogger:
         self.log_level = log_level
 
     def get_target_file(self):
-        target_file = ''
-        if self.log_dir is not None:
-            target_file = self.log_dir
+        if self.log_dir is None:
+            return ''
+        target_file = self.log_dir
         category_dir = os.path.join(target_file, self.title)
         if not os.path.exists(category_dir):
             os.mkdir(category_dir)
         today = time.strftime("%Y%m%d", time.localtime())
-        target_file = os.path.join(target_file, f'{self.title}-{today}.log')
+        target_file = os.path.join(category_dir, f'{self.title}-{today}.log')
         return target_file
 
     def write_raw_line_to_log(self, text):
         target_file = self.get_target_file()
-        file = open(target_file, 'a')
-        file.write(text + os.linesep)
+        if target_file == '':
+            print(target_file)
+        else:
+            file = open(target_file, 'a')
+            file.write(text + os.linesep)
+            file.flush()
+            file.close()
         return self
 
     @staticmethod
@@ -48,6 +54,8 @@ class NehushtanFileLogger:
             return 'NOTSET'
 
     def write_formatted_line_to_log(self, level: int, message: str, extra=None):
+        if level < self.log_level:
+            return self
         now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         level_label = NehushtanFileLogger.get_level_label(level)
         pid = os.getpid()
@@ -74,8 +82,9 @@ class NehushtanFileLogger:
     def critical(self, message: str, extra=None):
         return self.write_formatted_line_to_log(logging.CRITICAL, message, extra)
 
-    def ensure_extra_as_dict(self, extra):
+    @staticmethod
+    def ensure_extra_as_dict(extra):
         """
-        Since 0.1.16, add ensure_ascii as False to allow unicode chars
+        Since 0.1.25, add ensure_ascii as False to allow unicode chars
         """
         return json.dumps(extra, default=lambda inner_x: inner_x.__str__(), ensure_ascii=False)

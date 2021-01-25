@@ -2,7 +2,7 @@ import time
 from abc import abstractmethod
 
 from nehushtan.helper.CommonHelper import CommonHelper
-from nehushtan.logger.NehushtanLogger import NehushtanLogger
+from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
 from nehushtan.queue.NehushtanQueueTask import NehushtanQueueTask
 
 
@@ -16,18 +16,16 @@ class NehushtanQueueDelegate:
 
     CONFIG_KEY_POOL_CAPACITY = 'POOL_CAPACITY'
 
-    def __init__(self, config_dictionary: dict = None, logger: NehushtanLogger = None):
+    def __init__(self, config_dictionary: dict = None, logger: NehushtanFileLogger = None):
+        """
+        @since 0.1.25 logger changed to NehushtanFileLogger
+        """
         if config_dictionary is None:
             config_dictionary = {}
         self.config_dictionary = config_dictionary
 
         if logger is None:
-            logger = NehushtanLogger(
-                f"{self.__class__.__name__}-DefaultLogger",
-                [NehushtanLogger.make_stdout_handler()],
-                with_process_info=True,
-                with_thread_info=True
-            )
+            logger = NehushtanFileLogger(f"{self.__class__.__name__}-Logger", )
         self.logger = logger
 
         self.latest_command = NehushtanQueueDelegate.QUEUE_RUNTIME_COMMAND_CONTINUE
