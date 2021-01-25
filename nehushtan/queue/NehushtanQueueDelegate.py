@@ -122,7 +122,7 @@ class NehushtanQueueDelegate:
         """
         SINCE 0.1.24 add parameter pid
         Note: Any exceptions should be caught inside.
-        This works in WORKER
+        This works in WORKER - EMBEDED
         """
         pass
 
@@ -131,7 +131,7 @@ class NehushtanQueueDelegate:
         """
         SINCE 0.1.24 add parameter pid
         Note: Any exceptions should be caught inside.
-        This works in WORKER
+        This works in WORKER - EMBEDED
         """
         try:
             if task.after_execute():
@@ -144,7 +144,7 @@ class NehushtanQueueDelegate:
     @abstractmethod
     def when_task_raised_exception(self, task: NehushtanQueueTask, exception: Exception):
         """
-        This works in WORKER
+        This works in WORKER - EMBEDED
         """
         pass
 

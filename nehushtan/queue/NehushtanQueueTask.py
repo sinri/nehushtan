@@ -28,13 +28,13 @@ class NehushtanQueueTask:
     @abstractmethod
     def execute(self):
         """
-        This works in WORKER
+        This works in WORKER - EMBEDED
         """
         pass
 
     def after_execute(self):
         """
-        This works in WORKER
+        This works in WORKER - EMBEDED
         """
         self.ready_to_finish = True
         return self.ready_to_finish
