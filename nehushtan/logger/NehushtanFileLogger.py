@@ -30,7 +30,7 @@ class NehushtanFileLogger:
     def write_raw_line_to_log(self, text):
         target_file = self.get_target_file()
         if target_file == '':
-            print(target_file)
+            print(text)
         else:
             file = open(target_file, 'a')
             file.write(text + os.linesep)
