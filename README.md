@@ -41,10 +41,12 @@ A toolkit for projects in Python
 * 0.1.22: Import Helper
 * 0.1.23: Refine NoNextTaskSituation and Add grave accent to fields in writing.
 * 0.1.24: Add `pid` to NehushtanQueueDelegate's two methods.
+* 0.1.25: NehushtanFileLogger
+* 0.1.26: NehushtanFileLogger directly output bug fix
 
 ### Developing
 
-* 0.1.25: Pending
+* 0.1.27: Pending
 
 ## Notice
 
