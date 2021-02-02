@@ -29,6 +29,11 @@ class NehushtanQueueTask:
     def execute(self):
         """
         This works in WORKER - EMBEDED
+
+        Need to override and fulfill
+        self.done: bool
+        self.execute_feedback: str
+        self.execute_result: Any
         """
         pass
 

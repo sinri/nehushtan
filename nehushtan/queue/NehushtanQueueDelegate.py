@@ -97,6 +97,7 @@ class NehushtanQueueDelegate:
     def check_next_task(self) -> NehushtanQueueTask:
         """
         This works in MASTER
+        if none newly found... raise NoNextTaskSituation!
         """
         pass
 
@@ -177,3 +178,27 @@ class NehushtanQueueDelegate:
         This works in MASTER
         """
         return True
+
+    @abstractmethod
+    def should_kill_any_worker_processes(self) -> list:
+        """
+        This works in MASTER
+        return a list of Task Reference
+        """
+        pass
+
+    @abstractmethod
+    def when_killed_worker_process(self, task_reference, not_found=False):
+        """
+        This works in MASTER
+        """
+        pass
+
+    @abstractmethod
+    def handle_command_queue(self):
+        """
+        This works in MASTER
+        This may update the data for `should_kill_any_worker_processes` for loop,
+        or do other jobs
+        """
+        pass

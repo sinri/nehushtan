@@ -44,11 +44,16 @@ A toolkit for projects in Python
 * 0.1.25: NehushtanFileLogger
 * 0.1.26: NehushtanFileLogger directly output bug fix
 
+----
+
+* 0.2.0: New NehushtanFileLogger. Redesign NehushtanQueue with raw `Process`.
+
 ### Developing
 
 * 0.1.27: Pending
+* 0.2.1: Pending
 
 ## Notice
 
 * [Pythonのクラスの変数に潜む地雷](https://qiita.com/sinri/items/368a489412c78cb9d4e3)
-    > Python的class变量声明也不是不能当动态变量用，安全起见一定要在初始化的时候彻底初始化一下，避免id固化。
+  > Python的class变量声明也不是不能当动态变量用，安全起见一定要在初始化的时候彻底初始化一下，避免id固化。

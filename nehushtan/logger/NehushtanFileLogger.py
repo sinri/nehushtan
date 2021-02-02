@@ -11,20 +11,38 @@ class NehushtanFileLogger:
     Another solution for logging, just use raw writing method to target file.
     """
 
-    def __init__(self, title='default', log_dir=None, log_level=logging.DEBUG):
+    def __init__(
+            self,
+            title='default',
+            log_dir=None,
+            log_level=logging.DEBUG,
+            categorize: bool = True,
+            date_rotate: bool = True
+    ):
         self.title = title
         self.log_dir = log_dir
         self.log_level = log_level
+        self.categorize = categorize
+        self.date_rotate = date_rotate
 
     def get_target_file(self):
         if self.log_dir is None:
             return ''
-        target_file = self.log_dir
-        category_dir = os.path.join(target_file, self.title)
+
+        category_dir = self.log_dir
+
+        if self.categorize:
+            category_dir = os.path.join(self.log_dir, self.title)
+
         if not os.path.exists(category_dir):
-            os.mkdir(category_dir)
-        today = time.strftime("%Y%m%d", time.localtime())
-        target_file = os.path.join(category_dir, f'{self.title}-{today}.log')
+            os.makedirs(category_dir)
+
+        today = ''
+        if self.date_rotate:
+            today = time.strftime("%Y%m%d", time.localtime())
+            today = f'-{today}'
+
+        target_file = os.path.join(category_dir, f'{self.title}{today}.log')
         return target_file
 
     def write_raw_line_to_log(self, text):
