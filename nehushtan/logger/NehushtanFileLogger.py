@@ -3,6 +3,7 @@ import logging
 import os
 import threading
 import time
+import traceback
 
 
 class NehushtanFileLogger:
@@ -95,7 +96,14 @@ class NehushtanFileLogger:
         return self.write_formatted_line_to_log(logging.ERROR, message, extra)
 
     def exception(self, message: str, exception: BaseException):
-        return self.write_formatted_line_to_log(logging.ERROR, message, exception)
+        just_the_string = ''.join(
+            traceback.format_exception(
+                etype=type(exception),
+                value=exception,
+                tb=exception.__traceback__
+            )
+        )
+        return self.write_formatted_line_to_log(logging.ERROR, message, just_the_string)
 
     def critical(self, message: str, extra=None):
         return self.write_formatted_line_to_log(logging.CRITICAL, message, extra)
