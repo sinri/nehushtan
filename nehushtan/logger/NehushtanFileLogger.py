@@ -103,7 +103,8 @@ class NehushtanFileLogger:
                 tb=exception.__traceback__
             )
         )
-        return self.write_formatted_line_to_log(logging.ERROR, message, just_the_string)
+        return self.write_formatted_line_to_log(logging.ERROR, message, f'{type(exception).__name__}') \
+            .write_raw_line_to_log(just_the_string)
 
     def critical(self, message: str, extra=None):
         return self.write_formatted_line_to_log(logging.CRITICAL, message, extra)
