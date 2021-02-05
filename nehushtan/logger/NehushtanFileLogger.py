@@ -19,13 +19,15 @@ class NehushtanFileLogger:
             log_dir: str = None,
             log_level=logging.DEBUG,
             categorize: bool = True,
-            date_rotate: bool = True
+            date_rotate: bool = True,
+            print_as_well: bool = False
     ):
         self.title = title
         self.log_dir = log_dir
         self.log_level = log_level
         self.categorize = categorize
         self.date_rotate = date_rotate
+        self.print_as_well = print_as_well
 
     def get_target_file(self):
         if self.log_dir is None:
@@ -49,16 +51,19 @@ class NehushtanFileLogger:
 
     def write_raw_line_to_log(self, text: str, level: int = logging.INFO):
         target_file = self.get_target_file()
-        if target_file == '':
-            if level >= logging.WARNING:
-                print(text, file=sys.stderr)
-            else:
-                print(text)
-        else:
+
+        if target_file != '':
             file = open(target_file, 'a')
             file.write(text + os.linesep)
             file.flush()
             file.close()
+
+        if target_file == '' or self.print_as_well:
+            if level >= logging.WARNING:
+                print(text, file=sys.stderr)
+            else:
+                print(text)
+
         return self
 
     @staticmethod
