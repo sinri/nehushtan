@@ -49,11 +49,12 @@ A toolkit for projects in Python
 * 0.2.0: New NehushtanFileLogger. Redesign NehushtanQueue with raw `Process`.
 * 0.2.1: Refine NehushtanFileLogger for exception.
 * 0.2.2: Refine NehushtanFileLogger for exception.
+* 0.2.3: Output NehushtanFileLogger for raw output to stderr.
 
 ### Developing
 
 * 0.1.27: Pending
-* 0.2.3: Pending
+* 0.2.4: Pending
 
 ## Notice
 

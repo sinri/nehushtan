@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import sys
 import threading
 import time
 import traceback
@@ -15,7 +16,7 @@ class NehushtanFileLogger:
     def __init__(
             self,
             title='default',
-            log_dir=None,
+            log_dir: str = None,
             log_level=logging.DEBUG,
             categorize: bool = True,
             date_rotate: bool = True
@@ -46,10 +47,13 @@ class NehushtanFileLogger:
         target_file = os.path.join(category_dir, f'{self.title}{today}.log')
         return target_file
 
-    def write_raw_line_to_log(self, text):
+    def write_raw_line_to_log(self, text: str, level: int = logging.INFO):
         target_file = self.get_target_file()
         if target_file == '':
-            print(text)
+            if level >= logging.WARNING:
+                print(text, file=sys.stderr)
+            else:
+                print(text)
         else:
             file = open(target_file, 'a')
             file.write(text + os.linesep)
@@ -81,7 +85,7 @@ class NehushtanFileLogger:
         thread = threading.currentThread()
         extra_json = self.ensure_extra_as_dict(extra)
         line = f'{now} <{self.title}> [{level_label}] <{pid}:{thread.getName()}> {message} | {extra_json}'
-        return self.write_raw_line_to_log(line)
+        return self.write_raw_line_to_log(line, level)
 
     def debug(self, message: str, extra=None):
         return self.write_formatted_line_to_log(logging.DEBUG, message, extra)
@@ -104,7 +108,7 @@ class NehushtanFileLogger:
             )
         )
         return self.write_formatted_line_to_log(logging.ERROR, message, f'{type(exception).__name__}') \
-            .write_raw_line_to_log(just_the_string)
+            .write_raw_line_to_log(just_the_string, logging.ERROR)
 
     def critical(self, message: str, extra=None):
         return self.write_formatted_line_to_log(logging.CRITICAL, message, extra)
