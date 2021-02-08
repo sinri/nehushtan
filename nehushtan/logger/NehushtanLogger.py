@@ -4,12 +4,14 @@ import json
 import logging
 import logging.handlers
 import sys
+import warnings
 from typing import Iterable
 
 
 class NehushtanLogger:
     """
     A Logger Class For Shovel
+    DEPRECATED SINCE 0.2.5.
     """
 
     def __init__(
@@ -24,6 +26,8 @@ class NehushtanLogger:
         Reusable Logger, determined by name
         If parameter `handlers` provided and not None, all previous handlers would be cleared and newly given ones set.
         """
+        warnings.warn('Deprecated since 0.2.5. Use NehushtanFileLogger instead!',DeprecationWarning)
+
         self.with_process_info = with_process_info
         self.with_thread_info = with_thread_info
         self.logger = logging.getLogger(logger_name)

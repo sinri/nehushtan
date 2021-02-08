@@ -1,10 +1,11 @@
 import json
-import logging
 import os
 import sys
 import threading
 import time
 import traceback
+
+from nehushtan.logger.NehushtanLogging import NehushtanLogging
 
 
 class NehushtanFileLogger:
@@ -17,17 +18,24 @@ class NehushtanFileLogger:
             self,
             title='default',
             log_dir: str = None,
-            log_level=logging.DEBUG,
+            log_level=NehushtanLogging.DEBUG,
             categorize: bool = True,
             date_rotate: bool = True,
-            print_as_well: bool = False
+            print_higher_than_this_level=NehushtanLogging.CRITICAL
     ):
         self.title = title
         self.log_dir = log_dir
         self.log_level = log_level
         self.categorize = categorize
         self.date_rotate = date_rotate
-        self.print_as_well = print_as_well
+        # self.print_as_well = print_as_well <-- should use print_higher_than_this_level=NehushtanLogging.NOTSET
+        # If all, use NOTSET; if none, use FATAL
+        if print_higher_than_this_level is True:
+            self.print_higher_than_this_level = NehushtanLogging.NOTSET
+        elif print_higher_than_this_level is False:
+            self.print_higher_than_this_level = NehushtanLogging.CRITICAL
+        else:
+            self.print_higher_than_this_level = print_higher_than_this_level
 
     def get_target_file(self):
         if self.log_dir is None:
@@ -49,7 +57,7 @@ class NehushtanFileLogger:
         target_file = os.path.join(category_dir, f'{self.title}{today}.log')
         return target_file
 
-    def write_raw_line_to_log(self, text: str, level: int = logging.INFO):
+    def write_raw_line_to_log(self, text: str, level: int = NehushtanLogging.INFO):
         target_file = self.get_target_file()
 
         if target_file != '':
@@ -58,8 +66,8 @@ class NehushtanFileLogger:
             file.flush()
             file.close()
 
-        if target_file == '' or self.print_as_well:
-            if level >= logging.WARNING:
+        if target_file == '' or level > self.print_higher_than_this_level:
+            if level >= NehushtanLogging.WARNING:
                 print(text, file=sys.stderr)
             else:
                 print(text)
@@ -68,18 +76,7 @@ class NehushtanFileLogger:
 
     @staticmethod
     def get_level_label(level: int):
-        if level == logging.DEBUG:
-            return 'DEBUG'
-        elif level == logging.INFO:
-            return 'INFO'
-        elif level == logging.WARN or level == logging.WARNING:
-            return 'WARNING'
-        elif level == logging.ERROR:
-            return 'ERROR'
-        elif level == logging.CRITICAL or level == logging.FATAL:
-            return 'CRITICAL'
-        else:
-            return 'NOTSET'
+        return NehushtanLogging.get_label_of_level(level)
 
     def write_formatted_line_to_log(self, level: int, message: str, extra=None):
         if level < self.log_level:
@@ -93,16 +90,19 @@ class NehushtanFileLogger:
         return self.write_raw_line_to_log(line, level)
 
     def debug(self, message: str, extra=None):
-        return self.write_formatted_line_to_log(logging.DEBUG, message, extra)
+        return self.write_formatted_line_to_log(NehushtanLogging.DEBUG, message, extra)
 
     def info(self, message: str, extra=None):
-        return self.write_formatted_line_to_log(logging.INFO, message, extra)
+        return self.write_formatted_line_to_log(NehushtanLogging.INFO, message, extra)
+
+    def notice(self, message: str, extra=None):
+        return self.write_formatted_line_to_log(NehushtanLogging.NOTICE, message, extra)
 
     def warning(self, message: str, extra=None):
-        return self.write_formatted_line_to_log(logging.WARNING, message, extra)
+        return self.write_formatted_line_to_log(NehushtanLogging.WARNING, message, extra)
 
     def error(self, message: str, extra=None):
-        return self.write_formatted_line_to_log(logging.ERROR, message, extra)
+        return self.write_formatted_line_to_log(NehushtanLogging.ERROR, message, extra)
 
     def exception(self, message: str, exception: BaseException):
         just_the_string = ''.join(
@@ -112,11 +112,11 @@ class NehushtanFileLogger:
                 tb=exception.__traceback__
             )
         )
-        return self.write_formatted_line_to_log(logging.ERROR, message, f'{type(exception).__name__}') \
-            .write_raw_line_to_log(just_the_string, logging.ERROR)
+        return self.write_formatted_line_to_log(NehushtanLogging.ERROR, message, f'{type(exception).__name__}') \
+            .write_raw_line_to_log(just_the_string, NehushtanLogging.ERROR)
 
     def critical(self, message: str, extra=None):
-        return self.write_formatted_line_to_log(logging.CRITICAL, message, extra)
+        return self.write_formatted_line_to_log(NehushtanLogging.CRITICAL, message, extra)
 
     @staticmethod
     def ensure_extra_as_dict(extra):
