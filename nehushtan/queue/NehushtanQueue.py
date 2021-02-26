@@ -46,7 +46,7 @@ class NehushtanQueue:
     def _terminate_worker_process_of_task(self, task_reference):
         p = self.current_workers.get(task_reference)
         if p:
-            p.kill()
+            p.terminate()
             self.get_logger().info(
                 'NehushtanQueue._terminate_worker_process_of_task done',
                 {'task': task_reference, 'pid': p.pid, 'exitcode': p.exitcode, 'is_alive': p.is_alive()}
