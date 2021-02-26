@@ -46,12 +46,25 @@ class NehushtanQueue:
     def _terminate_worker_process_of_task(self, task_reference):
         p = self.current_workers.get(task_reference)
         if p:
+
+            # 终止进程
+            # https://docs.python.org/zh-cn/3/library/multiprocessing.html#multiprocessing.Process.terminate
+            #
+            #   在Unix上
+            #       这是使用 SIGTERM 信号完成的；
+            #   在Windows上
+            #       使用 TerminateProcess() 。请注意，不会执行退出处理程序和finally子句等。
+            #       这个函数可以用来终止或者说杀死一个进程，它不会留给进程及其所有线程清理的时间，
+            #       系统会马上终止(杀死)这个进程的所有线程，致使进程终止。
+            #
+            # 请注意，进程的后代进程将不会被终止 —— 它们将简单地变成孤立的。
             p.terminate()
+
             self.get_logger().info(
                 'NehushtanQueue._terminate_worker_process_of_task done',
                 {'task': task_reference, 'pid': p.pid, 'exitcode': p.exitcode, 'is_alive': p.is_alive()}
             )
-            self.delegate.when_killed_worker_process(task_reference)
+            self.delegate.when_killed_worker_process(task_reference, worker_pid=p.pid)
         else:
             self.get_logger().warning(
                 'NehushtanQueue._terminate_worker_process_of_task target task not found amongst current workers',

@@ -188,7 +188,7 @@ class NehushtanQueueDelegate:
         pass
 
     @abstractmethod
-    def when_killed_worker_process(self, task_reference, not_found=False):
+    def when_killed_worker_process(self, task_reference, not_found=False, worker_pid: int = None):
         """
         This works in MASTER
         """
