@@ -57,20 +57,24 @@ class NehushtanFileLogger:
         target_file = os.path.join(category_dir, f'{self.title}{today}.log')
         return target_file
 
-    def write_raw_line_to_log(self, text: str, level: int = NehushtanLogging.INFO):
+    def write_raw_line_to_log(self, text: str, level: int = NehushtanLogging.INFO, end=os.linesep):
+        """
+        Parameter `level` is only used to determine stdout or stderr when file empty.
+        Since 0.2.8, Parameter `end` added.
+        """
         target_file = self.get_target_file()
 
         if target_file != '':
             file = open(target_file, 'a')
-            file.write(text + os.linesep)
+            file.write(text + end)
             file.flush()
             file.close()
 
         if target_file == '' or level > self.print_higher_than_this_level:
             if level >= NehushtanLogging.WARNING:
-                print(text, file=sys.stderr)
+                print(text, file=sys.stderr, end=end)
             else:
-                print(text)
+                print(text, end=end)
 
         return self
 

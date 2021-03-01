@@ -57,4 +57,13 @@ afx = MySQLAnyTable(db, 'dt_chat_spider_task', 'sinri').insert_many_rows_with_ma
 
 logger.info('[model] end', {'afx': afx})
 
+replace_sql = """
+    REPLACE INTO sinri.dt_chat_spider_task(
+        shop_id, rece_date, buyer_wang_id, ct_merits_create_time
+    ) VALUES (%s, %s, %s, %s)
+    """
+last_row_id = db.raw_query_to_insert_many(replace_sql, data_set)
+
+logger.info('--> [raw] end', {'last_row_id': last_row_id})
+
 logger.info('fin')
