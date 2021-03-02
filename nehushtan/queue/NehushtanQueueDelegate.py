@@ -203,9 +203,9 @@ class NehushtanQueueDelegate:
         """
         pass
 
-    def register_queue_news(self, news: str, running_worker_count: int, busy_rate: float):
+    def register_queue_news(self, title: str, content: str, running_worker_count: int, busy_rate: float):
         """
-        Since 0.2.8
+        Since 0.2.9
         This works in MASTER
         It provides a method to let delegate know what daemon happened, other than the `when_*` methods.
         By default, the news would be ignored.
