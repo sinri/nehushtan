@@ -202,3 +202,13 @@ class NehushtanQueueDelegate:
         or do other jobs
         """
         pass
+
+    def register_queue_news(self, news: str, running_worker_count: int, busy_rate: float):
+        """
+        Since 0.2.8
+        This works in MASTER
+        It provides a method to let delegate know what daemon happened, other than the `when_*` methods.
+        By default, the news would be ignored.
+        It could be used to write a message queue, print to heartbeat logs, etc.
+        """
+        pass
