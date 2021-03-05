@@ -5,6 +5,8 @@ import threading
 import time
 import traceback
 
+import psutil
+
 from nehushtan.logger.NehushtanLogging import NehushtanLogging
 
 
@@ -121,6 +123,29 @@ class NehushtanFileLogger:
 
     def critical(self, message: str, extra=None):
         return self.write_formatted_line_to_log(NehushtanLogging.CRITICAL, message, extra)
+
+    def log_current_memory_usage_of_process(self, pid: int = None, level: int = NehushtanLogging.INFO):
+        """
+        Since 0.2.10
+        Filed `pid` would use os.getpid() for None.
+        """
+        memory_usage = psutil.Process(pid=pid).memory_info()
+        self.write_formatted_line_to_log(
+            level,
+            'Current Memory Usage Snapshot (in MB)',
+            {'rss': memory_usage.rss / 1024.0 / 1024.0, 'vms': memory_usage.vms / 1024.0 / 1024.0}
+        )
+
+    def log_current_memory_usage_of_object(self, target_name: str, target, level: int = NehushtanLogging.INFO):
+        """
+        Since 0.2.10
+        """
+        memory_usage = sys.getsizeof(target)
+        self.write_formatted_line_to_log(
+            level,
+            f'Current Memory Usage used by {target_name} (in MB)',
+            memory_usage / 1024.0 / 1024.0
+        )
 
     @staticmethod
     def ensure_extra_as_dict(extra):
