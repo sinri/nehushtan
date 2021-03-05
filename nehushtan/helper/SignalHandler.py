@@ -1,5 +1,6 @@
 import signal
 from abc import abstractmethod
+from typing import List
 
 
 class SignalHandler:
@@ -20,7 +21,7 @@ class SignalHandler:
     """
 
     @abstractmethod
-    def get_target_signal_list(self) -> list[int]:
+    def get_target_signal_list(self) -> List[int]:
         """
         return a list of signal number, commonly use the defined constants
         signal.SIGTERM, etc.
