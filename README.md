@@ -38,3 +38,7 @@ Provide a high-to-low solution on MySQL access, with Model support.
 ### Queue
 
 A designed framework for queue using `subprocess`. 
+
+### Multi-Processing
+
+Support for multiprocessing queue.
