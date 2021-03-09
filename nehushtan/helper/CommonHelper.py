@@ -58,17 +58,19 @@ class CommonHelper:
 
     @staticmethod
     def write_dictionary(target_dict: dict, keychain: tuple, value: any):
-        if len(keychain) <= 0:
-            # not modify anything if keychain is empty
-            return target_dict
-        if len(keychain) == 1:
+        keychain_length = len(keychain)
+        if keychain_length > 1:
+            current_key = keychain[0]
+            current_target = target_dict.get(current_key)
+            if type(current_target) is not dict:
+                # Since 0.2.14
+                # a great change: all non-dict-type entry would be cleared as an empty dict
+                target_dict[current_key] = {}
+            CommonHelper.write_dictionary(target_dict[current_key], keychain[1:], value)
+        elif keychain_length == 1:
             target_dict[keychain[0]] = value
-            return target_dict
 
-        current_key = keychain[0]
-        if target_dict.get(current_key) is None:
-            target_dict[current_key] = {}
-        return CommonHelper.write_dictionary(target_dict[current_key], keychain[1:], value)
+        return target_dict
 
     @staticmethod
     def class_with_class_path(module_path: str, class_name: str):
