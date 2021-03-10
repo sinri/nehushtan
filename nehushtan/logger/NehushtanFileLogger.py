@@ -153,3 +153,26 @@ class NehushtanFileLogger:
         Since 0.1.25, add ensure_ascii as False to allow unicode chars
         """
         return json.dumps(extra, default=lambda inner_x: inner_x.__str__(), ensure_ascii=False)
+
+    def get_args_json_to_clone(self):
+        """
+        Since 0.2.15
+        """
+        return json.dumps([
+            self.title,
+            self.log_dir,
+            self.log_level,
+            self.categorize,
+            self.date_rotate,
+            self.print_higher_than_this_level,
+        ])
+
+    @staticmethod
+    def build_instance_from_args_json(args_json: str):
+        """
+        Since 0.2.15
+        """
+        args = json.loads(args_json)
+        if type(args) is not list and type(args) is not tuple:
+            raise ValueError('String `args_json` should be an array in JSON format')
+        return NehushtanFileLogger(*args)
