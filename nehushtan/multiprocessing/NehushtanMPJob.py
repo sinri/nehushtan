@@ -8,25 +8,35 @@ class NehushtanMPJob:
     Since 0.2.13
     """
 
-    def __init__(self, name: str, logger: NehushtanFileLogger):
+    def __init__(self, name: str):
         """
         Override this and extend the parameters
+        Since 0.2.16, remove `logger`
         """
         self.__name = name
-        self.__logger = logger
         self.__pid = 0
 
     def get_name(self):
         return self.__name
 
-    def get_logger(self):
-        return self.__logger
+    @abstractmethod
+    def get_logger(self) -> NehushtanFileLogger:
+        """
+        Since 0.2.16
+        """
+        pass
 
     def set_pid(self, pid: int):
+        """
+        Available in Main Process
+        """
         self.__pid = pid
         return self
 
     def get_pid(self):
+        """
+        Available in Main Process
+        """
         return self.__pid
 
     @abstractmethod
