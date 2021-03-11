@@ -13,6 +13,10 @@ from nehushtan.multiprocessing.NehushtanMPTerminatedSituation import NehushtanMP
 class NehushtanMPQueue(SignalHandler):
     """
     Since 0.2.13
+
+    Notice:
+    The program entrance should be put into `if __name__ == '__main__':`;
+    and need `set_start_method('spawn')` in the beginning.
     """
 
     def __init__(self):
