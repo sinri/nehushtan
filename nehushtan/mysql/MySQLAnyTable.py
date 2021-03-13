@@ -15,8 +15,8 @@ class MySQLAnyTable(MySQLTableMixin):
     def get_mysql_kit(self) -> MySQLKit:
         return self._mysql_kit
 
-    def mapping_table_name(self):
+    def mapping_table_name(self) -> str:
         return self._table_name
 
-    def mapping_schema_name(self):
+    def mapping_schema_name(self) -> str:
         return self._schema_name

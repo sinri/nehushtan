@@ -10,6 +10,18 @@ from tests.queue.plan2.Test2NehushtanQueueTask import Test2NehushtanQueueTask
 
 class Test2NehushtanQueueDelegate(NehushtanQueueDelegate):
 
+    def should_kill_any_worker_processes(self) -> list:
+        return []
+
+    def when_killed_worker_process(self, task_reference, not_found=False, worker_pid: int = None):
+        self.logger.notice(
+            'when_killed_worker_process',
+            {'task_reference': task_reference, 'not_found': not_found, 'worker_pid': worker_pid}
+        )
+
+    def handle_command_queue(self):
+        self.logger.info('handle_command_queue, actually do nothing')
+
     def __init__(self, config_dictionary: dict = None, logger: NehushtanFileLogger = None):
         super().__init__(config_dictionary, logger)
         self.last_task_id = 1000

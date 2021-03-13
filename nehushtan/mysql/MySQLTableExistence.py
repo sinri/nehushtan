@@ -8,16 +8,14 @@ from nehushtan.mysql.MySQLKit import MySQLKit
 class MySQLTableExistence(ABC):
 
     def __init__(self):
-        # Must initialize `_mysql_kit` in overriding method here
-        self._mysql_kit = None
+        """
+        Since 0.2.17 Remove `self._mysql_kit`, it is not defined here anymore
+        """
         pass
 
     @abstractmethod
     def get_mysql_kit(self) -> MySQLKit:
         pass
-        # if self._mysql_kit is None:
-        #     raise Exception("MySQLKit is not available for querying...")
-        # return self._mysql_kit
 
     @abstractmethod
     def mapping_table_name(self) -> str:
