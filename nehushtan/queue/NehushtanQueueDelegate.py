@@ -195,11 +195,12 @@ class NehushtanQueueDelegate:
         pass
 
     @abstractmethod
-    def handle_command_queue(self):
+    def handle_command_queue(self) -> int:
         """
         This works in MASTER
         This may update the data for `should_kill_any_worker_processes` for loop,
         or do other jobs
+        Since 0.2.18 should return an integer, as the count of commands handled; so, zero for no command to do.
         """
         pass
 

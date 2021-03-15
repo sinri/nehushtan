@@ -85,8 +85,9 @@ class NehushtanQueue:
     def _loop_maintain(self, wait_till_processes_become_less_than: int = 0):
         self._scan_workers()
 
-        self.delegate.handle_command_queue()
-        self.register_news('handle_command_queue', 'Handled Command Queue')
+        if self.delegate.handle_command_queue() > 0:
+            # Since 0.2.18 the news only be sent when any command(s) done
+            self.register_news('handle_command_queue', 'Handled Command Queue')
 
         kill_list = self.delegate.should_kill_any_worker_processes()
         if len(kill_list) > 0:
