@@ -93,6 +93,16 @@ class NehushtanQueueDelegate:
         """
         pass
 
+    def before_seeking_next_tasks(self):
+        """
+        This works in MASTER
+        It is a hook before `check_next_task`.
+        A scnerio is, here delegate prepares a list of task candidates,
+        And be consumed in `check_next_task` in order.
+        Since 0.2.19
+        """
+        pass
+
     @abstractmethod
     def check_next_task(self) -> NehushtanQueueTask:
         """

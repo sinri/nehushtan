@@ -150,40 +150,17 @@ class NehushtanQueue:
                         self.register_news('exit_exclusive_mode', 'Exit exclusive mode as no task running now')
 
                 try:
-                    task = self.delegate.check_next_task()
-                    task_id = task.get_task_reference()
-
-                    if task.is_exclusive():
-                        # now daemon should wait for the other tasks to be over
-                        self.register_news('before_enter_exclusive_mode',
-                                           f'Task {task_id} is exclusive, waiting for all running workers finish')
-                        self._loop_maintain(1)
-                        self.register_news('enter_exclusive_mode',
-                                           f'Enter exclusive mode for task {task_id} as all other workers finished')
-                        self._is_running_exclusive_task = True
-
-                    if not task.before_execute():
-                        self.register_news('when_task_not_executable', f'Task {task_id} is not executable')
-                        self.delegate.when_task_not_executable(task)
-
+                    # maybe: reset task cadidates
+                    self.delegate.before_seeking_next_tasks()
+                    # maybe: seek in cache of task cadidates or from remote task queue directly
+                    while self.__seek_and_run_one_task() is True:
+                        if self.get_pool_capacity() <= len(self.current_workers.items()):
+                            # all workers busy
+                            break
                         if self._is_running_exclusive_task:
-                            self._is_running_exclusive_task = False
-                            self.register_news('exit_exclusive_mode',
-                                               f'Exit exclusive mode as task {task_id} is not executable')
-
-                        continue
-
-                    p = Process(target=NehushtanQueue.embedded_task_execute, args=(task, self.delegate))
-                    p.start()
-                    self.current_workers[task.get_task_reference()] = p
-
-                    self.register_news('when_worker_process_created',
-                                       f'Task [{task.get_task_reference()}] -> Process {p.name} PID is [{p.pid}]')
-                    self.delegate.when_worker_process_created(
-                        task.get_task_reference(),
-                        f'Task [{task.get_task_reference()}] -> Process {p.name} PID is [{p.pid}]'
-                    )
-
+                            # no other tasks should be executed
+                            break
+                    continue
                 except NoNextTaskSituation:
                     self.register_news('when_no_task_to_do', 'There is no task in queue able to deal now')
                     self.delegate.when_no_task_to_do()
@@ -196,6 +173,50 @@ class NehushtanQueue:
         self.register_news('loop_terminating', 'Loop is about to terminate')
         self.delegate.when_loop_terminates()
         self.register_news('when_loop_terminated', 'Loop terminated')
+
+    def __seek_and_run_one_task(self):
+        """
+        When a task found and successfully genereate a process to execute, return True.
+        When a task found but not executable, return False.
+        When no task found to execute, raise NoNextTaskSituation.
+        """
+        task = self.delegate.check_next_task()
+        task_id = task.get_task_reference()
+
+        if task.is_exclusive():
+            # now daemon should wait for the other tasks to be over
+            self.register_news('before_enter_exclusive_mode',
+                               f'Task {task_id} is exclusive, waiting for all running workers finish')
+            self._loop_maintain(1)
+            self.register_news('enter_exclusive_mode',
+                               f'Enter exclusive mode for task {task_id} as all other workers finished')
+            self._is_running_exclusive_task = True
+
+        if not task.before_execute():
+            self.register_news('when_task_not_executable', f'Task {task_id} is not executable')
+            self.delegate.when_task_not_executable(task)
+
+            if self._is_running_exclusive_task:
+                self._is_running_exclusive_task = False
+                self.register_news('exit_exclusive_mode',
+                                   f'Exit exclusive mode as task {task_id} is not executable')
+
+            return False
+
+        p = Process(target=NehushtanQueue.embedded_task_execute, args=(task, self.delegate))
+        p.start()
+        self.current_workers[task.get_task_reference()] = p
+
+        self.register_news(
+            'when_worker_process_created',
+            f'Task [{task.get_task_reference()}] -> Process {p.name} PID is [{p.pid}]'
+        )
+        self.delegate.when_worker_process_created(
+            task.get_task_reference(),
+            f'Task [{task.get_task_reference()}] -> Process {p.name} PID is [{p.pid}]'
+        )
+
+        return True
 
     @staticmethod
     def embedded_task_execute(embedded_task: NehushtanQueueTask, delegate: NehushtanQueueDelegate):
