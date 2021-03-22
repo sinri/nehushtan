@@ -1,13 +1,17 @@
 import re
+import sys
 
 
 class NehushtanArgumentParser:
 
-    def __init__(self, sys_arg_list: list):
+    def __init__(self, sys_arg_list: list = None):
         """
 
         :param sys_arg_list: Commonly `sys.argv[1:]`
         """
+        if sys_arg_list is None:
+            sys_arg_list = sys.argv[1:]
+
         self._sys_arg_list = sys_arg_list
         self._argument_dict = {}
         self._options_short = {}
@@ -15,6 +19,10 @@ class NehushtanArgumentParser:
         self._options_prefix = {}
         self._result_dict = {}
         self._usage_dict = {}
+
+    def set_arg_list(self, arg_list: list):
+        self._sys_arg_list = arg_list
+        return self
 
     def add_option(self, key: str, desc: str = '', short: str = '', long: str = '', prefix: str = ''):
         """
@@ -34,16 +42,26 @@ class NehushtanArgumentParser:
             'desc': desc,
         }
         if short != '':
-            self._options_short[f'-{short}'] = key
+            argument_key = f'-{short}'
+            if self._options_short.get(argument_key) is not None:
+                raise RuntimeError(f'Short Key [{argument_key}] Already Existed')
+            self._options_short[argument_key] = key
             usage['short'] = f'-{short} [VALUE]'
         if long != '':
-            self._options_long[f'--{long}'] = key
+            argument_key = f'--{long}'
+            if self._options_long.get(argument_key) is not None:
+                raise RuntimeError(f'Long Key [{argument_key}] Already Existed')
+            self._options_long[argument_key] = key
             usage['long'] = f'--{long} [VALUE]'
         if prefix != '':
-            self._options_prefix[f'--{prefix}-'] = key
+            argument_key = f'--{prefix}-'
+            if self._options_prefix.get(argument_key) is not None:
+                raise RuntimeError(f'Prefix Key [{argument_key}] Already Existed')
+            self._options_prefix[argument_key] = key
             usage['prefix'] = f'--{prefix}-[KEY] [VALUE]'
 
         self._usage_dict[key] = usage
+
         return self
 
     def parse(self):

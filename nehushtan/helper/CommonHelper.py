@@ -1,4 +1,5 @@
 import importlib
+import warnings
 
 
 class CommonHelper:
@@ -73,15 +74,19 @@ class CommonHelper:
         return target_dict
 
     @staticmethod
-    def class_with_class_path(module_path: str, class_name: str):
+    def class_with_class_path(module_path: str, class_name: str = None):
         """
         Since 0.1.22
+        Since 0.2.19 When the class name is the same with PY file name, `class_name` is optional.
+
         For a/b.py -> class b
         class_with_namespace is like 'package.sub_package.class', 'a.b'
         class_name is 'b'
         return a CLASS definition, to be used with parameters to make instance
         """
         module = importlib.import_module(module_path)
+        if class_name is None:
+            class_name = module_path.split('.')[-1]
         a_class = getattr(module, class_name)
         return a_class
 
@@ -89,10 +94,14 @@ class CommonHelper:
     def class_with_module_and_name(module_base: str, sub_module_name: str):
         """
         Since 0.1.21
+        Since 0.2.19 It is not so convinence to use, consider using `class_with_class_path`.
+
         For a/b.py -> class b
         module_base is a
         sub_module_name is b
         """
+        warnings.warn('Use `class_with_class_path` instead.')
+
         module = __import__(module_base)
         a_class = getattr(module, sub_module_name)
         return a_class
