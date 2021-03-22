@@ -3,11 +3,24 @@ import sys
 
 
 class NehushtanArgumentParser:
+    """
+    Support
+    <python xxx.py> [-a B] [--bb C] [--dd-ee F --dd-gg H]
+    Parsed as
+    {
+        "a":"B"
+        "bb":"C",
+        "dd":{
+            "ee":"F",
+            "gg":"H",
+        }
+    }
+    """
 
     def __init__(self, sys_arg_list: list = None):
         """
-
-        :param sys_arg_list: Commonly `sys.argv[1:]`
+        Since 0.2.19 sys_arg_list become optional
+        :param sys_arg_list: a list of arguments, if omitted use `sys.argv[1:]`
         """
         if sys_arg_list is None:
             sys_arg_list = sys.argv[1:]
@@ -21,6 +34,9 @@ class NehushtanArgumentParser:
         self._usage_dict = {}
 
     def set_arg_list(self, arg_list: list):
+        """
+        :param arg_list: Commonly `sys.argv[1:]`
+        """
         self._sys_arg_list = arg_list
         return self
 
@@ -114,3 +130,7 @@ class NehushtanArgumentParser:
             usage_text += "\n"
 
         return usage_text
+
+
+if __name__ == '__main__':
+    print(NehushtanArgumentParser().add_option('A', 'argument A', 'a').parse().get_parsed_option_dict())
