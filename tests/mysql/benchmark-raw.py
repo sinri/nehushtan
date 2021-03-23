@@ -1,12 +1,13 @@
 import random
 
+from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
 from nehushtan.logger.NehushtanLogger import NehushtanLogger
 from nehushtan.mysql.MySQLAnyTable import MySQLAnyTable
 from nehushtan.mysql.MySQLKit import MySQLKit
 from nehushtan.mysql.MySQLKitConfig import MySQLKitConfig
 from tests.config import MYSQL_CONFIG
 
-logger = NehushtanLogger('default', [NehushtanLogger.make_stdout_handler()])
+logger = NehushtanFileLogger('default')
 
 config = MySQLKitConfig(MYSQL_CONFIG)
 db = MySQLKit(config)

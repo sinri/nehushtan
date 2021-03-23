@@ -1,6 +1,3 @@
-import email
-import re
-from email.header import decode_header
 import email.parser
 
 from nehushtan.helper.CommonHelper import CommonHelper

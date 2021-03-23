@@ -18,9 +18,9 @@ if __name__ == '__main__':
     except Exception as error:
         file_logger.exception('X', error)
 
-    args_json=file_logger.get_args_json_to_clone()
+    args_json = file_logger.get_args_json_to_clone()
     print(args_json)
-    cloned_logger=NehushtanFileLogger.build_instance_from_args_json(args_json)
+    cloned_logger = NehushtanFileLogger.build_instance_from_args_json(args_json)
 
     cloned_logger.critical('C', {"A": "B"})
     cloned_logger.error('E', 111)

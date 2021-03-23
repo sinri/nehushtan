@@ -1,5 +1,6 @@
 import time
 from abc import abstractmethod
+from typing import List
 
 from nehushtan.helper.CommonHelper import CommonHelper
 from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
@@ -15,6 +16,9 @@ class NehushtanQueueDelegate:
     # QUEUE_RUNTIME_COMMAND_FORCE_RESTART = "FORCE-RESTART"
 
     CONFIG_KEY_POOL_CAPACITY = 'POOL_CAPACITY'
+    CONFIG_KEY_SLEEP_TIME_FOR_FREE = 'SLEEP_TIME_FOR_FREE'
+    CONFIG_KEY_SLEEP_TIME_FOR_BUSY = 'SLEEP_TIME_FOR_BUSY'
+    CONFIG_KEY_SLEEP_TIME_FOR_PAUSE = 'SLEEP_TIME_FOR_PAUSE'
 
     def __init__(self, config_dictionary: dict = None, logger: NehushtanFileLogger = None):
         """
@@ -35,6 +39,13 @@ class NehushtanQueueDelegate:
 
     def get_configured_pool_capacity(self) -> int:
         return self.read_config_of_delegate((NehushtanQueueDelegate.CONFIG_KEY_POOL_CAPACITY,), 1)
+
+    def sleep_for_configured_time(self, config_key: str):
+        """
+        config_key might be amongst `CONFIG_KEY_SLEEP_TIME_FOR_*`
+        """
+        x = self.read_config_of_delegate((config_key,), 1)
+        time.sleep(x)
 
     def read_latest_command(self) -> str:
         """
@@ -85,13 +96,12 @@ class NehushtanQueueDelegate:
         """
         pass
 
-    @abstractmethod
     def when_loop_should_not_run(self):
         """
         Sleep for a certain while.
         This works in MASTER
         """
-        pass
+        self.sleep_for_configured_time(self.CONFIG_KEY_SLEEP_TIME_FOR_PAUSE)
 
     def before_seeking_next_tasks(self):
         """
@@ -104,20 +114,20 @@ class NehushtanQueueDelegate:
         pass
 
     @abstractmethod
-    def check_next_task(self) -> NehushtanQueueTask:
+    def check_next_task_candidates(self) -> List[NehushtanQueueTask]:
         """
         This works in MASTER
         if none newly found... raise NoNextTaskSituation!
+        Since 0.3.0
         """
         pass
 
-    @abstractmethod
     def when_no_task_to_do(self):
         """
         When the loop cannot check for a task to do next, execute this
         This works in MASTER
         """
-        pass
+        self.sleep_for_configured_time(self.CONFIG_KEY_SLEEP_TIME_FOR_FREE)
 
     @abstractmethod
     def when_task_not_executable(self, task: NehushtanQueueTask):
@@ -162,8 +172,7 @@ class NehushtanQueueDelegate:
         This works in MASTER
         """
         self.logger.warning('Pool is full, sleep for a while', {'size': self.get_configured_pool_capacity()})
-        # self.beat('whenPoolIsFull', 'Pool Full Wait')
-        time.sleep(30)
+        self.sleep_for_configured_time(self.CONFIG_KEY_SLEEP_TIME_FOR_BUSY)
 
     def when_worker_process_created(self, task_reference, note: str = ''):
         """
@@ -177,11 +186,11 @@ class NehushtanQueueDelegate:
         """
         pass
 
-    def should_wait_when_pool_is_full(self):
-        """
-        This works in MASTER
-        """
-        return True
+    # def should_wait_when_pool_is_full(self):
+    #     """
+    #     This works in MASTER
+    #     """
+    #     return True
 
     def should_wait_for_all_workers_before_terminating(self):
         """

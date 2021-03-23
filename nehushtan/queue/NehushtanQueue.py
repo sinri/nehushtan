@@ -150,17 +150,15 @@ class NehushtanQueue:
                         self.register_news('exit_exclusive_mode', 'Exit exclusive mode as no task running now')
 
                 try:
-                    # maybe: reset task cadidates
                     self.delegate.before_seeking_next_tasks()
-                    # maybe: seek in cache of task cadidates or from remote task queue directly
-                    while self.__seek_and_run_one_task() is True:
-                        if self.get_pool_capacity() <= len(self.current_workers.items()):
-                            # all workers busy
-                            break
+                    task_candidates = self.delegate.check_next_task_candidates()
+                    for task_candidate in task_candidates:
+                        self.__run_one_task(task_candidate)
                         if self._is_running_exclusive_task:
-                            # no other tasks should be executed
                             break
-                    continue
+                        if self.get_pool_capacity() <= len(self.current_workers.items()):
+                            break
+
                 except NoNextTaskSituation:
                     self.register_news('when_no_task_to_do', 'There is no task in queue able to deal now')
                     self.delegate.when_no_task_to_do()
@@ -174,13 +172,13 @@ class NehushtanQueue:
         self.delegate.when_loop_terminates()
         self.register_news('when_loop_terminated', 'Loop terminated')
 
-    def __seek_and_run_one_task(self):
+    def __run_one_task(self, task: NehushtanQueueTask):
         """
-        When a task found and successfully genereate a process to execute, return True.
-        When a task found but not executable, return False.
-        When no task found to execute, raise NoNextTaskSituation.
+        Since 0.3.0
+        When a found task:
+            successfully genereate a process to execute, return True.
+            not executable, return False.
         """
-        task = self.delegate.check_next_task()
         task_id = task.get_task_reference()
 
         if task.is_exclusive():

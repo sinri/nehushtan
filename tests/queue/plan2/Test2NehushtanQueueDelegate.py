@@ -1,5 +1,6 @@
 import time
 from random import random
+from typing import List
 
 from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
 from nehushtan.queue.NehushtanQueueDelegate import NehushtanQueueDelegate
@@ -36,12 +37,12 @@ class Test2NehushtanQueueDelegate(NehushtanQueueDelegate):
         self.logger.warning('Test2NehushtanQueueDelegate when_loop_should_not_run sleep 10')
         time.sleep(10)
 
-    def check_next_task(self) -> NehushtanQueueTask:
+    def check_next_task_candidates(self) -> List[NehushtanQueueTask]:
         self.logger.info('Test2NehushtanQueueDelegate check_next_task')
         if random() > 0.7:
             self.last_task_id += 1
             self.logger.info('Test2NehushtanQueueDelegate check_next_task -> create new task')
-            return Test2NehushtanQueueTask(task_id=self.last_task_id)
+            return [Test2NehushtanQueueTask(task_id=self.last_task_id)]
         else:
             raise NoNextTaskSituation('No task to execute')
 

@@ -26,7 +26,7 @@ class NehushtanLogger:
         Reusable Logger, determined by name
         If parameter `handlers` provided and not None, all previous handlers would be cleared and newly given ones set.
         """
-        warnings.warn('Deprecated since 0.2.5. Use NehushtanFileLogger instead!',DeprecationWarning)
+        warnings.warn('Deprecated since 0.2.5. Use NehushtanFileLogger instead!', DeprecationWarning)
 
         self.with_process_info = with_process_info
         self.with_thread_info = with_thread_info

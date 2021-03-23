@@ -24,7 +24,7 @@ if __name__ == '__main__':
     x = db.raw_query_to_insert_one(replace_sql, (2, 2, 'a'))
     logger.info('Round 3', x)
 
-    x = db.raw_query_to_insert_one(replace_sql,[])
+    x = db.raw_query_to_insert_one(replace_sql, [])
     logger.info('Round 4', x)
 
     cursor = db.get_raw_connection().cursor()
