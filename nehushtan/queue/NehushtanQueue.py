@@ -152,12 +152,38 @@ class NehushtanQueue:
                 try:
                     self.delegate.before_seeking_next_tasks()
                     task_candidates = self.delegate.check_next_task_candidates()
+
+                    newly_locked = {}
                     for task_candidate in task_candidates:
-                        self.__run_one_task(task_candidate)
-                        if self._is_running_exclusive_task:
-                            break
-                        if self.get_pool_capacity() <= len(self.current_workers.items()):
-                            break
+
+                        # Since 0.3.1
+                        # check locks and maintain a newly locked dict to avoid trying start up for known new locks
+                        this_lock_list = task_candidate.get_lock_list()
+
+                        already_locked = False
+                        for x in this_lock_list:
+                            if newly_locked.get(x, False) is True:
+                                already_locked = True
+                                break
+                        if already_locked:
+                            self.get_logger().debug(
+                                f'Task Candidate {task_candidate.get_task_reference()} '
+                                f'locked by newly running tasks, passover'
+                            )
+                            continue
+                        else:
+                            for x in this_lock_list:
+                                newly_locked[x] = True
+
+                            self.__run_one_task(task_candidate)
+                            # here is a problem:
+                            # when __run_one_task return False, the task_candidate actually did not start up,
+                            # the locks are really not locked newly
+
+                            if self._is_running_exclusive_task:
+                                break
+                            if self.get_pool_capacity() <= len(self.current_workers.items()):
+                                break
 
                 except NoNextTaskSituation:
                     self.register_news('when_no_task_to_do', 'There is no task in queue able to deal now')
@@ -172,7 +198,7 @@ class NehushtanQueue:
         self.delegate.when_loop_terminates()
         self.register_news('when_loop_terminated', 'Loop terminated')
 
-    def __run_one_task(self, task: NehushtanQueueTask):
+    def __run_one_task(self, task: NehushtanQueueTask) -> bool:
         """
         Since 0.3.0
         When a found task:
