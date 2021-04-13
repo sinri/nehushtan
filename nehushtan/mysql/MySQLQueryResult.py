@@ -1,5 +1,5 @@
 #  Copyright (c) 2020. Sinri Edogawa
-from typing import Iterable, Optional, Union, List, Tuple
+from typing import Iterable, Optional, Union, List
 
 from pymysql.cursors import Cursor
 
@@ -117,7 +117,7 @@ class MySQLQueryResult:
             raise IOError('Cannot fetch query result as status is not QUERIED.')
         return tuple(self._result_rows)
 
-    def get_column_from_fetched_rows_as_tuple(self, field_key) -> Tuple[Union[tuple, dict], ...]:
+    def get_column_from_fetched_rows_as_tuple(self, field_key) -> tuple:
         """
         Since 0.3.2
         """
