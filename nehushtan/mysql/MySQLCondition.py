@@ -1,5 +1,5 @@
 #  Copyright (c) 2020. Sinri Edogawa
-from typing import Iterable
+from typing import Iterable, Union
 
 from nehushtan.mysql import constant
 from nehushtan.mysql.MySQLKit import MySQLKit
@@ -35,11 +35,11 @@ class MySQLCondition:
         return MySQLCondition(field, constant.MYSQL_CONDITION_OP_NEQ, value)
 
     @staticmethod
-    def make_in_array(field: str, array: tuple or list):
+    def make_in_array(field: str, array: Union[tuple, list]):
         return MySQLCondition(field, constant.MYSQL_CONDITION_OP_IN, array)
 
     @staticmethod
-    def make_not_in_array(field: str, array: tuple or list):
+    def make_not_in_array(field: str, array: Union[tuple, list]):
         return MySQLCondition(field, constant.MYSQL_CONDITION_OP_NOT_IN, array)
 
     @staticmethod
@@ -234,7 +234,7 @@ class MySQLCondition:
             return self._value
 
         else:
-            raise Exception("CANNOT OPERATE UNKNOWN TYPE!")
+            raise NotImplementedError("CANNOT OPERATE UNKNOWN TYPE!")
 
     @staticmethod
     def build_sql_component(conditions: Iterable["MySQLCondition"]):

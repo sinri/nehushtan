@@ -8,6 +8,7 @@ from nehushtan.mysql import constant
 from nehushtan.mysql.MySQLCondition import MySQLCondition
 from nehushtan.mysql.MySQLQueryResult import MySQLQueryResult
 from nehushtan.mysql.MySQLTableExistence import MySQLTableExistence
+from nehushtan.mysql.constant import MYSQL_QUERY_ROW_TYPE_DICT, MYSQL_QUERY_ROW_TYPE_TUPLE, MYSQL_QUERY_ROW_TYPE_UNKNOWN
 
 
 class MySQLTableSelection:
@@ -157,8 +158,18 @@ class MySQLTableSelection:
 
         return sql
 
+    @staticmethod
+    def parse_row_type_to_str(row_type: type):
+        if row_type is dict:
+            return MYSQL_QUERY_ROW_TYPE_DICT
+        elif row_type is tuple:
+            return MYSQL_QUERY_ROW_TYPE_TUPLE
+        else:
+            return MYSQL_QUERY_ROW_TYPE_UNKNOWN
+            # raise NotImplementedError(f'Row Type [{row_type}] Is Not Implemented.')
+
     def query_for_result_matrix(self, row_type: type):
-        result = MySQLQueryResult()
+        result = MySQLQueryResult(self.parse_row_type_to_str(row_type))
         try:
             sql = self.generate_sql()
             result.set_sql(sql)
@@ -184,7 +195,7 @@ class MySQLTableSelection:
         return self.query_for_result_matrix(tuple)
 
     def query_for_result_stream(self, row_type: type):
-        result = MySQLQueryResult()
+        result = MySQLQueryResult(self.parse_row_type_to_str(row_type))
         try:
             sql = self.generate_sql()
             result.set_sql(sql)

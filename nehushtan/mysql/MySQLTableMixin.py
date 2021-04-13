@@ -24,7 +24,7 @@ class MySQLTableMixin(MySQLViewMixin, ABC):
         return f'ON DUPLICATE KEY UPDATE {sql_parts}'
 
     def _modify_with_sql(self, sql_template: str, args: list = None, for_many_rows=False, commit_immediately=False):
-        result = MySQLQueryResult()
+        result = MySQLQueryResult(constant.MYSQL_QUERY_ROW_TYPE_UNKNOWN)
         cursor = None
 
         try:
