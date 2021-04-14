@@ -16,7 +16,7 @@ class MySQLQueryResult:
 
         self._last_inserted_id: int = -1
         self._affected_rows: int = -1
-        self._result_rows: List[Union[tuple, dict], ...] = []
+        self._result_rows: List[Union[tuple, dict]] = []
         self._result_stream: Optional[Cursor] = None
 
         self._row_type = row_type
@@ -72,7 +72,7 @@ class MySQLQueryResult:
         self._error = error
         return self
 
-    def append_result_rows(self, rows: Iterable[Union[tuple, dict], ...]):
+    def append_result_rows(self, rows: Iterable[Union[tuple, dict]]):
         """
 
         :param rows: Array (list ot tuple) of result rows, each row would be a dict or tuple
