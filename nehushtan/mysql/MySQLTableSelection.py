@@ -1,30 +1,19 @@
 #  Copyright (c) 2020. Sinri Edogawa
 from typing import Iterable
 
-import pymysql
-from pymysql.cursors import SSCursor, SSDictCursor
-
-from nehushtan.mysql import constant
 from nehushtan.mysql.MySQLCondition import MySQLCondition
-from nehushtan.mysql.MySQLQueryResult import MySQLQueryResult
+from nehushtan.mysql.MySQLKit import MySQLKit
+from nehushtan.mysql.MySQLSelectionMixin import MySQLSelectionMixin
 from nehushtan.mysql.MySQLTableExistence import MySQLTableExistence
-from nehushtan.mysql.constant import MYSQL_QUERY_ROW_TYPE_DICT, MYSQL_QUERY_ROW_TYPE_TUPLE, MYSQL_QUERY_ROW_TYPE_UNKNOWN
 
 
-class MySQLTableSelection:
-    # _model: MySQLTableExistence
-    # _select_fields: list
-    # _conditions: list
-    # _group_by_fields: list
-    # _sort_expression: str
-    # _limit: int
-    # _offset: int
-    # _use_indices: list
-    # _force_indices: list
-    # _ignore_indices: list
-    # _for_update: bool
+class MySQLTableSelection(MySQLSelectionMixin):
+    """
+    As of version 0.3.6, move some features to MySQLSelectionMixin
+    """
 
     def __init__(self, model: MySQLTableExistence):
+        super().__init__()
         self._model = model
         self._select_fields = []
         self._conditions = []
@@ -36,6 +25,9 @@ class MySQLTableSelection:
         self._force_indices = []
         self._ignore_indices = []
         self._for_update = False
+
+    def get_mysql_kit(self) -> MySQLKit:
+        return self._model.get_mysql_kit()
 
     def get_limit(self) -> int:
         return self._limit
@@ -123,7 +115,7 @@ class MySQLTableSelection:
     def set_for_update(self, value: bool):
         self._for_update = value
 
-    def generate_sql(self):
+    def generate_sql(self) -> str:
         table = self._model.get_table_expression()
 
         fields = "*"
@@ -157,67 +149,3 @@ class MySQLTableSelection:
             sql += " FOR UPDATE "
 
         return sql
-
-    @staticmethod
-    def parse_row_type_to_str(row_type: type):
-        if row_type is dict:
-            return MYSQL_QUERY_ROW_TYPE_DICT
-        elif row_type is tuple:
-            return MYSQL_QUERY_ROW_TYPE_TUPLE
-        else:
-            return MYSQL_QUERY_ROW_TYPE_UNKNOWN
-            # raise NotImplementedError(f'Row Type [{row_type}] Is Not Implemented.')
-
-    def query_for_result_matrix(self, row_type: type):
-        result = MySQLQueryResult(self.parse_row_type_to_str(row_type))
-        try:
-            sql = self.generate_sql()
-            result.set_sql(sql)
-            if row_type is dict:
-                matrix = self._model.get_mysql_kit().raw_query_for_all_dict_rows(sql)
-            else:
-                matrix = self._model.get_mysql_kit().raw_query_for_all_tuple_rows(sql)
-            result.set_status(constant.MYSQL_QUERY_STATUS_QUERIED)
-            result.append_result_rows(matrix)
-        except pymysql.MySQLError as e:
-            result.set_status(constant.MYSQL_QUERY_STATUS_ERROR)
-            result.set_error(f"MySQL Error {e.__class__} [{e.args[0]}] {e.args[1]}")
-        except Exception as pe:
-            result.set_status(constant.MYSQL_QUERY_STATUS_ERROR)
-            result.set_error(f"Python Error {pe.__class__}: {pe}")
-        finally:
-            return result
-
-    def query_for_result_as_tuple_of_dict(self):
-        return self.query_for_result_matrix(dict)
-
-    def query_for_result_as_tuple_of_tuple(self):
-        return self.query_for_result_matrix(tuple)
-
-    def query_for_result_stream(self, row_type: type):
-        result = MySQLQueryResult(self.parse_row_type_to_str(row_type))
-        try:
-            sql = self.generate_sql()
-            result.set_sql(sql)
-            if row_type is dict:
-                cursor = self._model.get_mysql_kit().get_raw_connection().cursor(SSDictCursor)
-            else:
-                cursor = self._model.get_mysql_kit().get_raw_connection().cursor(SSCursor)
-            cursor.execute(sql)
-            result.set_status(constant.MYSQL_QUERY_STATUS_STREAMING)
-            result.set_stream(cursor)
-            return result
-        except pymysql.MySQLError as e:
-            result.set_status(constant.MYSQL_QUERY_STATUS_ERROR)
-            result.set_error(f"MySQL Error {e.__class__} [{e.args[0]}] {e.args[1]}")
-        except Exception as pe:
-            result.set_status(constant.MYSQL_QUERY_STATUS_ERROR)
-            result.set_error(f"Python Error {pe.__class__}: {pe}")
-        finally:
-            return result
-
-    def query_for_result_stream_as_dict(self):
-        return self.query_for_result_stream(row_type=dict)
-
-    def query_for_result_stream_as_tuple(self):
-        return self.query_for_result_stream(row_type=tuple)

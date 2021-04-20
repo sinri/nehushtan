@@ -1,5 +1,4 @@
 #  Copyright (c) 2020. Sinri Edogawa
-
 from typing import Callable
 
 import pymysql
@@ -28,6 +27,9 @@ class MySQLKit:
         PYMYSQL 默认不自动递交。在实际场景中，建议设置成默认自动递交并仅在需要时手动开启事务。
         :param mysql_config: 获取一个MySQLKitConfig类的实例，可用字典构建，样本参见配置文件标准示例中 `mysql_database`.`sample` 项
         """
+        # Planned in 0.3.6 but not confirmed
+        # self.__instance_uuid = uuid.uuid1().urn
+
         if mysql_config is None:
             mysql_config = MySQLKitConfig()
         self._mysql_config = mysql_config
@@ -35,6 +37,10 @@ class MySQLKit:
         self._connection = None
         if len(self._mysql_config.get_host()) > 0:
             self.connect()
+
+    # Planned in 0.3.6 but not confirmed
+    # def get_mysql_kit_uuid(self):
+    #     return self.__instance_uuid
 
     @staticmethod
     def make_instance_from_pymysql_connection(connection: Connection):
