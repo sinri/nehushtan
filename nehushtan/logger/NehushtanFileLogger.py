@@ -1,4 +1,5 @@
 import json
+import math
 import os
 import sys
 import threading
@@ -84,15 +85,20 @@ class NehushtanFileLogger:
     def get_level_label(level: int):
         return NehushtanLogging.get_label_of_level(level)
 
-    def write_formatted_line_to_log(self, level: int, message: str, extra=None):
+    def write_formatted_line_to_log(self, level: int, message: str, extra=None, hide_extra: bool = False):
+        """
+        Since 0.3.7 add `hide_extra`
+        """
         if level < self.log_level:
             return self
         now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         level_label = NehushtanFileLogger.get_level_label(level)
         pid = os.getpid()
         thread = threading.currentThread()
-        extra_json = self.ensure_extra_as_dict(extra)
-        line = f'{now} <{self.title}> [{level_label}] <{pid}:{thread.getName()}> {message} | {extra_json}'
+        line = f'{now} <{self.title}> [{level_label}] <{pid}:{thread.getName()}> {message}'
+        if not hide_extra:
+            extra_json = self.ensure_extra_as_dict(extra)
+            line += f' | {extra_json}'
         return self.write_raw_line_to_log(line, level)
 
     def debug(self, message: str, extra=None):
@@ -123,6 +129,35 @@ class NehushtanFileLogger:
 
     def critical(self, message: str, extra=None):
         return self.write_formatted_line_to_log(NehushtanLogging.CRITICAL, message, extra)
+
+    def log_progress(
+            self,
+            title: str,
+            done_task_count: int,
+            total_task_count: int = 100,
+            progress_bar_length: int = 20,
+            desc: str = None,
+            level: int = NehushtanLogging.NOTICE
+    ):
+        """
+        Since 0.3.7
+        """
+        percent = 100.0 * done_task_count / total_task_count
+        bar = ''
+        done_bar_chars = math.floor(progress_bar_length * percent / 100.0)
+        for i in range(done_bar_chars):
+            bar += '='
+        for j in range(progress_bar_length - done_bar_chars):
+            bar += '-'
+
+        content = f'{title}: {percent:2.2f}% ({done_task_count}/{total_task_count}) [{bar}]'
+        if desc is not None:
+            content += f' {desc}'
+        return self.write_formatted_line_to_log(
+            level,
+            content,
+            hide_extra=True
+        )
 
     def log_current_memory_usage_of_process(self, pid: int = None, level: int = NehushtanLogging.INFO):
         """

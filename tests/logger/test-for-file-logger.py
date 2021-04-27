@@ -32,3 +32,8 @@ if __name__ == '__main__':
         raise ValueError('A<>B')
     except Exception as error:
         cloned_logger.exception('X', error)
+
+    progress_logger = NehushtanFileLogger()
+    total = 36
+    for i in range(total):
+        progress_logger.log_progress('TEST', i, total, desc=f'now done[{i}]')

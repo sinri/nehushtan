@@ -133,6 +133,7 @@ class NehushtanQueueDelegate:
     def when_task_not_executable(self, task: NehushtanQueueTask):
         """
         this is done before fork in pooled style
+        This works in MASTER
         """
         pass
 
