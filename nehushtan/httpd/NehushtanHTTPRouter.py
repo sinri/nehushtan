@@ -11,6 +11,7 @@ class NehushtanHTTPRouter:
     def register_route(self, route: NehushtanHTTPRoute):
         self.__route_list.append(route)
         print(f'NehushtanHTTPRouter::register_route {route}')
+        return self
 
     def check_request_for_route(self, method: str, path: str) -> NehushtanHTTPRoute:
         for route in self.__route_list:

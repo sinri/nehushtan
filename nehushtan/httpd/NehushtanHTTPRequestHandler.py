@@ -3,7 +3,7 @@ import re
 import socketserver
 from abc import abstractmethod
 from http.server import BaseHTTPRequestHandler
-from typing import Tuple, Iterable
+from typing import Tuple, Union, Sequence
 from urllib.parse import parse_qs
 
 from nehushtan.helper.CommonHelper import CommonHelper
@@ -18,6 +18,7 @@ class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
         # fulfilled by calling method `parse_path`
         self.parsed_path = '/'
         self.parsed_query_dict = {}
+        self.parsed_cookie_dict = {}
         # fulfilled by calling method `parse_body`
         self.raw_body = b''
         self.parsed_body_data = None
@@ -26,10 +27,14 @@ class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
         #
         self.matched_arguments = []
 
-        self.__process_chain_class = CommonHelper.class_with_class_path(
+        self.__process_chain_base_class = CommonHelper.class_with_class_path(
             'nehushtan.httpd.NehushtanHTTPRequestProcessChain')
+        self.__process_chain_share_data_dict = {}
 
         super().__init__(request, client_address, server)
+
+    def get_process_chain_share_data_dict(self):
+        return self.__process_chain_share_data_dict
 
     def prepare_path_and_queries(self):
         # self.path is like path=/ab/c/d?e=f
@@ -44,6 +49,17 @@ class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
                     self.parsed_query_dict[k] = v[0]
                 else:
                     self.parsed_query_dict[k] = v
+
+    def prepare_cookie(self):
+        # cookie
+        cookie = self.headers.get('Cookie', '')
+        pairs = cookie.split(";")
+        for pair in pairs:
+            pair = pair.lstrip()
+            parts = pair.split("=", 2)
+            name = parts[0].encode('latin-1').decode('utf-8')
+            value = parts[1].encode('latin-1').decode('utf-8')
+            self.parsed_cookie_dict[name] = value
 
     def prepare_body(self, body_charset=None):
         length = int(self.headers.get('content-length', 0))
@@ -76,6 +92,9 @@ class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
                     self.parsed_body_data[k] = v
         elif content_type.startswith('application/json'):
             self.parsed_body_data = json.loads(self.raw_body)
+        elif content_type.startswith('multipart/form-data'):
+            # TODO for multipart/form-data; boundary=something
+            raise NotImplementedError('BODY for FORM multipart/form-data IS NOT IMPLEMENTED')
         else:
             self.parsed_body_data = None
 
@@ -222,6 +241,7 @@ class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
     def process_request(self):
         try:
             self.prepare_path_and_queries()
+            self.prepare_cookie()
 
             process_chain_list = self.seek_route_for_process_chains(self.method, self.parsed_path)
 
@@ -234,46 +254,35 @@ class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
             if methods_contains_body.__contains__(self.method):
                 self.prepare_body()
 
-            for process_chain in process_chain_list:
-                c = CommonHelper.class_with_class_path(process_chain[0])
+            # for process_chain in process_chain_list:
+            # l=len(process_chain_list)
+            for i in range(len(process_chain_list)):
+                process_chain = process_chain_list[i]
 
+                c = process_chain[0]
+                if type(process_chain[0]) is str:
+                    c = CommonHelper.class_with_class_path(process_chain[0])
                 # self.log_message(f'{c} against {self.__process_chain_class}')
-                if not issubclass(c, self.__process_chain_class):
+                if not issubclass(c, self.__process_chain_base_class):
                     raise NehushtanProcessChainIncorrectError(
                         http_error_message=f'Process Chain Class Error for {process_chain}',
                         http_code=500
                     )
-
                 process_chain_instance = c(self)
                 process_chain_instance_target_method = getattr(process_chain_instance, process_chain[1])
-                args = self.matched_arguments
-                process_chain_instance_target_method(*args)
+
+                if i == 0:
+                    args = self.matched_arguments
+                    process_chain_instance_target_method(*args)
+                else:
+                    process_chain_instance_target_method()
 
         except NehushtanHTTPError as http_error:
             self.send_error(http_error.get_http_code(), http_error.http_error_message)
             self.wfile.write(http_error.get_http_error_message().encode())
 
-        # self.send_response(200)
-        # self.send_header('content-type', 'text/plain')
-        # self.end_headers()
-        #
-        # self.wfile.write(f'{self.method}\n'.encode())
-        #
-        # self.wfile.write(f'path: {self.parsed_path}\n'.encode())
-        #
-        # for k, v in self.parsed_query_dict.items():
-        #     self.wfile.write(f'query [{k}] : {v}\n'.encode())
-        #
-        # self.wfile.write(f'headers: \n{self.headers}'.encode())
-        # self.wfile.write(f'Cookie: {self.headers.get("Cookie")}\n'.encode())
-        # # self.wfile.write(f'Cookie: {self.headers.get_param("Cookie")}\n'.encode())
-        #
-        # self.wfile.write(f'Raw Body:\n{self.raw_body}\n'.encode())
-        #
-        # self.wfile.write(f'Parsed Body:\n{self.parsed_body_data}\n'.encode())
-
     @abstractmethod
-    def seek_route_for_process_chains(self, method: str, path: str) -> Iterable[Tuple[str, str]]:
+    def seek_route_for_process_chains(self, method: str, path: str) -> Sequence[Tuple[Union[type, str], str]]:
         """
         You may need to update `self.matched_arguments` here
         """

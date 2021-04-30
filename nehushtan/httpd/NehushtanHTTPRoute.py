@@ -1,5 +1,5 @@
 import re
-from typing import Iterable, Tuple, List
+from typing import Tuple, List, Sequence, Union
 
 
 class NehushtanHTTPRoute:
@@ -7,7 +7,7 @@ class NehushtanHTTPRoute:
     def __init__(
             self,
             path_template: str,
-            process_chain_list: Iterable[Tuple[str, str]],
+            process_chain_list: Sequence[Tuple[Union[type, str], str]],
             method_options: List[str] = None
     ):
         self.path_template = path_template
