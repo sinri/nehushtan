@@ -1,7 +1,7 @@
-from nehushtan.httpd.NehushtanHTTPRequestProcessChain import NehushtanHTTPRequestProcessChain
+from nehushtan.httpd.NehushtanHTTPRequestController import NehushtanHTTPRequestController
 
 
-class TestProcessChainB(NehushtanHTTPRequestProcessChain):
+class TestProcessChainB(NehushtanHTTPRequestController):
     def list(self):
         index = self._get_http_handler().parsed_query_dict.get('index', -1)
         # header_cookie=self._read_header('cookie')
@@ -19,3 +19,6 @@ class TestProcessChainB(NehushtanHTTPRequestProcessChain):
     def step3(self):
         x = self._get_http_handler().get_process_chain_share_data_dict().get('index', 0)
         self._reply_with_ok(x)
+
+    def mix(self, index, name):
+        self._reply_with_ok({'index': index, 'name': name})

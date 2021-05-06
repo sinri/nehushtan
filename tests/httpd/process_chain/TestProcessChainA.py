@@ -1,7 +1,7 @@
-from nehushtan.httpd.NehushtanHTTPRequestProcessChain import NehushtanHTTPRequestProcessChain
+from nehushtan.httpd.NehushtanHTTPRequestController import NehushtanHTTPRequestController
 
 
-class TestProcessChainA(NehushtanHTTPRequestProcessChain):
+class TestProcessChainA(NehushtanHTTPRequestController):
     def read(self, index: int):
         # self.get_http_handler().log_message('emmm')
         # self._get_http_handler().send_response(200)

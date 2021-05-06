@@ -3,13 +3,15 @@ import re
 import socketserver
 from abc import abstractmethod
 from http.server import BaseHTTPRequestHandler
-from typing import Tuple, Union, Sequence
+from typing import Tuple, Union, Sequence, Dict
 from urllib.parse import parse_qs
 
 from nehushtan.helper.CommonHelper import CommonHelper
 from nehushtan.httpd.NehushtanHTTPConstant import NehushtanHTTPConstant
+from nehushtan.httpd.NehushtanHTTPResponseBuffer import NehushtanHTTPResponseBuffer
 from nehushtan.httpd.exceptions.NehushtanHTTPError import NehushtanHTTPError
 from nehushtan.httpd.exceptions.NehushtanProcessChainIncorrectError import NehushtanProcessChainIncorrectError
+from nehushtan.httpd.exceptions.NehushtanRequestDeniedByFilterError import NehushtanRequestDeniedByFilterError
 
 
 class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
@@ -24,11 +26,19 @@ class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
         self.parsed_body_data = None
         # fulfilled after do_SPAM
         self.method = ''
-        #
-        self.matched_arguments = []
+        # Router Matched Data
+        self.matched_arguments: Sequence[str] = []
+        self.matched_keyed_arguments: Dict[str, str] = {}
 
-        self.__process_chain_base_class = CommonHelper.class_with_class_path(
-            'nehushtan.httpd.NehushtanHTTPRequestProcessChain')
+        # self.__process_chain_base_class = CommonHelper.class_with_class_path(
+        #     'nehushtan.httpd.NehushtanHTTPRequestProcessChain'
+        # )
+        self.__filter_base_class = CommonHelper.class_with_class_path(
+            'nehushtan.httpd.NehushtanHTTPRequestFilter'
+        )
+        self.__controller_base_class = CommonHelper.class_with_class_path(
+            'nehushtan.httpd.NehushtanHTTPRequestController'
+        )
         self.__process_chain_share_data_dict = {}
 
         super().__init__(request, client_address, server)
@@ -243,7 +253,7 @@ class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
             self.prepare_path_and_queries()
             self.prepare_cookie()
 
-            process_chain_list = self.seek_route_for_process_chains(self.method, self.parsed_path)
+            filters, controller_and_method = self.seek_route_for_process_chains(self.method, self.parsed_path)
 
             methods_contains_body = (
                 NehushtanHTTPConstant.METHOD_POST,
@@ -254,36 +264,73 @@ class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
             if methods_contains_body.__contains__(self.method):
                 self.prepare_body()
 
-            # for process_chain in process_chain_list:
-            # l=len(process_chain_list)
-            for i in range(len(process_chain_list)):
-                process_chain = process_chain_list[i]
-
-                c = process_chain[0]
-                if type(process_chain[0]) is str:
-                    c = CommonHelper.class_with_class_path(process_chain[0])
-                # self.log_message(f'{c} against {self.__process_chain_class}')
-                if not issubclass(c, self.__process_chain_base_class):
+            filter_data_dict = {}
+            for filter_item in filters:
+                c = filter_item
+                if type(c) is str:
+                    c = CommonHelper.class_with_class_path(c)
+                if not issubclass(c, self.__filter_base_class):
                     raise NehushtanProcessChainIncorrectError(
-                        http_error_message=f'Process Chain Class Error for {process_chain}',
+                        http_error_message=f'Filter Class Error: {filter_item}',
                         http_code=500
                     )
-                process_chain_instance = c(self)
-                process_chain_instance_target_method = getattr(process_chain_instance, process_chain[1])
+                filter_instance = c(self, filter_data_dict)
+                if not filter_instance.shouldAcceptRequest():
+                    raise NehushtanRequestDeniedByFilterError(
+                        filter_item,
+                        filter_instance.message_for_denial,
+                        filter_instance.http_code_for_denial
+                    )
 
-                if i == 0:
-                    args = self.matched_arguments
-                    process_chain_instance_target_method(*args)
-                else:
-                    process_chain_instance_target_method()
+            controller_item = controller_and_method[0]
+            method_item = controller_and_method[1]
+
+            c = controller_item
+            if type(c) is str:
+                c = CommonHelper.class_with_class_path(c)
+            if not issubclass(c, self.__controller_base_class):
+                raise NehushtanProcessChainIncorrectError(
+                    http_error_message=f'Controller Class Error for {controller_item}',
+                    http_code=500
+                )
+            controller_instance = c(self)
+            controller_instance_target_method = getattr(controller_instance, method_item)
+
+            args = self.matched_arguments
+            kwargs = self.matched_keyed_arguments
+            controller_instance_target_method(*args, **kwargs)
 
         except NehushtanHTTPError as http_error:
             self.send_error(http_error.get_http_code(), http_error.http_error_message)
             self.wfile.write(http_error.get_http_error_message().encode())
 
     @abstractmethod
-    def seek_route_for_process_chains(self, method: str, path: str) -> Sequence[Tuple[Union[type, str], str]]:
+    def seek_route_for_process_chains(self, method: str, path: str) \
+            -> Tuple[Sequence[Union[type, str]], Tuple[Union[type, str], str]]:
         """
-        You may need to update `self.matched_arguments` here
+        You may need to update `self.matched_arguments` or `self.matched_keyed_arguments` here.
+        It would return the filter list and the controller-method pair.
         """
         pass
+
+    def send_response_with_buffer(self, buffer: NehushtanHTTPResponseBuffer):
+        if buffer.http_code < 200 or buffer.http_code >= 400:
+            self.send_error(buffer.http_code, buffer.http_code_message)
+            return self
+
+        self.send_response(buffer.http_code, buffer.http_code_message)
+
+        text = buffer.get_body_as_string()
+
+        if buffer.encoding is not None:
+            s = text.encode(buffer.encoding)
+        else:
+            s = text.encode()
+
+        buffer.set_header('Content-Length', '%i' % len(s))
+
+        for k, v in buffer.headers.items():
+            self.send_header(k, v)
+        self.end_headers()
+
+        self.wfile.write(s)

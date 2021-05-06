@@ -4,17 +4,23 @@ import re
 from nehushtan.helper.CommonHelper import CommonHelper
 from nehushtan.httpd.NehushtanHTTPConstant import NehushtanHTTPConstant
 from nehushtan.httpd.NehushtanHTTPRequestHandler import NehushtanHTTPRequestHandler
+from nehushtan.httpd.NehushtanHTTPResponseBuffer import NehushtanHTTPResponseBuffer
 from nehushtan.httpd.exceptions.NehushtanRequestParameterError import NehushtanRequestParameterError
 
 
-class NehushtanHTTPRequestProcessChain:
+class NehushtanHTTPRequestController:
     def __init__(self, http_handler: NehushtanHTTPRequestHandler):
         self.__http_handler = http_handler
+        self.__response_buffer = NehushtanHTTPResponseBuffer()
 
     def _get_http_handler(self) -> NehushtanHTTPRequestHandler:
         return self.__http_handler
 
-    def __clean_paramter_with_regex(self, read_value, value_regex: str, key: str, key_type: str):
+    def _get_response_buffer(self):
+        return self.__response_buffer
+
+    @staticmethod
+    def __clean_paramter_with_regex(read_value, value_regex: str, key: str, key_type: str):
         if read_value is None:
             raise NehushtanRequestParameterError(
                 key,
@@ -52,40 +58,29 @@ class NehushtanHTTPRequestProcessChain:
     def _read_cookie(self, key: str, default: str = None):
         return CommonHelper.read_target(self._get_http_handler().parsed_cookie_dict, (key,), default)
 
-    def _reply(self, text: str, http_code: int = 200, header_dict: dict = None, encoding: str = None):
-        if encoding is not None:
-            s = text.encode(encoding)
-        else:
-            s = text.encode()
-
-        self._get_http_handler().send_response(http_code)
-
-        if header_dict is None:
-            header_dict = {}
-        header_dict['Content-Length'] = '%i' % len(s)
-        for k, v in header_dict.items():
-            self._get_http_handler().send_header(k, v)
-        self._get_http_handler().end_headers()
-
-        self._get_http_handler().wfile.write(s)
+    def _respond_with_buffer(self):
+        self._get_http_handler().send_response_with_buffer(self._get_response_buffer())
 
     def _reply_with_text(self, text: str, http_code: int = 200, encoding: str = None):
-        self._reply(
-            text,
-            http_code,
-            {NehushtanHTTPConstant.HEADER_CONTENT_TYPE: NehushtanHTTPConstant.HEADER_CONTENT_TYPE_VALUE_TEXT},
-            encoding
-        )
+        buffer = self._get_response_buffer()
+        if encoding is not None:
+            buffer.encoding = encoding
+        buffer.set_header(NehushtanHTTPConstant.HEADER_CONTENT_TYPE,
+                          NehushtanHTTPConstant.HEADER_CONTENT_TYPE_VALUE_TEXT)
+        buffer.set_http_code(http_code)
+        buffer.reset_body_as_string(text)
+        self._respond_with_buffer()
 
     def _reply_with_json(self, anything, http_code: int = 200, encoding: str = None):
         s = json.dumps(anything)
-
-        self._reply(
-            s,
-            http_code,
-            {NehushtanHTTPConstant.HEADER_CONTENT_TYPE: NehushtanHTTPConstant.HEADER_CONTENT_TYPE_VALUE_JSON},
-            encoding
-        )
+        buffer = self._get_response_buffer()
+        if encoding is not None:
+            buffer.encoding = encoding
+        buffer.set_header(NehushtanHTTPConstant.HEADER_CONTENT_TYPE,
+                          NehushtanHTTPConstant.HEADER_CONTENT_TYPE_VALUE_JSON)
+        buffer.set_http_code(http_code)
+        buffer.reset_body_as_string(s)
+        self._respond_with_buffer()
 
     def _reply_with_ok(self, anything, encoding: str = None):
         self._reply_with_json({"code": NehushtanHTTPConstant.REPLY_CODE_OK, "data": anything}, 200, encoding)

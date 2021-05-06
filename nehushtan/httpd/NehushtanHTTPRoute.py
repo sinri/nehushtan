@@ -1,32 +1,27 @@
-import re
-from typing import Tuple, List, Sequence, Union
+from abc import abstractmethod
+from typing import Tuple, List, Sequence, Union, Dict
 
 
 class NehushtanHTTPRoute:
 
-    def __init__(
-            self,
-            path_template: str,
-            process_chain_list: Sequence[Tuple[Union[type, str], str]],
-            method_options: List[str] = None
-    ):
-        self.path_template = path_template
-        self.process_chain_list = process_chain_list
-        self.method_options = method_options
-
+    def __init__(self):
         self.matched_arguments = []
+        self.matched_keyed_arguments = {}
 
+    @abstractmethod
     def match_request(self, method: str, path: str) -> bool:
-        if self.method_options is not None:
-            if not self.method_options.__contains__(method):
-                return False
+        pass
 
-        result = re.search(self.path_template, path)
-        if result is None:
-            return False
+    @abstractmethod
+    def get_filter_list(self) -> Sequence[Union[type, str]]:
+        pass
 
-        self.matched_arguments = result.groups()
-        return True
+    @abstractmethod
+    def get_controller_target(self) -> Tuple[Union[type, str], str]:
+        pass
 
     def get_matched_arguments(self) -> List[str]:
         return self.matched_arguments
+
+    def get_matched_keyed_arguments(self) -> Dict[str, str]:
+        return self.matched_keyed_arguments
