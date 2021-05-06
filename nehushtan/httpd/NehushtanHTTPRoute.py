@@ -3,6 +3,9 @@ from typing import Tuple, List, Sequence, Union, Dict
 
 
 class NehushtanHTTPRoute:
+    """
+    Since 0.4.0
+    """
 
     def __init__(self):
         self.matched_arguments = []

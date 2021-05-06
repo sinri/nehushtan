@@ -4,6 +4,10 @@ from nehushtan.httpd.NehushtanHTTPConstant import NehushtanHTTPConstant
 
 
 class NehushtanHTTPResponseBuffer:
+    """
+    Since 0.4.0
+    """
+
     BODY_DUMP_FORMAT_JSON = 'JSON'
 
     def __init__(self):

@@ -10,11 +10,14 @@ from nehushtan.helper.CommonHelper import CommonHelper
 from nehushtan.httpd.NehushtanHTTPConstant import NehushtanHTTPConstant
 from nehushtan.httpd.NehushtanHTTPResponseBuffer import NehushtanHTTPResponseBuffer
 from nehushtan.httpd.exceptions.NehushtanHTTPError import NehushtanHTTPError
-from nehushtan.httpd.exceptions.NehushtanProcessChainIncorrectError import NehushtanProcessChainIncorrectError
 from nehushtan.httpd.exceptions.NehushtanRequestDeniedByFilterError import NehushtanRequestDeniedByFilterError
+from nehushtan.httpd.exceptions.NehushtanRequestProcessTargetError import NehushtanRequestProcessTargetError
 
 
 class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
+    """
+    Since 0.4.0
+    """
 
     def __init__(self, request: bytes, client_address: Tuple[str, int], server: socketserver.BaseServer):
         # fulfilled by calling method `parse_path`
@@ -270,7 +273,7 @@ class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
                 if type(c) is str:
                     c = CommonHelper.class_with_class_path(c)
                 if not issubclass(c, self.__filter_base_class):
-                    raise NehushtanProcessChainIncorrectError(
+                    raise NehushtanRequestProcessTargetError(
                         http_error_message=f'Filter Class Error: {filter_item}',
                         http_code=500
                     )
@@ -289,7 +292,7 @@ class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
             if type(c) is str:
                 c = CommonHelper.class_with_class_path(c)
             if not issubclass(c, self.__controller_base_class):
-                raise NehushtanProcessChainIncorrectError(
+                raise NehushtanRequestProcessTargetError(
                     http_error_message=f'Controller Class Error for {controller_item}',
                     http_code=500
                 )

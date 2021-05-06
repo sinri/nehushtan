@@ -4,6 +4,9 @@ from nehushtan.httpd.NehushtanHTTPRequestHandler import NehushtanHTTPRequestHand
 
 
 class NehushtanHTTPRequestFilter:
+    """
+    Since 0.4.0
+    """
 
     def __init__(self, http_handler: NehushtanHTTPRequestHandler, extra_data_dict: dict = None):
         self.__http_handler = http_handler

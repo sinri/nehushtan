@@ -6,6 +6,10 @@ from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
 
 
 class NehushtanHTTPRouter:
+    """
+    Since 0.4.0
+    """
+
     def __init__(self, logger: NehushtanFileLogger = None):
         self.__route_list: List[NehushtanHTTPRoute] = []
         self.__logger = logger

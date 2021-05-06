@@ -3,6 +3,9 @@ from typing import Callable
 
 
 class NehushtanHTTPService:
+    """
+    Since 0.4.0
+    """
 
     def __init__(self):
         self.__server = None

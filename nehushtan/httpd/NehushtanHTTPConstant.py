@@ -1,4 +1,8 @@
 class NehushtanHTTPConstant:
+    """
+    Since 0.4.0
+    """
+
     METHOD_HEAD = "HEAD"
     METHOD_GET = "GET"
     METHOD_POST = "POST"

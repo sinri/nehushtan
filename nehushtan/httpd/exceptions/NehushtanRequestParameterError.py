@@ -2,6 +2,10 @@ from nehushtan.httpd.exceptions.NehushtanHTTPError import NehushtanHTTPError
 
 
 class NehushtanRequestParameterError(NehushtanHTTPError):
+    """
+    When a request cannot be processed due to errors in the parameters
+    """
+
     TYPE_QUERY = "QUERY"
     TYPE_BODY = "BODY"
     TYPE_HEADER = "HEADER"

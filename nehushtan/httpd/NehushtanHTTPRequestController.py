@@ -9,6 +9,10 @@ from nehushtan.httpd.exceptions.NehushtanRequestParameterError import NehushtanR
 
 
 class NehushtanHTTPRequestController:
+    """
+    Since 0.4.0
+    """
+
     def __init__(self, http_handler: NehushtanHTTPRequestHandler):
         self.__http_handler = http_handler
         self.__response_buffer = NehushtanHTTPResponseBuffer()

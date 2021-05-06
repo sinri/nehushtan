@@ -5,6 +5,9 @@ from nehushtan.httpd.NehushtanHTTPRoute import NehushtanHTTPRoute
 
 
 class NehushtanHTTPRouteWithRegexArgs(NehushtanHTTPRoute):
+    """
+    Since 0.4.0
+    """
 
     def __init__(
             self,
