@@ -9,24 +9,29 @@ from tests.httpd.process_chain.TestProcessChainB import TestProcessChainB
 
 TestRequestHandler.router.register_route(
     NehushtanHTTPRouteWithRegexArgs(
-        r'^/read/(\d+)$',
+        r'/read/{int}',
         ('tests.httpd.process_chain.TestProcessChainA', 'read'),
         [],
         [NehushtanHTTPConstant.METHOD_GET]
     )
 ).register_route(
     NehushtanHTTPRouteWithRegexArgs(
-        r'/list$',
+        r'/list/{str}',
         (TestProcessChainB, 'list')
     )
 ).register_route(
     NehushtanHTTPRouteWithRegexArgs(
-        r'^/step-in/(\d+)$',
+        r'/step-in/{float}',
         (TestProcessChainB, 'step3'),
     )
 ).register_route(
+    NehushtanHTTPRouteWithRegexArgs(
+        r'/args/{int}/{float}/{str}/end',
+        (TestProcessChainB, 'args'),
+    )
+).register_route(
     NehushtanHTTPRouteWithRegexKwargs(
-        r'/mix/{index}/name/{name}',
+        r'/mix/{index:int}/name/{name:str}/value/{value:float}/action/{action}',
         (TestProcessChainB, 'mix'),
     )
 ).register_route(
