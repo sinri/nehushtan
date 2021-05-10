@@ -69,7 +69,11 @@ class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
         pairs = cookie.split(";")
         for pair in pairs:
             pair = pair.lstrip()
+            if pair == '':
+                continue
             parts = pair.split("=", 2)
+            if len(parts) != 2:
+                continue
             name = parts[0].encode('latin-1').decode('utf-8')
             value = parts[1].encode('latin-1').decode('utf-8')
             self.parsed_cookie_dict[name] = value
