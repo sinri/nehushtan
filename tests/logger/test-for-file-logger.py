@@ -5,7 +5,8 @@ from nehushtan.logger.NehushtanLogging import NehushtanLogging
 
 if __name__ == '__main__':
     file_logger = NehushtanFileLogger('test', '/Users/leqee/code/nehushtan/log', log_level=logging.INFO,
-                                      print_higher_than_this_level=NehushtanLogging.INFO)
+                                      print_higher_than_this_level=NehushtanLogging.INFO,
+                                      record_millisecond=True)
 
     file_logger.critical('C', {"A": "B"})
     file_logger.error('E', 111)

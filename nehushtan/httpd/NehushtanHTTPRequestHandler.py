@@ -66,6 +66,8 @@ class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
     def prepare_cookie(self):
         # cookie
         cookie = self.headers.get('Cookie', '')
+        if cookie == '':
+            return
         pairs = cookie.split(";")
         for pair in pairs:
             pair = pair.lstrip()

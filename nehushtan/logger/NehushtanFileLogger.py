@@ -5,6 +5,7 @@ import sys
 import threading
 import time
 import traceback
+from datetime import datetime
 
 import psutil
 
@@ -24,13 +25,15 @@ class NehushtanFileLogger:
             log_level=NehushtanLogging.DEBUG,
             categorize: bool = True,
             date_rotate: bool = True,
-            print_higher_than_this_level=NehushtanLogging.CRITICAL
+            print_higher_than_this_level=NehushtanLogging.CRITICAL,
+            record_millisecond=False,
     ):
         self.title = title
         self.log_dir = log_dir
         self.log_level = log_level
         self.categorize = categorize
         self.date_rotate = date_rotate
+        self.record_millisecond = record_millisecond
         # self.print_as_well = print_as_well <-- should use print_higher_than_this_level=NehushtanLogging.NOTSET
         # If all, use NOTSET; if none, use FATAL
         if print_higher_than_this_level is True:
@@ -91,7 +94,11 @@ class NehushtanFileLogger:
         """
         if level < self.log_level:
             return self
-        now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        time_format_string = "%Y-%m-%d %H:%M:%S"
+        if self.record_millisecond:
+            time_format_string += '.%f'
+        # now = time.strftime(time_format_string, time.localtime())
+        now = datetime.now().strftime(time_format_string)
         level_label = NehushtanFileLogger.get_level_label(level)
         pid = os.getpid()
         thread = threading.currentThread()
@@ -200,6 +207,7 @@ class NehushtanFileLogger:
             self.categorize,
             self.date_rotate,
             self.print_higher_than_this_level,
+            self.record_millisecond,
         ])
 
     @staticmethod
