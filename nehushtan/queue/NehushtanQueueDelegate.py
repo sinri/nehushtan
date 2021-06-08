@@ -63,9 +63,10 @@ class NehushtanQueueDelegate:
         pass
 
     @abstractmethod
-    def when_loop_reports_error(self, error_message: str):
+    def when_loop_reports_error(self, error_message: str, cause_exception: Exception = None):
         """
         This works in MASTER
+        Since 0.4.4 Added cause_exception, could be expressed by NehushtanFileLogger
         """
         pass
 

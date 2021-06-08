@@ -124,13 +124,7 @@ class NehushtanFileLogger:
         return self.write_formatted_line_to_log(NehushtanLogging.ERROR, message, extra)
 
     def exception(self, message: str, exception: BaseException):
-        just_the_string = ''.join(
-            traceback.format_exception(
-                etype=type(exception),
-                value=exception,
-                tb=exception.__traceback__
-            )
-        )
+        just_the_string = self.get_traceback_info_from_exception(exception)
         return self.write_formatted_line_to_log(NehushtanLogging.ERROR, message, f'{type(exception).__name__}') \
             .write_raw_line_to_log(just_the_string, NehushtanLogging.ERROR)
 
@@ -219,3 +213,16 @@ class NehushtanFileLogger:
         if type(args) is not list and type(args) is not tuple:
             raise ValueError('String `args_json` should be an array in JSON format')
         return NehushtanFileLogger(*args)
+
+    @staticmethod
+    def get_traceback_info_from_exception(exception: BaseException) -> str:
+        """
+        Since 0.4.4
+        """
+        return ''.join(
+            traceback.format_exception(
+                etype=type(exception),
+                value=exception,
+                tb=exception.__traceback__
+            )
+        )

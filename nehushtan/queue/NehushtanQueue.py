@@ -192,7 +192,7 @@ class NehushtanQueue:
 
             except Exception as loop_round_error:
                 self.register_news('when_loop_reports_error', f'Loop meets error: {loop_round_error}')
-                self.delegate.when_loop_reports_error(loop_round_error.__str__())
+                self.delegate.when_loop_reports_error(loop_round_error.__str__(), loop_round_error)
 
         self.register_news('loop_terminating', 'Loop is about to terminate')
         self.delegate.when_loop_terminates()
