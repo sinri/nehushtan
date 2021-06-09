@@ -247,9 +247,20 @@ class NehushtanQueue:
         """
         This works in WORKER
         """
-        delegate.when_to_execute_task(embedded_task, os.getpid())
         try:
-            embedded_task.execute()
-        except Exception as e:
-            delegate.when_task_raised_exception(embedded_task, e)
-        delegate.when_task_executed(embedded_task, os.getpid())
+            """
+            Since 0.4.5 Add try block to catch outer_exception
+            """
+            delegate.when_to_execute_task(embedded_task, os.getpid())
+            try:
+                embedded_task.execute()
+            except Exception as e:
+                delegate.when_task_raised_exception(embedded_task, e)
+            delegate.when_task_executed(embedded_task, os.getpid())
+
+        except Exception as outer_exception:
+            delegate.logger.exception(
+                'In embedded_task_execute exception occurs outside the embedded_task '
+                f'[{embedded_task.get_task_reference()}] on Process {os.getpid()}',
+                outer_exception
+            )
