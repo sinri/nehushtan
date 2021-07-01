@@ -10,71 +10,102 @@ class NehushtanMailPackage:
     def __init__(self):
         self.meta_dict = {}
         self.raw_body_lines = []
+        self.charset = None
+
+    def __decode_with_charset(self, x: bytes):
+        if x is None:
+            return None
+        if self.charset is None:
+            return x.decode('ascii')
+        return x.decode(self.charset)
 
     def get_date(self) -> Optional[str]:
-        return CommonHelper.read_target(self.meta_dict, ('Date', 0))
+        x = CommonHelper.read_target(self.meta_dict, (b'Date', 0))
+        return self.__decode_with_charset(x)
 
     @staticmethod
     def parse_mail_address_line(x: str):
-        name, address = x.split(" ")
+        print('parse_mail_address_line <-', x)
+        matched = re.match(r'(\S*)\s*<([\S]+)>', x)
+        name = matched[1]
+        address = matched[2]
+        # name, address = x.split(" ")
         name = EncodedWordsKit.decode_string_following_rfc2047(name)
         address: str = address[1:-1]
         return address, name
 
     def get_from_mail_address(self) -> Optional[Tuple[str, str]]:
-        x = CommonHelper.read_target(self.meta_dict, ('From', 0))
+        x = CommonHelper.read_target(self.meta_dict, (b'From', 0))
         if x:
+            x = self.__decode_with_charset(x)
             return NehushtanMailPackage.parse_mail_address_line(x)
         return None
 
     def get_reply_to_mail_address(self):
-        x = CommonHelper.read_target(self.meta_dict, ('Reply-To', 0))
+        x = CommonHelper.read_target(self.meta_dict, (b'Reply-To', 0))
         if x:
+            x = self.__decode_with_charset(x)
             return NehushtanMailPackage.parse_mail_address_line(x)
         return self.get_from_mail_address()
 
     def get_to_mail_address(self):
-        x = CommonHelper.read_target(self.meta_dict, ('To', 0))
+        x = CommonHelper.read_target(self.meta_dict, (b'To', 0))
         if x:
+            x = self.__decode_with_charset(x)
             return NehushtanMailPackage.parse_mail_address_line(x)
         return self.get_from_mail_address()
 
     def get_subject(self) -> str:
-        x = CommonHelper.read_target(self.meta_dict, ('Subject', 0))
-        if type(x) is str:
-            return EncodedWordsKit.decode_string_following_rfc2047(x)
-        else:
+        x = CommonHelper.read_target(self.meta_dict, (b'Subject', 0))
+        if type(x) is bytes:
+            x = self.__decode_with_charset(x)
+        if type(x) is not str:
             return ''
+        return EncodedWordsKit.decode_string_following_rfc2047(x)
 
     def get_content_type(self) -> Optional[str]:
-        x = CommonHelper.read_target(self.meta_dict, ('Content-Type', 0))
-        return x
+        x_array = CommonHelper.read_target(self.meta_dict, (b'Content-Type',), [])
+        # print('get_content_type <- ',x_array)
+        s = ''
+        for x in x_array:
+            if type(x) is bytes:
+                x = x.decode('ascii')
+            s += x
+        # print('get_content_type -> ',s)
+        return s
 
     def get_content_transfer_encoding(self):
-        x = CommonHelper.read_target(self.meta_dict, ('Content-Transfer-Encoding', 0))
+        x = CommonHelper.read_target(self.meta_dict, (b'Content-Transfer-Encoding', 0))
+        if type(x) is bytes:
+            x = x.decode('ascii')
         return x
 
     def get_parsed_body_text(self):
-        x = ''
+        x = b''
         for line in self.raw_body_lines[1:-2]:
             x += line
         if self.get_content_transfer_encoding() == 'base64':
             x = b64decode(x)
 
-            encoding = None
-            content_type = self.get_content_type()
-            if content_type:
-                matched = re.match(r'charset="(.+)"', content_type)
-                if matched:
-                    encoding = matched[1]
-            if encoding is None:
+            if self.charset is None:
                 x = x.decode()
             else:
-                x = x.decode(encoding)
+                x = x.decode(self.charset)
 
         return x
 
+    def update_for_charset(self):
+        self.charset = None
+        content_type = self.get_content_type()
+        # print('update_for_charset by ',content_type)
+        if content_type:
+            matched = re.match(r'.*charset=\"(.+)\"', content_type)
+            # print('matched',matched)
+            if matched:
+                self.charset = matched[1]
+
     def show_debug_info(self):
+        print("CHARSET is ", self.charset)
         print('Meta:')
         print('DATE', self.get_date())
         print('FROM', self.get_from_mail_address())

@@ -1,8 +1,10 @@
 import imaplib
 import re
+import warnings
 from email.header import decode_header
-from typing import Iterable
+from typing import Iterable, List
 
+from nehushtan.mail.rfc3501.SearchCommandKit import SearchCommandKit
 from nehushtan.mail.rfc822.NehushtanMail import NehushtanMail
 
 
@@ -100,11 +102,12 @@ class IMAPAgent:
 
     def search_mails_in_mailbox(self, criteria, charset=None):
         """
-
+        DEPRECATED
         :param criteria:
         :param charset:
         :return: Message ID array
         """
+        warnings.warn('NOT FRIENDLY WITH NON-ASCII')
         response_code, data = self._connection.search(charset, criteria)
         if response_code != 'OK':
             raise Exception(f"IMAPAgent search_mails_in_mailbox failed: {response_code} with Data: {data}")
@@ -118,6 +121,20 @@ class IMAPAgent:
         if response_code != 'OK':
             raise Exception(f"IMAPAgent search_mails_in_mailbox failed: {response_code} with Data: {data}")
         uid_array = data[0].decode('utf-8').split(' ')
+        return uid_array
+
+    def search_for_mail_uid(self, search: SearchCommandKit):
+        command, arguments, literal = search.build()
+        if literal is not None:
+            self._connection.literal = literal
+        response_code, data = self._connection.uid(command, *arguments)
+        if response_code != 'OK':
+            raise Exception(f"IMAPAgent search_mails_in_mailbox failed: {response_code} with Data: {data}")
+        uid_array: List[str] = data[0].decode().split(' ')
+        # uid_array = data[0].decode(search.get_charset()).split(' ')
+
+        if len(uid_array) == 1 and uid_array[0] == '':
+            return []
         return uid_array
 
     def fetch_mail(self, message_id: str, message_parts: str) -> list:
@@ -191,6 +208,6 @@ class IMAPAgent:
 
     def fetch_for_nehushtan_mail(self, message_id: str) -> NehushtanMail:
         rfc822 = self.fetch_for_rfc822(message_id)
-        print(rfc822)
-        raw_mail_text: str = rfc822[0][1].decode()
+        # print(rfc822[0][1].decode('gb18030'))
+        raw_mail_text: bytes = rfc822[0][1]
         return NehushtanMail.make_mail_by_rfc822_content(raw_mail_text)
