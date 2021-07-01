@@ -3,6 +3,8 @@ import re
 from email.header import decode_header
 from typing import Iterable
 
+from nehushtan.mail.rfc822.NehushtanMail import NehushtanMail
+
 
 class IMAPAgent:
     """
@@ -109,7 +111,16 @@ class IMAPAgent:
         message_id_array = data[0].decode('utf-8').split(' ')
         return message_id_array
 
-    def fetch_mail(self, message_id: str, message_parts: str):
+    def search_mails_subject(self, keyword: str):
+        self._connection.literal = keyword.encode('utf-8')
+        response_code, data = self._connection.uid('SEARCH', 'CHARSET', 'UTF-8', 'SUBJECT')
+        # messages = msg[0].decode('utf-8').split()
+        if response_code != 'OK':
+            raise Exception(f"IMAPAgent search_mails_in_mailbox failed: {response_code} with Data: {data}")
+        uid_array = data[0].decode('utf-8').split(' ')
+        return uid_array
+
+    def fetch_mail(self, message_id: str, message_parts: str) -> list:
         """
 
         :param message_id:
@@ -128,3 +139,58 @@ class IMAPAgent:
         if charset:
             value = value.decode(charset)
         return value
+
+    def fetch_for_body(self, message_id: str):
+        x = self.fetch_mail(message_id, '(UID BODY)')
+        # print(x)
+
+        body_string = x[0].decode()
+        # print(body_string)
+
+        # 30 (UID 30 BODYSTRUCTURE ("TEXT" "HTML" ("CHARSET" "UTF-8") NIL NIL "BASE64" 616 8))
+        # [UID] (UID [UID] BODYSTRUCTURE ([BODY_TYPE] [BODY_SUBTYPE] ([[KEY] [VALUE]]...) [BODY_ID] [BODY_DESC] [BODY_ENCODING] [BODY_SIZE])
+
+        return body_string
+
+    def fetch_for_body_structure(self, message_id: str):
+        """
+        比 BODY 多三个字段
+        """
+        x = self.fetch_mail(message_id, '(UID BODYSTRUCTURE)')
+        print(x)
+        return x
+
+    def fetch_for_envelope(self, message_id: str):
+        x = self.fetch_mail(message_id, '(UID ENVELOPE)')
+        print(x)
+        return x
+
+    def fetch_for_flags(self, message_id: str):
+        x = self.fetch_mail(message_id, '(UID FLAGS)')
+        print(x)
+        return x
+
+    def fetch_for_internaldate(self, message_id: str):
+        x = self.fetch_mail(message_id, '(UID INTERNALDATE)')
+        print(x)
+        return x
+
+    def fetch_for_rfc822(self, message_id: str):
+        """
+        Functionally equivalent to BODY[],
+        differing in the syntax of the resulting untagged FETCH data (RFC822 is returned).
+        See https://datatracker.ietf.org/doc/html/rfc3501
+        See https://datatracker.ietf.org/doc/html/rfc822
+        """
+        return self.fetch_mail(message_id, '(UID RFC822)')
+
+    def fetch_for_rfc822_text(self, message_id: str):
+        x = self.fetch_mail(message_id, '(UID RFC822.TEXT)')
+        # print(x[0][1].decode())
+        return x
+
+    def fetch_for_nehushtan_mail(self, message_id: str) -> NehushtanMail:
+        rfc822 = self.fetch_for_rfc822(message_id)
+        print(rfc822)
+        raw_mail_text: str = rfc822[0][1].decode()
+        return NehushtanMail.make_mail_by_rfc822_content(raw_mail_text)
