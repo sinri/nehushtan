@@ -6,6 +6,7 @@ from nehushtan.mail.rfc822.NehushtanMailPackage import NehushtanMailPackage
 class NehushtanMail:
     """
     This class works following RFC822
+    Since 0.4.6
     """
 
     def __init__(self):

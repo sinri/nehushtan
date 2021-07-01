@@ -1,12 +1,16 @@
 import re
 from base64 import b64decode
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 
 from nehushtan.helper.CommonHelper import CommonHelper
 from nehushtan.mail.rfc2047.EncodedWordsKit import EncodedWordsKit
 
 
 class NehushtanMailPackage:
+    """
+    Since 0.4.6
+    """
+
     def __init__(self):
         self.meta_dict = {}
         self.raw_body_lines = []
@@ -83,16 +87,55 @@ class NehushtanMailPackage:
     def get_parsed_body_text(self):
         x = b''
         for line in self.raw_body_lines[1:-2]:
+            # print("> ", line)
+
+            if line == b'This is a multi-part message in MIME format.':
+                return self.__handle_mime_multi_part_body(self.raw_body_lines[3:-2])
+
             x += line
         if self.get_content_transfer_encoding() == 'base64':
             x = b64decode(x)
-
             if self.charset is None:
                 x = x.decode()
             else:
                 x = x.decode(self.charset)
 
         return x
+
+    def __handle_mime_multi_part_body(self, lines: List[bytes]):
+        boundary = lines[0]
+
+        pieces = []
+        buffer = []
+        for line in lines[2:]:
+            if line == boundary or line[:-2] == boundary:
+                piece = b"".join(buffer)
+                if self.get_content_transfer_encoding() == 'base64':
+                    piece = b64decode(piece)
+                if self.charset is None:
+                    piece = piece.decode()
+                else:
+                    piece = piece.decode(self.charset)
+
+                pieces.append(piece)
+
+                buffer = []
+            else:
+                if line == b'':
+                    continue
+                buffer.append(line)
+        # print('@',buffer)
+        # piece = b"".join(buffer)
+        # if self.get_content_transfer_encoding() == 'base64':
+        #     piece = b64decode(piece)
+        # if self.charset is None:
+        #     piece = piece.decode()
+        # else:
+        #     piece = piece.decode(self.charset)
+        # pieces.append(piece)
+
+        # print(pieces)
+        return "\n".join(pieces)
 
     def update_for_charset(self):
         self.charset = None

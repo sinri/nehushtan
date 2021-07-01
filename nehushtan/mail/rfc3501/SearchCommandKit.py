@@ -1,8 +1,11 @@
+import time
+
+
 class SearchCommandKit:
     """
     See https://datatracker.ietf.org/doc/html/rfc3501#section-6.4.4
 
-    DATE format: like '1-Jul-2021'
+    Since 0.4.6
     """
 
     def __init__(self, charset: str = None):
@@ -18,6 +21,14 @@ class SearchCommandKit:
 
     def get_charset(self):
         return self.__charset
+
+    @staticmethod
+    def formatted_date_from_time(x: float):
+        """
+        `x` might be get by `time.time()` and along with operations
+        result would be `1-Jul-2021` alike
+        """
+        return time.strftime("%d-%b-%Y", time.localtime(x))
 
     def append_all(self):
         """

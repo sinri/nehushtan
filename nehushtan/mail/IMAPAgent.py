@@ -114,15 +114,6 @@ class IMAPAgent:
         message_id_array = data[0].decode('utf-8').split(' ')
         return message_id_array
 
-    def search_mails_subject(self, keyword: str):
-        self._connection.literal = keyword.encode('utf-8')
-        response_code, data = self._connection.uid('SEARCH', 'CHARSET', 'UTF-8', 'SUBJECT')
-        # messages = msg[0].decode('utf-8').split()
-        if response_code != 'OK':
-            raise Exception(f"IMAPAgent search_mails_in_mailbox failed: {response_code} with Data: {data}")
-        uid_array = data[0].decode('utf-8').split(' ')
-        return uid_array
-
     def search_for_mail_uid(self, search: SearchCommandKit):
         command, arguments, literal = search.build()
         if literal is not None:
@@ -157,43 +148,9 @@ class IMAPAgent:
             value = value.decode(charset)
         return value
 
-    def fetch_for_body(self, message_id: str):
-        x = self.fetch_mail(message_id, '(UID BODY)')
-        # print(x)
-
-        body_string = x[0].decode()
-        # print(body_string)
-
-        # 30 (UID 30 BODYSTRUCTURE ("TEXT" "HTML" ("CHARSET" "UTF-8") NIL NIL "BASE64" 616 8))
-        # [UID] (UID [UID] BODYSTRUCTURE ([BODY_TYPE] [BODY_SUBTYPE] ([[KEY] [VALUE]]...) [BODY_ID] [BODY_DESC] [BODY_ENCODING] [BODY_SIZE])
-
-        return body_string
-
-    def fetch_for_body_structure(self, message_id: str):
-        """
-        比 BODY 多三个字段
-        """
-        x = self.fetch_mail(message_id, '(UID BODYSTRUCTURE)')
-        print(x)
-        return x
-
-    def fetch_for_envelope(self, message_id: str):
-        x = self.fetch_mail(message_id, '(UID ENVELOPE)')
-        print(x)
-        return x
-
-    def fetch_for_flags(self, message_id: str):
-        x = self.fetch_mail(message_id, '(UID FLAGS)')
-        print(x)
-        return x
-
-    def fetch_for_internaldate(self, message_id: str):
-        x = self.fetch_mail(message_id, '(UID INTERNALDATE)')
-        print(x)
-        return x
-
     def fetch_for_rfc822(self, message_id: str):
         """
+        Since 0.4.6
         Functionally equivalent to BODY[],
         differing in the syntax of the resulting untagged FETCH data (RFC822 is returned).
         See https://datatracker.ietf.org/doc/html/rfc3501
@@ -201,13 +158,10 @@ class IMAPAgent:
         """
         return self.fetch_mail(message_id, '(UID RFC822)')
 
-    def fetch_for_rfc822_text(self, message_id: str):
-        x = self.fetch_mail(message_id, '(UID RFC822.TEXT)')
-        # print(x[0][1].decode())
-        return x
-
     def fetch_for_nehushtan_mail(self, message_id: str) -> NehushtanMail:
+        """
+        Since 0.4.6
+        """
         rfc822 = self.fetch_for_rfc822(message_id)
-        # print(rfc822[0][1].decode('gb18030'))
         raw_mail_text: bytes = rfc822[0][1]
         return NehushtanMail.make_mail_by_rfc822_content(raw_mail_text)

@@ -4,6 +4,10 @@ from base64 import b64decode, b64encode
 
 
 class EncodedWordsKit:
+    """
+    Since 0.4.6
+    """
+
     @staticmethod
     def decode_string_following_rfc2047(raw_string: str):
         """
