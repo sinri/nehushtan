@@ -103,6 +103,11 @@ class NehushtanMailPackage:
         return x
 
     def __handle_mime_multi_part_body(self, lines: List[bytes]):
+        """
+        See https://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
+
+        TODO 解析每个piece内的header
+        """
         boundary = lines[0]
 
         pieces = []
