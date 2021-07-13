@@ -158,10 +158,28 @@ class IMAPAgent:
         """
         return self.fetch_mail(message_id, '(UID RFC822)')
 
+    def fetch_for_rfc822_header(self, message_id: str):
+        """
+        Since 0.4.7
+        Functionally equivalent to BODY[],
+        differing in the syntax of the resulting untagged FETCH data (RFC822 is returned).
+        See https://datatracker.ietf.org/doc/html/rfc3501
+        See https://datatracker.ietf.org/doc/html/rfc822
+        """
+        return self.fetch_mail(message_id, '(UID RFC822.HEADER)')
+
     def fetch_for_nehushtan_mail(self, message_id: str) -> NehushtanMail:
         """
         Since 0.4.6
         """
         rfc822 = self.fetch_for_rfc822(message_id)
+        raw_mail_text: bytes = rfc822[0][1]
+        return NehushtanMail.make_mail_by_rfc822_content(raw_mail_text)
+
+    def fetch_for_nehushtan_mail_header(self, message_id: str) -> NehushtanMail:
+        """
+        Since 0.4.7
+        """
+        rfc822 = self.fetch_for_rfc822_header(message_id)
         raw_mail_text: bytes = rfc822[0][1]
         return NehushtanMail.make_mail_by_rfc822_content(raw_mail_text)
