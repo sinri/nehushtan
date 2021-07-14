@@ -4,7 +4,10 @@ import warnings
 from email.header import decode_header
 from typing import Iterable, List
 
+from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
+from nehushtan.logger.NehushtanLogging import NehushtanLogging
 from nehushtan.mail.rfc3501.SearchCommandKit import SearchCommandKit
+from nehushtan.mail.rfc822.NehushtanEmailMessage import NehushtanEmailMessage
 from nehushtan.mail.rfc822.NehushtanMail import NehushtanMail
 
 
@@ -19,11 +22,16 @@ class IMAPAgent:
     STATUS_NAME_UIDVALIDITY = 'UIDVALIDITY'  # 邮箱的唯一标识符有效性值。
     STATUS_NAME_UNSEEN = 'UNSEEN'  # 没有设置 .een 标志的消息数。
 
-    def __init__(self, host: str, port: int, use_ssl: bool):
+    def __init__(self, host: str, port: int, use_ssl: bool, logger: NehushtanFileLogger = None):
         if use_ssl:
             self._connection = imaplib.IMAP4_SSL(host, port)
         else:
             self._connection = imaplib.IMAP4(host, port)
+
+        if logger:
+            self.logger = logger
+        else:
+            self.logger = NehushtanFileLogger(log_level=NehushtanLogging.CRITICAL)
 
     def login(self, username: str, password: str):
         self._connection.login(username, password)
@@ -128,6 +136,13 @@ class IMAPAgent:
             return []
         return uid_array
 
+    def fetch_mail_with_uid(self, uid: str, message_parts: str):
+        arguments = [uid, message_parts]
+        response_code, data = self._connection.uid('FETCH', *arguments)
+        if response_code != 'OK':
+            raise Exception(f"IMAPAgent fetch_mail_using_uid failed: {response_code} with Data: {data}")
+        return data
+
     def fetch_mail(self, message_id: str, message_parts: str) -> list:
         """
 
@@ -174,7 +189,7 @@ class IMAPAgent:
         """
         rfc822 = self.fetch_for_rfc822(message_id)
         raw_mail_text: bytes = rfc822[0][1]
-        return NehushtanMail.make_mail_by_rfc822_content(raw_mail_text)
+        return NehushtanMail.make_mail_by_rfc822_content(raw_mail_text, self.logger)
 
     def fetch_for_nehushtan_mail_header(self, message_id: str) -> NehushtanMail:
         """
@@ -182,4 +197,9 @@ class IMAPAgent:
         """
         rfc822 = self.fetch_for_rfc822_header(message_id)
         raw_mail_text: bytes = rfc822[0][1]
-        return NehushtanMail.make_mail_by_rfc822_content(raw_mail_text)
+        return NehushtanMail.make_mail_by_rfc822_content(raw_mail_text, self.logger)
+
+    def fetch_for_nehushtan_email_message(self, message_id: str) -> NehushtanEmailMessage:
+        rfc822 = self.fetch_for_rfc822(message_id)
+        raw_mail_text: bytes = rfc822[0][1]
+        return NehushtanEmailMessage.parse_bytes(raw_mail_text)

@@ -4,6 +4,7 @@ from typing import Optional, Tuple, List
 
 from nehushtan.helper.CommonHelper import CommonHelper
 from nehushtan.mail.rfc2047.EncodedWordsKit import EncodedWordsKit
+from nehushtan.mail.rfc822.NehushtanMailContent import NehushtanMailContent
 
 
 class NehushtanMailPackage:
@@ -15,6 +16,8 @@ class NehushtanMailPackage:
         self.meta_dict = {}
         self.raw_body_lines = []
         self.charset = None
+
+        self.content_list: List[NehushtanMailContent] = []
 
     def __decode_with_charset(self, x: bytes):
         if x is None:
@@ -30,52 +33,71 @@ class NehushtanMailPackage:
     @staticmethod
     def parse_mail_address_line(x: str):
         print('parse_mail_address_line <-', x)
-        matched = re.match(r'(\S*)\s*<([\S]+)>', x)
-        name = matched[1]
-        address = matched[2]
-        # name, address = x.split(" ")
-        name = EncodedWordsKit.decode_string_following_rfc2047(name)
-        address: str = address[1:-1]
-        return address, name
 
-    def get_from_mail_address(self) -> Optional[Tuple[str, str]]:
-        x = CommonHelper.read_target(self.meta_dict, (b'From', 0))
+        # a1@b.c, a2@b.c
+        # A1 <a1@b.c>, a2@b.c
+        # A1 <a1@b.c>, A2 <a2@b.c>
+
+        email_rule_express = r'([A-Za-z0-9.-]+@[A-Za-z0-9.-]+)|((\S*)\s*<([A-Za-z0-9.-]+@[A-Za-z0-9.-]+)>)'
+        address_pieces = re.findall(email_rule_express, x)
+
+        list_of_mail_address_tuple = []
+        for address_piece in address_pieces:
+            address = None
+            name = None
+            if address_piece[0]:
+                address = address_piece[0]
+                name = None
+            elif address_piece[2] and address_piece[3]:
+                address = address_piece[3]
+                name = address_piece[2]
+                EncodedWordsKit.decode_string_following_rfc2047(name)
+
+            list_of_mail_address_tuple.append((address, name))
+        return list_of_mail_address_tuple
+
+    def get_from_mail_address(self) -> Optional[List[Tuple[str, Optional[str]]]]:
+        xs = CommonHelper.read_target(self.meta_dict, (b'From',), [])
+        x = b''.join(xs)
         if x:
             x = self.__decode_with_charset(x)
             return NehushtanMailPackage.parse_mail_address_line(x)
         return None
 
     def get_reply_to_mail_address(self):
-        x = CommonHelper.read_target(self.meta_dict, (b'Reply-To', 0))
+        xs = CommonHelper.read_target(self.meta_dict, (b'Reply-To',), [])
+        x = b''.join(xs)
         if x:
             x = self.__decode_with_charset(x)
             return NehushtanMailPackage.parse_mail_address_line(x)
         return self.get_from_mail_address()
 
     def get_to_mail_address(self):
-        x = CommonHelper.read_target(self.meta_dict, (b'To', 0))
+        xs = CommonHelper.read_target(self.meta_dict, (b'To',), [])
+        x = b''.join(xs)
         if x:
             x = self.__decode_with_charset(x)
             return NehushtanMailPackage.parse_mail_address_line(x)
         return self.get_from_mail_address()
 
     def get_subject(self) -> str:
-        x = CommonHelper.read_target(self.meta_dict, (b'Subject', 0))
-        if type(x) is bytes:
-            x = self.__decode_with_charset(x)
-        if type(x) is not str:
-            return ''
-        return EncodedWordsKit.decode_string_following_rfc2047(x)
+        xs = CommonHelper.read_target(self.meta_dict, (b'Subject',), [])
+        s = ''
+        for x in xs:
+            if type(x) is bytes:
+                p = self.__decode_with_charset(x)
+                s += EncodedWordsKit.decode_string_following_rfc2047(p)
+            if type(x) is not str:
+                s += ''
+        return s
 
     def get_content_type(self) -> Optional[str]:
         x_array = CommonHelper.read_target(self.meta_dict, (b'Content-Type',), [])
-        # print('get_content_type <- ',x_array)
         s = ''
         for x in x_array:
             if type(x) is bytes:
                 x = x.decode('ascii')
             s += x
-        # print('get_content_type -> ',s)
         return s
 
     def get_content_transfer_encoding(self):
