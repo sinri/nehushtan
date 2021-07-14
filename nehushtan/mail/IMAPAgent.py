@@ -1,17 +1,24 @@
 import imaplib
 import re
 import warnings
-from email.header import decode_header
 from typing import Iterable, List
 
 from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
 from nehushtan.logger.NehushtanLogging import NehushtanLogging
 from nehushtan.mail.rfc3501.SearchCommandKit import SearchCommandKit
 from nehushtan.mail.rfc822.NehushtanEmailMessage import NehushtanEmailMessage
-from nehushtan.mail.rfc822.NehushtanMail import NehushtanMail
 
 
 class IMAPAgent:
+    """
+    Greatly Changed between 0.4.7 and 0.4.8
+    """
+
+    FETCH_METHOD_RFC822 = '(RFC822)'
+    FETCH_METHOD_RFC822_HEADER = '(RFC822.HEADER)'
+    FETCH_METHOD_RFC822_WITH_UID = '(UID RFC822)'
+    FETCH_METHOD_RFC822_HEADER_WITH_UID = '(UID RFC822.HEADER)'
+
     """
     Since 0.1.13
     [Experimental, Not Fully Completed]
@@ -108,9 +115,8 @@ class IMAPAgent:
             raise Exception(f"IMAPAgent select_mailbox {box} failed: {response_code} with Data: {data}")
         return int(data[0])
 
-    def search_mails_in_mailbox(self, criteria, charset=None):
+    def search_mails_for_message_id(self, criteria, charset=None):
         """
-        DEPRECATED
         :param criteria:
         :param charset:
         :return: Message ID array
@@ -122,7 +128,7 @@ class IMAPAgent:
         message_id_array = data[0].decode('utf-8').split(' ')
         return message_id_array
 
-    def search_for_mail_uid(self, search: SearchCommandKit):
+    def search_mail_for_uid(self, search: SearchCommandKit):
         command, arguments, literal = search.build()
         if literal is not None:
             self._connection.literal = literal
@@ -143,7 +149,7 @@ class IMAPAgent:
             raise Exception(f"IMAPAgent fetch_mail_using_uid failed: {response_code} with Data: {data}")
         return data
 
-    def fetch_mail(self, message_id: str, message_parts: str) -> list:
+    def fetch_mail_with_message_id(self, message_id: str, message_parts: str) -> list:
         """
 
         :param message_id:
@@ -155,51 +161,42 @@ class IMAPAgent:
             raise Exception(f"IMAPAgent fetch_mail failed: {response_code} with Data: {data}")
         return data
 
-    # 字符编码转换
-    @staticmethod
-    def decode_str(str_in):
-        value, charset = decode_header(str_in)[0]
-        if charset:
-            value = value.decode(charset)
-        return value
+    # # 字符编码转换
+    # @staticmethod
+    # def decode_str(str_in):
+    #     value, charset = decode_header(str_in)[0]
+    #     if charset:
+    #         value = value.decode(charset)
+    #     return value
 
-    def fetch_for_rfc822(self, message_id: str):
+    def fetch_mail_with_message_id_as_nem(
+            self,
+            message_id: str,
+            headers_only: bool = False
+    ) -> NehushtanEmailMessage:
         """
-        Since 0.4.6
-        Functionally equivalent to BODY[],
-        differing in the syntax of the resulting untagged FETCH data (RFC822 is returned).
-        See https://datatracker.ietf.org/doc/html/rfc3501
-        See https://datatracker.ietf.org/doc/html/rfc822
+        Since 0.4.8
         """
-        return self.fetch_mail(message_id, '(UID RFC822)')
+        fetch_method = self.FETCH_METHOD_RFC822
+        if headers_only:
+            fetch_method = self.FETCH_METHOD_RFC822_HEADER
 
-    def fetch_for_rfc822_header(self, message_id: str):
-        """
-        Since 0.4.7
-        Functionally equivalent to BODY[],
-        differing in the syntax of the resulting untagged FETCH data (RFC822 is returned).
-        See https://datatracker.ietf.org/doc/html/rfc3501
-        See https://datatracker.ietf.org/doc/html/rfc822
-        """
-        return self.fetch_mail(message_id, '(UID RFC822.HEADER)')
-
-    def fetch_for_nehushtan_mail(self, message_id: str) -> NehushtanMail:
-        """
-        Since 0.4.6
-        """
-        rfc822 = self.fetch_for_rfc822(message_id)
+        rfc822 = self.fetch_mail_with_message_id(message_id, fetch_method)
         raw_mail_text: bytes = rfc822[0][1]
-        return NehushtanMail.make_mail_by_rfc822_content(raw_mail_text, self.logger)
+        return NehushtanEmailMessage.parse_bytes(raw_mail_text)
 
-    def fetch_for_nehushtan_mail_header(self, message_id: str) -> NehushtanMail:
+    def fetch_mail_with_uid_as_nem(
+            self,
+            uid: str,
+            headers_only: bool = False
+    ) -> NehushtanEmailMessage:
         """
-        Since 0.4.7
+        Since 0.4.8
         """
-        rfc822 = self.fetch_for_rfc822_header(message_id)
-        raw_mail_text: bytes = rfc822[0][1]
-        return NehushtanMail.make_mail_by_rfc822_content(raw_mail_text, self.logger)
+        fetch_method = self.FETCH_METHOD_RFC822_WITH_UID
+        if headers_only:
+            fetch_method = self.FETCH_METHOD_RFC822_HEADER_WITH_UID
 
-    def fetch_for_nehushtan_email_message(self, message_id: str) -> NehushtanEmailMessage:
-        rfc822 = self.fetch_for_rfc822(message_id)
+        rfc822 = self.fetch_mail_with_uid(uid, fetch_method)
         raw_mail_text: bytes = rfc822[0][1]
         return NehushtanEmailMessage.parse_bytes(raw_mail_text)

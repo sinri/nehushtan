@@ -1,6 +1,3 @@
-import email.parser
-
-from nehushtan.helper.CommonHelper import CommonHelper
 from nehushtan.mail.IMAPAgent import IMAPAgent
 from tests.config import IMAP_CONFIG
 
@@ -27,45 +24,14 @@ for box in boxes:
 data = imap_agent.select_mailbox('INBOX')
 print(f'Total Mails: {data}')
 
-message_id_array = imap_agent.search_mails_in_mailbox('ALL')
+message_id_array = imap_agent.search_mails_for_message_id('ALL')
 print(message_id_array)
 
 for message_id in message_id_array:
     print(f"MESSAGE [{message_id}]")
-    data = imap_agent.fetch_mail(message_id, "(RFC822)")
-
-    for i in range(len(data) - 1):
-        for j in range(len(data[i])):
-            print(i, j, data[i][j])
-
-    header = CommonHelper.read_target(data, (0, 1), '')
-    print('decoded header', header)
-    # lines=header.splitlines()
-    # for line in lines:
-    #     line = line.strip()
-    #     if line=='':
-    #         continue
-    #     parts=re.split(r': *',line.decode('gbk'),maxsplit=1)
-    #     print(parts)
-
-    email_parser = email.parser.BytesFeedParser()
-    email_parser.feed(CommonHelper.read_target(data, (0, 1), b''))
-    msg = email_parser.close()
-
-    # print(msg)
-
-    for header in ['subject', 'to', 'from']:
-        print('{:^8}: {}'.format(header.upper(), IMAPAgent.decode_str(msg[header])))
-
-    for part in msg.walk():
-        part_info = {
-            "content_type": part.get_content_type(),
-            "file_name": part.get_filename(),
-            "charset": part.get_charset(),
-            "content_maintype": part.get_content_maintype(),
-            "content_subtype": part.get_content_subtype(),
-        }
-
-        print('part info -> ', part_info)
+    nem = imap_agent.fetch_mail_with_message_id_as_nem(message_id)
+    print(f'\tOn {nem.read_field_date()}')
+    print(f'\tFrom {nem.read_field_from()} To {nem.read_field_to()}')
+    print(f'\tSubject {nem.read_field_subject()}')
 
 imap_agent.logout()

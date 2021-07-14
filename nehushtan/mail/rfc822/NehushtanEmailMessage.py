@@ -8,6 +8,9 @@ from nehushtan.mail.rfc822.NehushtanMessagePart import NehushtanMessagePart
 
 
 class NehushtanEmailMessage:
+    """
+    Since 0.4.8
+    """
 
     def __init__(self, msg: Union[EmailMessage, Message]):
         self.__email_message = msg
@@ -27,8 +30,17 @@ class NehushtanEmailMessage:
         # x=self.__email_message.get('To','')
         # return NehushtanEmailMessage.parse_mail_address_line(x)
 
+    def read_field_cc(self):
+        return self.__email_message.get('cc', '')
+
+    def read_field_bcc(self):
+        return self.__email_message.get('bcc', '')
+
     def read_field_subject(self):
         return self.__email_message.get('Subject', '')
+
+    def read_field_date(self):
+        return self.__email_message.get('Date', '')
 
     @staticmethod
     def parse_bytes(text: bytes):
