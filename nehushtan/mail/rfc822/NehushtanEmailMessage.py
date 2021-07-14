@@ -73,3 +73,11 @@ class NehushtanEmailMessage:
 
             list_of_mail_address_tuple.append((address, name))
         return list_of_mail_address_tuple
+
+    @staticmethod
+    def extract_email_address(x: str):
+        """
+        Since 0.4.9
+        """
+        email_rule_express = r'[A-Za-z0-9.-]+@[A-Za-z0-9.-]+'
+        return re.findall(email_rule_express, x)
