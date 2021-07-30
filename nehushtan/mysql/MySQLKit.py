@@ -38,6 +38,12 @@ class MySQLKit:
         if len(self._mysql_config.get_host()) > 0:
             self.connect()
 
+    def __del__(self):
+        """
+        Since 0.4.10
+        """
+        self.disconnect()
+
     # Planned in 0.3.6 but not confirmed
     # def get_mysql_kit_uuid(self):
     #     return self.__instance_uuid

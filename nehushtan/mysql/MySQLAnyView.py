@@ -13,6 +13,12 @@ class MySQLAnyView(MySQLViewMixin):
         self.__view_name = view_name
         self.__schema_name = schema_name
 
+    def __del__(self):
+        """
+        Since 0.4.10
+        """
+        self.__mysql_kit = None
+
     def get_mysql_kit(self) -> MySQLKit:
         return self.__mysql_kit
 

@@ -12,6 +12,12 @@ class MySQLAnyTable(MySQLTableMixin):
         self._table_name = table_name
         self._schema_name = schema_name
 
+    def __del__(self):
+        """
+        Since 0.4.10
+        """
+        self._mysql_kit = None
+
     def get_mysql_kit(self) -> MySQLKit:
         return self._mysql_kit
 
