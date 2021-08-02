@@ -4,12 +4,17 @@ from multiprocessing import Process
 
 from nehushtan.queue.NehushtanQueueDelegate import NehushtanQueueDelegate
 from nehushtan.queue.NehushtanQueueTask import NehushtanQueueTask
+from nehushtan.queue.NehushtanQueueTaskDelegate import NehushtanQueueTaskDelegate
 from nehushtan.queue.situation.NoNextTaskSituation import NoNextTaskSituation
 
 
 class NehushtanQueue:
-    def __init__(self, delegate: NehushtanQueueDelegate):
-        self.delegate: NehushtanQueueDelegate = delegate
+    def __init__(self, delegate: NehushtanQueueDelegate, task_delegate: NehushtanQueueTaskDelegate):
+        """
+        Since 0.4.11 add task_delegate
+        """
+        self.delegate = delegate
+        self.task_delegate = task_delegate
         self.current_workers = {}
         self._is_running_exclusive_task = False
 
@@ -227,7 +232,7 @@ class NehushtanQueue:
 
             return False
 
-        p = Process(target=NehushtanQueue.embedded_task_execute, args=(task, self.delegate))
+        p = Process(target=NehushtanQueue.embedded_task_execute, args=(task, self.task_delegate))
         p.start()
         self.current_workers[task.get_task_reference()] = p
 
@@ -243,23 +248,24 @@ class NehushtanQueue:
         return True
 
     @staticmethod
-    def embedded_task_execute(embedded_task: NehushtanQueueTask, delegate: NehushtanQueueDelegate):
+    def embedded_task_execute(embedded_task: NehushtanQueueTask, task_delegate: NehushtanQueueTaskDelegate):
         """
         This works in WORKER
+        Since 0.4.11 use NehushtanQueueTaskDelegate
         """
         try:
             """
             Since 0.4.5 Add try block to catch outer_exception
             """
-            delegate.when_to_execute_task(embedded_task, os.getpid())
+            task_delegate.when_to_execute_task(embedded_task, os.getpid())
             try:
                 embedded_task.execute()
             except Exception as e:
-                delegate.when_task_raised_exception(embedded_task, e)
-            delegate.when_task_executed(embedded_task, os.getpid())
+                task_delegate.when_task_raised_exception(embedded_task, e)
+            task_delegate.when_task_executed(embedded_task, os.getpid())
 
         except Exception as outer_exception:
-            delegate.logger.exception(
+            task_delegate.logger.exception(
                 'In embedded_task_execute exception occurs outside the embedded_task '
                 f'[{embedded_task.get_task_reference()}] on Process {os.getpid()}',
                 outer_exception

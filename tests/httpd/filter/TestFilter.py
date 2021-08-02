@@ -2,7 +2,7 @@ from nehushtan.httpd.NehushtanHTTPRequestFilter import NehushtanHTTPRequestFilte
 
 
 class TestFilter(NehushtanHTTPRequestFilter):
-    def shouldAcceptRequest(self) -> bool:
+    def should_accept_request(self) -> bool:
         """
         Sample
         ------

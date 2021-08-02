@@ -138,37 +138,6 @@ class NehushtanQueueDelegate:
         """
         pass
 
-    @abstractmethod
-    def when_to_execute_task(self, task: NehushtanQueueTask, pid: int):
-        """
-        SINCE 0.1.24 add parameter pid
-        Note: Any exceptions should be caught inside.
-        This works in WORKER - EMBEDED
-        """
-        pass
-
-    @abstractmethod
-    def when_task_executed(self, task: NehushtanQueueTask, pid: int):
-        """
-        SINCE 0.1.24 add parameter pid
-        Note: Any exceptions should be caught inside.
-        This works in WORKER - EMBEDED
-        """
-        try:
-            if task.after_execute():
-                self.logger.info('TASK FINISHED', {'task_id': task.get_task_reference(), 'pid': pid})
-            else:
-                self.logger.warning('TASK FINISHING UNWELL', {'task_id': task.get_task_reference(), 'pid': pid})
-        except Exception as e:
-            self.logger.exception(f'when_task_executed for task {task.get_task_reference()} on PID {pid}', e)
-
-    @abstractmethod
-    def when_task_raised_exception(self, task: NehushtanQueueTask, exception: Exception):
-        """
-        This works in WORKER - EMBEDED
-        """
-        pass
-
     def when_pool_is_full(self):
         """
         This works in MASTER

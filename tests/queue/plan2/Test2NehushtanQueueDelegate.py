@@ -20,15 +20,19 @@ class Test2NehushtanQueueDelegate(NehushtanQueueDelegate):
             {'task_reference': task_reference, 'not_found': not_found, 'worker_pid': worker_pid}
         )
 
-    def handle_command_queue(self):
+    def handle_command_queue(self) -> int:
         self.logger.info('handle_command_queue, actually do nothing')
+        return 0
 
     def __init__(self, config_dictionary: dict = None, logger: NehushtanFileLogger = None):
         super().__init__(config_dictionary, logger)
         self.last_task_id = 1000
 
-    def when_loop_reports_error(self, error_message: str):
-        self.logger.error('Test2NehushtanQueueDelegate when_loop_reports_error', error_message)
+    def when_loop_reports_error(self, error_message: str, cause_exception: Exception = None):
+        if cause_exception:
+            self.logger.exception(error_message, cause_exception)
+        else:
+            self.logger.error('Test2NehushtanQueueDelegate when_loop_reports_error', error_message)
 
     def when_loop_terminates(self):
         self.logger.critical('Test2NehushtanQueueDelegate when_loop_terminates')
@@ -52,21 +56,3 @@ class Test2NehushtanQueueDelegate(NehushtanQueueDelegate):
 
     def when_task_not_executable(self, task: NehushtanQueueTask):
         self.logger.info('Test2NehushtanQueueDelegate when_task_not_executable', {'task_id': task.get_task_reference()})
-
-    def when_to_execute_task(self, task: NehushtanQueueTask, pid: int):
-        self.logger.info(
-            'Test2NehushtanQueueDelegate when_to_execute_task',
-            {'task_id': task.get_task_reference(), 'pid': pid}
-        )
-
-    def when_task_executed(self, task: NehushtanQueueTask, pid: int):
-        self.logger.info(
-            'Test2NehushtanQueueDelegate when_task_executed',
-            {'task_id': task.get_task_reference(), 'pid': pid}
-        )
-
-    def when_task_raised_exception(self, task: NehushtanQueueTask, exception: Exception):
-        self.logger.exception(
-            f'Test2NehushtanQueueDelegate when_task_raised_exception task_id={task.get_task_reference()}',
-            exception
-        )

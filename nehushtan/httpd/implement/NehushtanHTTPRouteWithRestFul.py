@@ -54,22 +54,22 @@ class NehushtanHTTPRouteWithRestFul(NehushtanHTTPRoute):
             component = components[i]
             class_full_path += '.' + component
             try:
-                c = CommonHelper.class_with_class_path(class_full_path)
-                # print(c)
-                if len(components) - 1 == i:
-                    # do not have enough path components
-                    return False
-                self.sub_class_path = ".".join(components[:i + 1])
-                self.class_method_name = components[i + 1]
-                self.matched_arguments = components[i + 2:]
-                # print({
-                #     'self.sub_class_path':self.sub_class_path,
-                #     'self.class_method_name':self.class_method_name,
-                #     'self.matched_arguments':self.matched_arguments,
-                # })
-                return True
+                CommonHelper.class_with_class_path(class_full_path)
             except ModuleNotFoundError:
                 continue
+            if len(components) - 1 == i:
+                # do not have enough path components
+                return False
+            self.sub_class_path = ".".join(components[:i + 1])
+            self.class_method_name = components[i + 1]
+            self.matched_arguments = components[i + 2:]
+            # print({
+            #     'self.sub_class_path':self.sub_class_path,
+            #     'self.class_method_name':self.class_method_name,
+            #     'self.matched_arguments':self.matched_arguments,
+            # })
+            return True
+
         # anyway not match
         return False
 

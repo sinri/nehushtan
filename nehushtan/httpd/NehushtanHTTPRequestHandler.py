@@ -284,7 +284,7 @@ class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
                         http_code=500
                     )
                 filter_instance = c(self, filter_data_dict)
-                if not filter_instance.shouldAcceptRequest():
+                if not filter_instance.should_accept_request():
                     raise NehushtanRequestDeniedByFilterError(
                         filter_item,
                         filter_instance.message_for_denial,

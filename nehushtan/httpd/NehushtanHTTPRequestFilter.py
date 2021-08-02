@@ -22,5 +22,5 @@ class NehushtanHTTPRequestFilter:
         return self.__http_handler
 
     @abstractmethod
-    def shouldAcceptRequest(self) -> bool:
+    def should_accept_request(self) -> bool:
         pass
