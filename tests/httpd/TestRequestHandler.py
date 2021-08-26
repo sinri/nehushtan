@@ -1,12 +1,14 @@
 import socketserver
 from typing import Tuple, Sequence, Union
 
+from nehushtan.MessageQueue.implement.NehushtanMemoryMessageQueue import NehushtanMemoryMessageQueue
 from nehushtan.httpd.NehushtanHTTPRequestHandler import NehushtanHTTPRequestHandler
 from nehushtan.httpd.NehushtanHTTPRouter import NehushtanHTTPRouter
 
 
 class TestRequestHandler(NehushtanHTTPRequestHandler):
     router = NehushtanHTTPRouter()
+    mq = NehushtanMemoryMessageQueue()
 
     def __init__(self, request: bytes, client_address: Tuple[str, int], server: socketserver.BaseServer):
         # self.prepare_router()
