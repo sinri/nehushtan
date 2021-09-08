@@ -1,4 +1,5 @@
 import importlib
+import uuid
 import warnings
 
 
@@ -105,3 +106,11 @@ class CommonHelper:
         module = __import__(module_base)
         a_class = getattr(module, sub_module_name)
         return a_class
+
+    @staticmethod
+    def generate_random_uuid_hex():
+        """
+        Generate a random UUID.
+        Since 0.4.15
+        """
+        return uuid.uuid4().hex
