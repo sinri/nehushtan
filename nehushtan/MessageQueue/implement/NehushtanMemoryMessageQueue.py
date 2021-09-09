@@ -33,7 +33,7 @@ class NehushtanMemoryMessageQueue(NehushtanMessageQueue):
         if lock is not None:
             self.__lock_map[queue_name].release()
 
-    def push(self, item: str, queue_name: str):
+    def enqueue(self, item: str, queue_name: str):
         if not self.__lock_queue(queue_name):
             return False
 
@@ -44,7 +44,7 @@ class NehushtanMemoryMessageQueue(NehushtanMessageQueue):
 
         return True
 
-    def pop(self, queue_name: str):
+    def dequeue(self, queue_name: str):
         if not self.__lock_queue(queue_name):
             return False
 
@@ -52,7 +52,10 @@ class NehushtanMemoryMessageQueue(NehushtanMessageQueue):
         if type(x) is not list:
             return_value = None
         else:
-            return_value = self.__queue_map[queue_name].pop(0)
+            try:
+                return_value = self.__queue_map[queue_name].pop(0)
+            except IndexError:
+                return None
 
         self.__unlock_queue(queue_name)
         return return_value

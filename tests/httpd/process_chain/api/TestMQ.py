@@ -5,11 +5,11 @@ from tests.httpd.TestRequestHandler import TestRequestHandler
 class TestMQ(NehushtanHTTPRequestController):
 
     def product(self, queue_name: str, item: str):
-        TestRequestHandler.mq.push(item, queue_name)
+        TestRequestHandler.mq.enqueue(item, queue_name)
         self._reply_with_ok("done")
 
     def consume(self, queue_name: str):
-        x = TestRequestHandler.mq.pop(queue_name)
+        x = TestRequestHandler.mq.dequeue(queue_name)
         if x is None:
             self._reply_with_ok({"mq_empty": True})
         else:
