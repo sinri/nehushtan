@@ -61,9 +61,6 @@ class NehushtanTCPSocketServer:
             except socket.timeout:
                 continue
 
-            # let the socket process in blocked mode (Since 0.4.17)
-            self.__socket_instance.settimeout(None)
-
             thread = Thread(
                 target=self.handle_incoming_connection,
                 name=connection.getpeername(),
