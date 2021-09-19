@@ -52,8 +52,17 @@ class NehushtanTCPSocketServer:
         if self.__socket_instance is None:
             raise prepare_error
 
+        # let accept could be interupted (Since 0.4.17)
+        self.__socket_instance.settimeout(1)
+
         while not self.should_terminate():
-            connection, address = self.__socket_instance.accept()
+            try:
+                connection, address = self.__socket_instance.accept()
+            except socket.timeout:
+                continue
+
+            # let the socket process in blocked mode (Since 0.4.17)
+            self.__socket_instance.settimeout(None)
 
             thread = Thread(
                 target=self.handle_incoming_connection,
