@@ -28,10 +28,27 @@ class NehushtanFileLogger:
             print_higher_than_this_level=NehushtanLogging.CRITICAL,
             record_millisecond=False,
     ):
-        self.title = title
-        self.log_dir = log_dir
-        self.log_level = log_level
         self.categorize = categorize
+        self.log_dir = log_dir
+        self.title = title
+
+        # This logic is since 0.4.19
+        if self.categorize:
+            x = title.split('/')
+            last_title = None
+            y = []
+            for xx in x:
+                if xx:
+                    if last_title:
+                        y.append(last_title)
+                    last_title = xx
+            if y and self.log_dir:
+                self.log_dir = self.log_dir + '/' + ('/'.join(y))
+            if last_title:
+                self.title = last_title
+
+        self.log_level = log_level
+
         self.date_rotate = date_rotate
         self.record_millisecond = record_millisecond
         # self.print_as_well = print_as_well <-- should use print_higher_than_this_level=NehushtanLogging.NOTSET
@@ -49,6 +66,11 @@ class NehushtanFileLogger:
 
         category_dir = self.log_dir
 
+        # TODO
+        # a -> a/a-DATE.log
+        # a/b -> a/b-DATE.log
+        # a/b/c -> a/b/c-DATE.log
+
         if self.categorize:
             category_dir = os.path.join(self.log_dir, self.title)
 
@@ -61,6 +83,7 @@ class NehushtanFileLogger:
             today = f'-{today}'
 
         target_file = os.path.join(category_dir, f'{self.title}{today}.log')
+
         return target_file
 
     def write_raw_line_to_log(self, text: str, level: int = NehushtanLogging.INFO, end=os.linesep):
