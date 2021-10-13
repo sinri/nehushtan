@@ -94,7 +94,7 @@ class NehushtanFileLogger:
         target_file = self.get_target_file()
 
         if target_file != '':
-            file = open(target_file, 'a')
+            file = open(target_file, 'a',encoding='utf-8')
             file.write(text + end)
             file.flush()
             file.close()
