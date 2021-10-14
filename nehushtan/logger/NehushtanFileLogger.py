@@ -27,6 +27,7 @@ class NehushtanFileLogger:
             date_rotate: bool = True,
             print_higher_than_this_level=NehushtanLogging.CRITICAL,
             record_millisecond=False,
+            file_encoding='utf-8'
     ):
         self.categorize = categorize
         self.log_dir = log_dir
@@ -60,22 +61,30 @@ class NehushtanFileLogger:
         else:
             self.print_higher_than_this_level = print_higher_than_this_level
 
+        # Since 0.4.20 CACHED FILE HANDLER
+        self.keep_file_open = True
+        self.opened_files = {}
+        # Since 0.4.20 TARGET FILE ENCODING
+        self.file_encoding = file_encoding
+
+    def __del__(self):
+        if len(self.opened_files.items()) > 0:
+            for name, file in self.opened_files.items():
+                file.close()
+                # print(name, 'closed')
+
     def get_target_file(self):
         if self.log_dir is None:
             return ''
 
         category_dir = self.log_dir
 
-        # TODO
         # a -> a/a-DATE.log
         # a/b -> a/b-DATE.log
         # a/b/c -> a/b/c-DATE.log
 
         if self.categorize:
             category_dir = os.path.join(self.log_dir, self.title)
-
-        if not os.path.exists(category_dir):
-            os.makedirs(category_dir)
 
         today = ''
         if self.date_rotate:
@@ -84,7 +93,25 @@ class NehushtanFileLogger:
 
         target_file = os.path.join(category_dir, f'{self.title}{today}.log')
 
+        final_dir = os.path.dirname(target_file)
+        if not os.path.exists(final_dir):
+            os.makedirs(final_dir)
+
         return target_file
+
+    def get_target_file_hander(self, target_file_path: str):
+        if not target_file_path:
+            return None
+
+        if self.keep_file_open:
+            file = self.opened_files.get(target_file_path)
+            if not file:
+                file = open(target_file_path, 'a', encoding=self.file_encoding)
+                self.opened_files[target_file_path] = file
+        else:
+            file = open(target_file_path, 'a', encoding=self.file_encoding)
+
+        return file
 
     def write_raw_line_to_log(self, text: str, level: int = NehushtanLogging.INFO, end=os.linesep):
         """
@@ -94,10 +121,12 @@ class NehushtanFileLogger:
         target_file = self.get_target_file()
 
         if target_file != '':
-            file = open(target_file, 'a',encoding='utf-8')
+            file = self.get_target_file_hander(target_file)
             file.write(text + end)
             file.flush()
-            file.close()
+
+            if not self.keep_file_open:
+                file.close()
 
         if target_file == '' or level > self.print_higher_than_this_level:
             if level >= NehushtanLogging.WARNING:
