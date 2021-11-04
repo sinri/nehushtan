@@ -1,4 +1,6 @@
 import importlib
+import secrets
+import string
 import uuid
 import warnings
 
@@ -114,3 +116,74 @@ class CommonHelper:
         Since 0.4.15
         """
         return uuid.uuid4().hex
+
+    @staticmethod
+    def generate_a_password_string(
+            length=8,
+            least_special_ascii_letters=-1,
+            least_lower_case_letters=1,
+            least_upper_case_letters=1,
+            least_digits=1,
+    ):
+        """
+        Since 0.4.21
+        Parameters named as `least_*` are following one rule:
+        - if it is less than 0, this kind of chars would not appear;
+        - else, the total appearence count in generated password would be no less than it.
+        The sum of them (if less than 0, count it as 0) should not be longer than `length`.
+        """
+
+        options = ''
+        if least_lower_case_letters < 0:
+            least_lower_case_letters = 0
+        else:
+            options += string.ascii_lowercase
+
+        if least_upper_case_letters < 0:
+            least_upper_case_letters = 0
+        else:
+            options += string.ascii_uppercase
+
+        if least_digits < 0:
+            least_digits = 0
+        else:
+            options += string.digits
+
+        if least_special_ascii_letters < 0:
+            least_special_ascii_letters = 0
+        else:
+            special = r"!#()*,-.:;<>@[]^_{}"
+            options += special
+
+        if least_upper_case_letters + least_lower_case_letters + least_digits + least_special_ascii_letters > length:
+            raise RuntimeError("generate_secure_password error: check parameters")
+
+        password = "".join(secrets.choice(options) for i in range(length))
+
+        total_s = 0
+        total_l = 0
+        total_u = 0
+        total_d = 0
+        for c in password:
+            if c.islower():
+                total_l += 1
+            elif c.isupper():
+                total_u += 1
+            elif c.isdigit():
+                total_d += 1
+            else:
+                total_s += 1
+
+        if total_d >= least_digits \
+                and total_u >= least_upper_case_letters \
+                and total_l >= least_lower_case_letters \
+                and total_s >= least_special_ascii_letters:
+            return password
+
+        return CommonHelper.generate_a_password_string(
+            length=length,
+            least_special_ascii_letters=least_special_ascii_letters,
+            least_lower_case_letters=least_lower_case_letters,
+            least_upper_case_letters=least_upper_case_letters,
+            least_digits=least_digits,
+        )
