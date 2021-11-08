@@ -7,8 +7,3 @@ psutil~=5.8.0
 PyMySQL~=0.10.1
 
 websockets~=9.1
-
-# learning
-pandas~=1.3.4
-# the above pandas would rely: numpy-1.21.3 python-dateutil-2.8.2 pytz-2021.3 and so on
-matplotlib~=3.4.3
