@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='nehushtan',
-    version='0.4.21',
+    version='0.4.22',
     packages=find_packages(),
     url='https://sinri.github.io/nehushtan/',
     license='MIT',
@@ -21,7 +21,6 @@ setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        'PyMySQL~=0.10.1',
         'psutil~=5.8.0',
     ]
 )
