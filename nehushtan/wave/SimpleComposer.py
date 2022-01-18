@@ -1,5 +1,5 @@
 import math
-from typing import Union
+from typing import List
 
 from nehushtan.wave.Note import Note
 from nehushtan.wave.WaveWriter import WaveWriter
@@ -10,45 +10,54 @@ class SimpleComposer:
         self.__wave_writer = WaveWriter(target_wav_file_path)
         self.__beats_in_minute = beats_in_minute
 
-        self.__note_frames_cache = []
+        self.__notes_lines = {0: []}
+        # self.__note_frames_cache = []
 
-    def add_note(self, note: Note):
-        self.__add_sound(int(note.get_sound_in_hz()), note.beats)
+    def add_note_to_line(self, note: Note, line_index: int = 0):
+        if not self.__notes_lines.get(line_index):
+            self.__notes_lines[line_index] = []
+        self.__notes_lines[line_index].append(note)
 
-    def __add_sound(self, frequency_in_hz: int, beats: Union[int, float]):
-        # make time piece
+    def add_notes_to_lines(self, notes: List[Note]):
+        for line_index in range(len(notes)):
+            self.add_note_to_line(notes[line_index], line_index)
+
+    def __process_notes(self):
         # 每次采样代表的秒数 = 1秒 / 每秒采样次数
         step = 1.0 / self.__wave_writer.get_frame_rate()
-        # 本音占用时长 = 拍数 * (一分钟 / 每分钟拍数)
-        time = beats * 60.0 / self.__beats_in_minute
-        piece_count = int(round(time / step))
+        mixed_frames = []
+        print("TO PROCESS NOTES")
+        time_piece_index = 0
+        for line_index, line in self.__notes_lines.items():
+            line_frames = []
+            for note in line:
+                hz = note.get_sound_in_hz()
+                beats = note.get_beats()
+                # 本音占用时长 = 拍数 * (一分钟 / 每分钟拍数)
+                time = beats * 60.0 / self.__beats_in_minute
+                piece_count = int(round(time / step))
 
-        print(f"time={time},piece_count={piece_count}")
+                for i in range(piece_count):
+                    t = step * time_piece_index
 
-        frames = []
-        for i in range(piece_count):
-            t = step * i
-            frame = math.cos(2 * math.pi * (frequency_in_hz * t)) * 10000
-            frames.append(int(frame))
+                    frame = math.cos(2 * math.pi * (hz * t))
+                    frame = frame * 10000  # it is like volumn
 
-        self.__note_frames_cache.append(frames)
-        # print(frames)
-        # self.__wave_writer.write_frames(frames)
+                    line_frames.append(int(frame))
+                    time_piece_index += 1
+
+            for i in range(len(line_frames)):
+                frame = line_frames[i]
+                if line_index == 0:
+                    mixed_frames.append(frame)
+                else:
+                    mixed_frames[i] += frame
+
+        print("PREPARED")
+
+        self.__wave_writer.write_frames(mixed_frames)
 
     def close(self):
-        last = None
-        total = []
-        for frames in self.__note_frames_cache:
-            if last is not None:
-                first = frames[0]
-
-                middle_beats = 10
-                delta = 1.0 * (first - last) / middle_beats
-                for i in range(middle_beats):
-                    x = last + i * delta
-                    total.append(int(x))
-
-            total = total + frames
-            last = total[-1]
-        self.__wave_writer.write_frames(total)
+        self.__process_notes()
         self.__wave_writer.close()
+        print("WRITTEN AND CLOSED")

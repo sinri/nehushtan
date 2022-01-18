@@ -27,7 +27,7 @@ class Note:
         self.name = name
         self.flat = move_half < 0
         self.sharp = move_half > 0
-        self.beats = beats
+        self.__beats = beats
 
     def __as_indexed(self):
         a = self.group
@@ -101,6 +101,9 @@ class Note:
             raise RuntimeError
 
         return Note(name, group, move_half)
+
+    def get_beats(self):
+        return self.__beats
 
     def get_note_higher(self, distance: int):
         if distance < 0:

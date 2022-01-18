@@ -44,15 +44,12 @@ class WaveWriter:
             写入的目标二进制字节串为 0x10 0x27 | 0x9 0x27 | ...
             自 10000=0x2710 | 9993=0x2709 | ... 转换而来
         """
-        # 将wav_data转换为二进制数据写入文件
-        # 0x10 0x27 | 0x9 0x27
 
         frames_in_byte = b""
         for frame in wave_data:
             frames_in_byte += frame.to_bytes(2, byteorder="little", signed=True)
 
         self.__target_wav_file.writeframes(frames_in_byte)
-        # print(f"written frames: {frames_in_byte}")
 
     def __enter__(self):
         pass
