@@ -1,4 +1,5 @@
 import importlib
+import platform
 import secrets
 import string
 import uuid
@@ -187,3 +188,18 @@ class CommonHelper:
             least_upper_case_letters=least_upper_case_letters,
             least_digits=least_digits,
         )
+
+    @staticmethod
+    def get_python_version():
+        """
+        Since 0.4.25
+        """
+        return platform.python_version()
+
+    @staticmethod
+    def is_python_version_at_least(big_version: int, middle_version: int = 0, small_version: int = 0):
+        """
+        Since 0.4.25
+        """
+        x = platform.python_version_tuple()
+        return int(x[0]) >= big_version and int(x[1]) >= middle_version and int(x[2]) >= small_version

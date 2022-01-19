@@ -9,6 +9,7 @@ from datetime import datetime
 
 import psutil
 
+from nehushtan.helper.CommonHelper import CommonHelper
 from nehushtan.logger.NehushtanLogging import NehushtanLogging
 
 
@@ -270,11 +271,15 @@ class NehushtanFileLogger:
     def get_traceback_info_from_exception(exception: BaseException) -> str:
         """
         Since 0.4.4
+        Since 0.4.26 -> try to make it compitable with 3.10
         """
-        return ''.join(
-            traceback.format_exception(
-                etype=type(exception),
-                value=exception,
-                tb=exception.__traceback__
+        if CommonHelper.is_python_version_at_least(3, 10):
+            return ''.join(traceback.format_exception(exception))
+        else:
+            return ''.join(
+                traceback.format_exception(
+                    etype=type(exception),
+                    value=exception,
+                    tb=exception.__traceback__
+                )
             )
-        )
