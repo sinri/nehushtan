@@ -34,7 +34,7 @@ class NehushtanQueue:
     def _scan_workers(self):
         """
         Scan registered workers, and remove dead ones from dictionary.
-        Finally return the total running processes count.
+        Finally, return the total running processes count.
         """
         if len(self.current_workers.items()) > 0:
             delete_keys = []
@@ -88,26 +88,30 @@ class NehushtanQueue:
             self.delegate.when_killed_worker_process(task_reference, not_found=True)
 
     def _loop_maintain(self, wait_till_processes_become_less_than: int = 0):
-        self._scan_workers()
+        """
+        Since 0.4.27 Use `while True` to avoid stack overflow
+        @see https://qiita.com/komorin0521/items/9f2ea1e2a37fd7f13fe2
+        For Issue: `Fatal Python error: Cannot recover from stack overflow. Python runtime state: initialized`
+        """
+        while True:
+            self._scan_workers()
 
-        if self.delegate.handle_command_queue() > 0:
-            # Since 0.2.18 the news only be sent when any command(s) done
-            self.register_news('handle_command_queue', 'Handled Command Queue')
+            if self.delegate.handle_command_queue() > 0:
+                # Since 0.2.18 the news only be sent when any command(s) done
+                self.register_news('handle_command_queue', 'Handled Command Queue')
 
-        kill_list = self.delegate.should_kill_any_worker_processes()
-        if len(kill_list) > 0:
-            for kill_task_id in kill_list:
-                self._terminate_worker_process_of_task(kill_task_id)
+            kill_list = self.delegate.should_kill_any_worker_processes()
+            if len(kill_list) > 0:
+                for kill_task_id in kill_list:
+                    self._terminate_worker_process_of_task(kill_task_id)
 
-        total_alive_current_workers = self._scan_workers()
+            total_alive_current_workers = self._scan_workers()
 
-        if wait_till_processes_become_less_than > 0:
             # need to do some wait
-            if total_alive_current_workers >= wait_till_processes_become_less_than:
+            if total_alive_current_workers >= wait_till_processes_become_less_than > 0:
                 time.sleep(2)
-                return self._loop_maintain(wait_till_processes_become_less_than)
-        else:
-            return total_alive_current_workers
+            else:
+                return total_alive_current_workers
 
     def register_news(self, title: str, content: str):
         """
