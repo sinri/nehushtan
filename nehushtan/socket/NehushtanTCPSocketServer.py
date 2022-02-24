@@ -52,7 +52,7 @@ class NehushtanTCPSocketServer:
         if self.__socket_instance is None:
             raise prepare_error
 
-        # let accept could be interupted (Since 0.4.17)
+        # let the process of accept could be interupted (Since 0.4.17)
         self.__socket_instance.settimeout(1)
 
         while not self.should_terminate():
