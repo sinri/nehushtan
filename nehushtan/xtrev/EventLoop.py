@@ -1,10 +1,10 @@
 import time
-from concurrent.futures.thread import ThreadPoolExecutor
 from queue import SimpleQueue, Empty
 from threading import Thread
 from typing import Dict, Optional
 
 from nehushtan.xtrev.EventHandler import EventHandler
+from nehushtan.xtrev.XtrevThreadExecutor import XtreVThreadExecutor
 
 event_key_of_timer: str = "event_timer"
 event_key_of_loop_ended: str = "event_loop_ended"
@@ -16,7 +16,7 @@ class EventLoop:
         self.__event_mapping: Dict[str, EventHandler] = {}
         self.__event_queue = SimpleQueue()
         self.__thread_for_loop: Optional[Thread] = None
-        self.__pool_executor = ThreadPoolExecutor()
+        self.__pool_executor = XtreVThreadExecutor()  # ThreadPoolExecutor()
 
         self.__timer_pointer_as_second = time.time()
 
@@ -35,6 +35,9 @@ class EventLoop:
 
     def unregister_event_listener(self, event_key: str):
         del self.__event_mapping[event_key]
+
+    def unregister_all_event_listeners(self):
+        self.__event_mapping.clear()
 
     def trigger_event(self, event_key: str):
         self.__event_queue.put(event_key)

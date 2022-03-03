@@ -3,7 +3,7 @@ from typing import Dict, Optional
 
 from nehushtan.helper.CommonHelper import CommonHelper
 from nehushtan.xtrev.EventHandler import EventHandler
-from nehushtan.xtrev.EventLoop import EventLoop, event_key_of_timer
+from nehushtan.xtrev.EventLoop import EventLoop, event_key_of_timer, event_key_of_loop_ended
 
 
 class NehushtanXtreVTimerMeta:
@@ -16,6 +16,9 @@ class NehushtanXtreVTimerMeta:
 class NehushtanXtreV:
     def __init__(self):
         self.__event_loop = EventLoop()
+
+        self.__event_loop.register_event_listener(event_key_of_loop_ended, EventHandler(self.__close_handler))
+
         self.__event_loop.start()
 
         # timer related
@@ -23,9 +26,16 @@ class NehushtanXtreV:
         self.__event_loop.register_event_listener(event_key_of_timer,
                                                   EventHandler(self.__timer_event_handler))
 
+    def daemon(self):
+        self.__event_loop.join_thread_for_loop()
+
     def close(self):
         self.__timers.clear()
+        self.__event_loop.unregister_all_event_listeners()
         self.__event_loop.stop()
+
+    def __close_handler(self):
+        pass
 
     def __timer_event_handler(self, current_time):
         to_delete = []
@@ -45,8 +55,11 @@ class NehushtanXtreV:
                     timer_meta.expected_time = time.time() + timer_meta.periodicity
         for x in to_delete:
             del self.__timers[x]
-        for timer_id, handler in to_execute.items():
-            self.__event_loop.trigger_once_event_handler(handler, timer_id)
+        try:
+            for timer_id, handler in to_execute.items():
+                self.__event_loop.trigger_once_event_handler(handler, timer_id)
+        except RuntimeError as runtime_error:
+            print(f"NehushtanXtreV::__timer_event_handler Runtime: {runtime_error}")
 
     def set_timer(self, periodicity: float, event_handler: EventHandler, periodically: bool):
         timer_id = CommonHelper.generate_random_uuid_hex()

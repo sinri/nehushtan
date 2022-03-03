@@ -16,5 +16,5 @@ if __name__ == '__main__':
     event_handler = EventHandler(handler_for_twice)
     event_handler.set_success_handler(handler_for_print)
     event_handler.set_failure_handler(handler_for_print)
-    event_handler.set_next_event_handler(EventHandler(handler_for_print))
+    event_handler.__set_next_event_handler(EventHandler(handler_for_print))
     event_handler.execute(pool_executor, 1)

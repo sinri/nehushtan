@@ -27,5 +27,6 @@ if __name__ == '__main__':
     xtrev.set_timer(2.0, EventHandler(timer_callback), True)
 
     time.sleep(4)
-    timer_callback("END")
-    # xtrev.close()
+    timer_callback("MAIN END")
+
+    xtrev.daemon()

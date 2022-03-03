@@ -18,13 +18,20 @@ class EventHandler:
         self.__when_failure = callback
         return self
 
-    def set_next_event_handler(self, next_event_handler: "EventHandler"):
+    def __set_next_event_handler(self, next_event_handler: "EventHandler"):
         self.__next_event_handler = next_event_handler
 
     def execute(self, executor: Executor, param):
         self.__executor = executor
         f = self.__executor.submit(self.__real_callback, param)
         f.add_done_callback(self.__future_done_callback)
+        return self
+
+    def next(self, next_event_handler: "EventHandler"):
+        ptr = self
+        while ptr.__next_event_handler is not None:
+            ptr = ptr.__next_event_handler
+        ptr.__set_next_event_handler(next_event_handler)
 
     def __future_done_callback(self, future: Future):
         exception = future.exception()
