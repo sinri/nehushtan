@@ -12,12 +12,22 @@ class CommonHelper:
 
     @staticmethod
     def read_target(target, keychain: tuple, default: any = None):
-        if type(target) is dict:
-            return CommonHelper.read_dictionary(target, keychain, default)
-        elif type(target) is list or type(target) is tuple:
-            return CommonHelper.read_array(target, keychain, default)
-        else:
-            return default
+        if not keychain: return default
+
+        c_target, empty = target.copy(), object()
+        for i in keychain:
+            if isinstance(c_target, dict):
+                c_target = c_target.get(i, empty)
+            elif isinstance(c_target, (tuple, list)):
+                c_len = len(c_target)
+                if isinstance(i, int) and -c_len <= i <= c_len - 1:
+                    c_target = c_target[i]
+                else:
+                    c_target = empty
+            else:
+                break
+        ret = default if c_target is empty else c_target
+        return ret
 
     @staticmethod
     def read_dictionary(dictionary: dict, keychain: tuple, default: any = None):
