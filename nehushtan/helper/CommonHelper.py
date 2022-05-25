@@ -40,17 +40,17 @@ class CommonHelper:
 
     @staticmethod
     def write_dictionary(target_dict: dict, keychain: tuple, value: any):
-        keychain_length = len(keychain)
-        if keychain_length > 1:
-            current_key = keychain[0]
-            current_target = target_dict.get(current_key)
-            if type(current_target) is not dict:
+        _target = target_dict
+        for index, _key in enumerate(keychain):
+            _value = _target.get(_key)
+            if not isinstance(_value, dict):
                 # Since 0.2.14
                 # a great change: all non-dict-type entry would be cleared as an empty dict
-                target_dict[current_key] = {}
-            CommonHelper.write_dictionary(target_dict[current_key], keychain[1:], value)
-        elif keychain_length == 1:
-            target_dict[keychain[0]] = value
+                _value = {}
+            if index == len(keychain) - 1:
+                _value = value
+            _target[_key] = _value
+            _target = _value
 
         return target_dict
 
