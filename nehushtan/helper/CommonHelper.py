@@ -4,86 +4,53 @@ import secrets
 import string
 import uuid
 import warnings
+from typing import Union
 
 
 class CommonHelper:
-    def __init__(self):
-        pass
 
     @staticmethod
-    def read_target(target, keychain: tuple, default: any = None):
+    def read_target(target: Union[dict, tuple, list, None], keychain: tuple, default: any = None):
         if not keychain: return default
 
-        c_target, empty = target.copy(), object()
+        c_target, not_find = target.copy(), object()
         for i in keychain:
             if isinstance(c_target, dict):
-                c_target = c_target.get(i, empty)
+                c_target = c_target.get(i, not_find)
             elif isinstance(c_target, (tuple, list)):
                 c_len = len(c_target)
                 if isinstance(i, int) and -c_len <= i <= c_len - 1:
                     c_target = c_target[i]
                 else:
-                    c_target = empty
+                    c_target = not_find
             else:
                 break
-        ret = default if c_target is empty else c_target
+        ret = default if c_target is not_find else c_target
         return ret
 
     @staticmethod
     def read_dictionary(dictionary: dict, keychain: tuple, default: any = None):
-        if len(keychain) <= 0:
-            return default
-        elif len(keychain) == 1:
-            return dictionary.get(keychain[0], default)
-        else:
-            current_key = keychain[0]
-            if dictionary.keys().__contains__(current_key):
-                sub_dictionary = dictionary.get(current_key, None)
-                if type(sub_dictionary) is dict:
-                    return CommonHelper.read_dictionary(sub_dictionary, keychain[1:], default)
-                elif type(sub_dictionary) is tuple or type(sub_dictionary) is list:
-                    return CommonHelper.read_array(sub_dictionary, keychain[1:], default)
-                else:
-                    return default
-            else:
-                return default
+        warnings.warn('DEPRECATED use read_target()', DeprecationWarning)
+        return CommonHelper.read_target(dictionary, keychain, default)
 
     @staticmethod
     def read_array(array: tuple, keychain: tuple, default: any = None):
-        if len(keychain) <= 0:
-            return default
-        elif len(keychain) == 1:
-            current_key = int(keychain[0])
-            if len(array) > current_key:
-                return array[int(keychain[0])]
-            else:
-                return default
-        else:
-            current_key = int(keychain[0])
-            if len(array) > current_key:
-                sub_array = array[current_key]
-                if type(sub_array) is tuple or type(sub_array) is list:
-                    return CommonHelper.read_array(sub_array, keychain[1:], default)
-                elif type(sub_array) is dict:
-                    return CommonHelper.read_dictionary(sub_array, keychain[1:], default)
-                else:
-                    return default
-            else:
-                return default
+        warnings.warn('DEPRECATED use read_target()', DeprecationWarning)
+        return CommonHelper.read_target(array, keychain, default)
 
     @staticmethod
     def write_dictionary(target_dict: dict, keychain: tuple, value: any):
-        keychain_length = len(keychain)
-        if keychain_length > 1:
-            current_key = keychain[0]
-            current_target = target_dict.get(current_key)
-            if type(current_target) is not dict:
+        _target = target_dict
+        for index, _key in enumerate(keychain):
+            _value = _target.get(_key)
+            if not isinstance(_value, dict):
                 # Since 0.2.14
                 # a great change: all non-dict-type entry would be cleared as an empty dict
-                target_dict[current_key] = {}
-            CommonHelper.write_dictionary(target_dict[current_key], keychain[1:], value)
-        elif keychain_length == 1:
-            target_dict[keychain[0]] = value
+                _value = {}
+            if index == len(keychain) - 1:
+                _value = value
+            _target[_key] = _value
+            _target = _value
 
         return target_dict
 

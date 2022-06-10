@@ -118,6 +118,21 @@ class TestForCommonHelper(unittest.TestCase):
             {'A': {'B': 'D', 'E': 'F'}, },
             CommonHelper.write_dictionary(target, ('A', 'E',), 'F')
         )
+        self.assertEqual(
+            {'A': {'B': 'D', 'E': 'F'}, },
+            CommonHelper.write_dictionary(target, tuple(), 'G')  # 空元组，保持不变
+        )
+        # 都说是 write_dictionary 还传别的东西进来
+        self.assertRaises(AttributeError, lambda: CommonHelper.write_dictionary(None, ('H', 'I',), 'J'))
+
+        obj_1 = object()
+        obj_2 = object()
+        self.assertNotEqual(obj_1, obj_2)
+        target = {'K': {'L': obj_1}}
+        self.assertEqual(
+            {'K': obj_2},
+            CommonHelper.write_dictionary(target, ('K',), obj_2)
+        )
 
     def test_seek_class(self):
         self.assertIsInstance(
