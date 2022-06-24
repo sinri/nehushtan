@@ -8,3 +8,5 @@ PyMySQL~=0.10.1
 psycopg2-binary~=2.9.2
 
 websockets~=9.1
+
+pysimplegui~=4.60.1

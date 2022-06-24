@@ -11,7 +11,8 @@ class CommonHelper:
 
     @staticmethod
     def read_target(target: Union[dict, tuple, list, None], keychain: tuple, default: any = None):
-        if not keychain: return default
+        if not keychain:
+            return default
 
         c_target, not_find = target.copy(), object()
         for i in keychain:
