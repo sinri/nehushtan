@@ -44,16 +44,24 @@ class NotationTextParser:
             self.__parsed_lines.append(ParsedLineAsTitle(components))
 
     def __parse_lyric_line(self, line):
-        compiled = re.compile("^>((.+)>)? (.+)\s*$")
+        compiled = re.compile("^>((.+)([<=>]))? (.+)\s*$")
         r = compiled.match(line)
         if r:
-            if len(r.groups()) == 2:
+            prefix = r.group(2)
+            if prefix == "":
                 prefix = None
-                content = r.group(1)
-            else:
-                prefix = r.group(2)
-                content = r.group(3)
-            self.__parsed_lines.append(ParsedLineAsLyric(content, prefix))
+            content_align_type = r.group(3)
+            if content_align_type is None or content_align_type == "":
+                content_align_type = ">"
+            content = r.group(4)
+
+            # if len(r.groups()) == 2:
+            #     prefix = None
+            #     content = r.group(1)
+            # else:
+            #     prefix = r.group(2)
+            #     content = r.group(3)
+            self.__parsed_lines.append(ParsedLineAsLyric(content, prefix, content_align_type))
 
     def __parse_score_line(self, line):
         print(line)

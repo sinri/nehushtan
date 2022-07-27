@@ -109,6 +109,7 @@ class ScoreDrawer:
 
     def __draw_lines(self):
         line_index = 1
+        self.__left_offset = 0
         for line in self.__parsed_lines:
             if isinstance(line, ParsedLineAsTitle):
                 self.__draw_title_line(line_index, line)
@@ -187,6 +188,12 @@ class ScoreDrawer:
         ts_end_cell_index = None
         ts_above_y = None
 
+        this_score_columns = 0
+        for su in score_line.get_score_units():
+            this_score_columns += su.get_cell_needed()
+        self.__left_offset = int(
+            cell_index - 2 + (self.__max_score_columns - this_score_columns) / 2) * self.__cell_width
+
         for i in range(len(score_line.get_score_units())):
             su = score_line.get_score_unit(i)
             print(f"draw su: {su}")
@@ -203,8 +210,8 @@ class ScoreDrawer:
                 ts_end_cell_index = cell_index
                 # draw tie or clur
                 self.aimed_tie_or_slur(
-                    (ts_start_cell_index * self.__cell_width, ts_above_y),
-                    (ts_end_cell_index * self.__cell_width, ts_above_y),
+                    (self.__left_offset + ts_start_cell_index * self.__cell_width, ts_above_y),
+                    (self.__left_offset + ts_end_cell_index * self.__cell_width, ts_above_y),
                     int(max(5.0, self.__cell_height * 0.2)),
                     "black"
                 )
@@ -214,14 +221,14 @@ class ScoreDrawer:
                 ts_end_cell_index = cell_index
                 # draw tie or clur for triplet
                 self.aimed_tie_or_slur(
-                    (ts_start_cell_index * self.__cell_width, ts_above_y),
-                    (ts_end_cell_index * self.__cell_width, ts_above_y),
+                    (self.__left_offset + ts_start_cell_index * self.__cell_width, ts_above_y),
+                    (self.__left_offset + ts_end_cell_index * self.__cell_width, ts_above_y),
                     int(max(5.0, self.__cell_height * 0.2)),
                     "black"
                 )
                 small_font = Paint.load_ttf_font(self.__ttf_font_file_path, int(self.__font_size * 2 / 3.0))
                 self.aimed_text(
-                    int((ts_start_cell_index + ts_end_cell_index) / 2 * self.__cell_width),
+                    int(self.__left_offset + (ts_start_cell_index + ts_end_cell_index) / 2 * self.__cell_width),
                     int(ts_above_y - max(5.0, self.__cell_height * 0.2) - 2),
                     "3",
                     small_font,
@@ -230,49 +237,60 @@ class ScoreDrawer:
                 )
                 continue
             elif note in ("|", "||", "||:", ":||", "|:", ":|"):
-                self.aimed_text(
-                    int((cell_index + 0.5) * self.__cell_width),
-                    int((line_index + 0.5) * self.__cell_height),
-                    text=note,
-                    font=self.__font,
-                    fill="black"
+                self.__print_text_to_cell(
+                    note,
+                    cell_index,
+                    line_index,
+                    self.__left_offset
                 )
+                # self.aimed_text(
+                #     int((cell_index + 0.5) * self.__cell_width),
+                #     int((line_index + 0.5) * self.__cell_height),
+                #     text=note,
+                #     font=self.__font,
+                #     fill="black"
+                # )
                 cell_index += 1
             else:
                 # 0, 1-7
-                self.aimed_text(
-                    int((cell_index + 0.5) * self.__cell_width),
-                    int((line_index + 0.5) * self.__cell_height),
-                    text=note,
-                    font=self.__font,
-                    fill="black"
+                self.__print_text_to_cell(
+                    note,
+                    cell_index,
+                    line_index,
+                    self.__left_offset
                 )
+                # self.aimed_text(
+                #     int((cell_index + 0.5) * self.__cell_width),
+                #     int((line_index + 0.5) * self.__cell_height),
+                #     text=note,
+                #     font=self.__font,
+                #     fill="black"
+                # )
                 under_line_start_cell_index = cell_index
                 if su.get_right_line_count() > 0:
                     for right_line_index in range(su.get_right_line_count()):
                         cell_index += 1
-                        self.aimed_text(
-                            int((cell_index + 0.5) * self.__cell_width),
-                            int((line_index + 0.5) * self.__cell_height),
-                            text="-",
-                            font=self.__font,
-                            fill="black"
+                        self.__print_text_to_cell(
+                            "－",
+                            cell_index,
+                            line_index,
+                            self.__left_offset
                         )
+                        # self.aimed_text(
+                        #     int((cell_index + 0.5) * self.__cell_width),
+                        #     int((line_index + 0.5) * self.__cell_height),
+                        #     text="-",
+                        #     font=self.__font,
+                        #     fill="black"
+                        # )
                 if su.get_dot():
                     cell_index += 1
                     self.aimed_point(
-                        int((cell_index + 0.5) * self.__cell_width),
+                        self.__left_offset + int((cell_index + 0.5) * self.__cell_width),
                         int((line_index + 0.5) * self.__cell_height),
                         self.__point_width,
                         "black"
                     )
-                    # self.aimed_text(
-                    #     int((cell_index + 0.5) * self.__cell_width),
-                    #     int((line_index + 0.5) * self.__cell_height),
-                    #     text="·",
-                    #     font=self.__font,
-                    #     fill="black"
-                    # )
                 under_line_end_cell_index = cell_index
 
                 under_y = int((line_index + 1 - 0.1) * self.__cell_height)
@@ -282,7 +300,7 @@ class ScoreDrawer:
                     for under_line_index in range(su.get_under_line_count()):
                         self.__paint.line(
                             xy=(
-                                (x0, under_y), (x1, under_y)
+                                (self.__left_offset + x0, under_y), (self.__left_offset + x1, under_y)
                             ),
                             fill="black",
                             width=self.__line_width
@@ -291,32 +309,18 @@ class ScoreDrawer:
                 if su.get_below_point_count() > 0:
                     for below_point_index in range(su.get_below_point_count()):
                         self.aimed_point(
-                            int((under_line_start_cell_index + 0.5) * self.__cell_width),
+                            self.__left_offset + int((under_line_start_cell_index + 0.5) * self.__cell_width),
                             under_y,
                             self.__point_width,
                             "black"
                         )
-                        # self.__paint.ellipse(
-                        #     xy=(
-                        #         (int((under_line_start_cell_index + 0.5) * self.__cell_width - 1), under_y - 1),
-                        #         (int((under_line_start_cell_index + 0.5) * self.__cell_width + 1), under_y + 1)
-                        #     ),
-                        #     fill="black"
-                        # )
                         under_y += self.__point_width * 2
 
                 above_y = int((line_index + 0.25) * self.__cell_height)
                 if su.get_above_point_count() > 0:
                     for above_point_index in range(su.get_above_point_count()):
-                        # self.__paint.ellipse(
-                        #     xy=(
-                        #         (int((under_line_start_cell_index + 0.5) * self.__cell_width - 1), above_y - 1),
-                        #         (int((under_line_start_cell_index + 0.5) * self.__cell_width + 1), above_y + 1)
-                        #     ),
-                        #     fill="black"
-                        # )
                         self.aimed_point(
-                            int((under_line_start_cell_index + 0.5) * self.__cell_width),
+                            self.__left_offset + int((under_line_start_cell_index + 0.5) * self.__cell_width),
                             above_y,
                             self.__point_width,
                             "black"
@@ -325,7 +329,7 @@ class ScoreDrawer:
 
                 if su.get_fermata():
                     self.aimed_fermata(
-                        int((under_line_start_cell_index + 0.5) * self.__cell_width),
+                        self.__left_offset + int((under_line_start_cell_index + 0.5) * self.__cell_width),
                         above_y,
                         "black"
                     )
@@ -360,10 +364,17 @@ class ScoreDrawer:
 
             lyric_body_offset += (self.__max_prefix_columns + 1) * self.__cell_width
 
+        left_offset = 0
+        if lyric_line.get_content_align_type() == ">":
+            left_offset = self.__left_offset
+        elif lyric_line.get_content_align_type() == "=":
+            left_offset = int(
+                (self.__max_score_columns - len(lyric_line.get_content().strip())) / 2.0 * self.__cell_width)
+
         for i in range(len(lyric_line.get_content())):
             self.__paint.text(
                 xy=(
-                    lyric_body_offset + i * self.__cell_width,
+                    left_offset + lyric_body_offset + i * self.__cell_width,
                     line_index * self.__cell_height
                 ),
                 text=lyric_line.get_lyric_char(i),
@@ -371,6 +382,14 @@ class ScoreDrawer:
                 align="center",
                 fill="black"
             )
+
+    def __print_text_to_cell(self, text, cell_index, line_index, left_offset: int = 0):
+        self.aimed_text(
+            int((cell_index + 0.5) * self.__cell_width + left_offset),
+            int((line_index + 0.5) * self.__cell_height),
+            text,
+            self.__font
+        )
 
     def aimed_text(self, center_x, center_y, text, font, fill="black", background_color=None):
         box = self.__paint.textbbox(
@@ -407,13 +426,6 @@ class ScoreDrawer:
         )
 
     def aimed_fermata(self, point_x, point_y, fill="black"):
-        # self.__paint.rectangle(
-        #     (
-        #         (point_x - self.__cell_width / 3, point_y - self.__cell_width / 3),
-        #         (point_x + self.__cell_width / 3, point_y)
-        #     ),
-        #     outline="red"
-        # )
         self.__paint.arc(
             (
                 (point_x - self.__cell_width / 3, point_y - self.__cell_width / 3),
@@ -432,7 +444,6 @@ class ScoreDrawer:
                 (start_xy[0], int(start_xy[1] - high)),
                 (end_xy[0], end_xy[1])
             ),
-            # 225,315,
             180, 0,
             fill=fill,
             width=self.__line_width
