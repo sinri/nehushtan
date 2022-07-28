@@ -1,5 +1,6 @@
 from nehushtan.score.NotationTextParser import NotationTextParser
 from nehushtan.score.ScoreDrawer import ScoreDrawer
+from nehushtan.score.ScoreDrawerOptions import ScoreDrawerOptions
 
 text = """
 ~ 1=A 4/4 | 第一百零六首 | 主的复活
@@ -27,10 +28,11 @@ if __name__ == '__main__':
     parser = NotationTextParser(text=text)
     parser.parse()
     parser.debug()
-    drawer = ScoreDrawer(
-        parser.get_parsed_score_lines(),
-        # "/Users/leqee/code/Verbum/fonts/优设好身体/YSHaoShenTi-2.ttf",
-        "/Users/leqee/code/Verbum/fonts/Arial Unicode.ttf",
-        50
-    )
+    font_path = "/Users/leqee/code/Verbum/fonts/Arial Unicode.ttf"
+
+    font2 = "/Users/leqee/code/Verbum/fonts/优设好身体/YSHaoShenTi-2.ttf"
+
+    options = ScoreDrawerOptions(font_path, 50)
+    options.set_lyric_font_path(font2)
+    drawer = ScoreDrawer(parser.get_parsed_score_lines(), options)
     drawer.show("test3")

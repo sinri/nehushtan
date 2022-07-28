@@ -5,22 +5,28 @@ from nehushtan.score.ParsedLine import ParsedLine
 from nehushtan.score.ParsedLineAsLyric import ParsedLineAsLyric
 from nehushtan.score.ParsedLineAsScore import ParsedLineAsScore
 from nehushtan.score.ParsedLineAsTitle import ParsedLineAsTitle
+from nehushtan.score.ScoreDrawerOptions import ScoreDrawerOptions
 
 
 class ScoreDrawer:
     def __init__(self,
                  parsed_lines: List[ParsedLine],
-                 ttf_font_file_path,
-                 font_size: int = 50
+                 options: ScoreDrawerOptions
                  ):
         self.__parsed_lines = parsed_lines
 
-        self.__ttf_font_file_path = ttf_font_file_path
-        self.__font_size = font_size
-        self.__font = Paint.load_ttf_font(self.__ttf_font_file_path, self.__font_size)
+        self.__options = options
 
-        self.__line_width = int(max(2.0, self.__font_size / 10))
-        self.__point_width = int(max(3.0, self.__font_size / 8))
+        # self.__ttf_font_file_path = ttf_font_file_path
+        # self.__font_size = font_size
+        # self.__font = Paint.load_ttf_font(self.__ttf_font_file_path, self.__font_size)
+
+        # self.__title_font_size = title_font_size
+
+        cell_size_param = self.__options.get_default_font_size()
+
+        self.__line_width = int(max(2.0, cell_size_param / 10))
+        self.__point_width = int(max(3.0, cell_size_param / 8))
 
         self.__max_columns = 0
         self.__max_prefix_columns = 0
@@ -28,8 +34,8 @@ class ScoreDrawer:
 
         self.__compute_cells()
 
-        self.__cell_width = font_size
-        self.__cell_height = font_size
+        self.__cell_width = cell_size_param
+        self.__cell_height = cell_size_param
         self.__paint: Optional[Paint] = None
 
         self.__prepare_image_paper()
@@ -85,7 +91,7 @@ class ScoreDrawer:
             x = p.textbbox(
                 (0, 0),
                 "喵",
-                self.__font,
+                self.__options.get_default_font(),
                 align="center"
             )
             # print(x)
@@ -121,7 +127,7 @@ class ScoreDrawer:
                 self.__paint.text(
                     (self.__cell_width, line_index * self.__cell_height),
                     "不支持的 PARSED LINE",
-                    font=self.__font,
+                    font=self.__options.get_default_font(),
                     align="center"
                 )
 
@@ -132,13 +138,13 @@ class ScoreDrawer:
             box = self.__paint.textbbox(
                 xy=(0, 0),
                 text=title_line.get_left_componet(),
-                font=self.__font,
+                font=self.__options.get_font_for_title_left_component(),
                 align="left"
             )
             self.__paint.text(
                 xy=(self.__cell_width, line_index * self.__cell_height),
                 text=title_line.get_left_componet(),
-                font=self.__font,
+                font=self.__options.get_font_for_title_left_component(),
                 align="left",
                 fill="black"
             )
@@ -146,7 +152,7 @@ class ScoreDrawer:
             box = self.__paint.textbbox(
                 xy=(0, 0),
                 text=title_line.get_middle_component(),
-                font=self.__font,
+                font=self.__options.get_font_for_title_middle_component(),
                 align="center"
             )
             self.__paint.text(
@@ -155,7 +161,7 @@ class ScoreDrawer:
                     line_index * self.__cell_height
                 ),
                 text=title_line.get_middle_component(),
-                font=self.__font,
+                font=self.__options.get_font_for_title_middle_component(),
                 align="center",
                 fill="black",
             )
@@ -163,7 +169,7 @@ class ScoreDrawer:
             box = self.__paint.textbbox(
                 xy=(0, 0),
                 text=title_line.get_right_component(),
-                font=self.__font,
+                font=self.__options.get_font_for_title_right_component(),
                 align="right"
             )
             xy = (
@@ -173,7 +179,7 @@ class ScoreDrawer:
             self.__paint.text(
                 xy=xy,
                 text=title_line.get_right_component(),
-                font=self.__font,
+                font=self.__options.get_font_for_title_right_component(),
                 align="right",
                 fill="black"
             )
@@ -226,18 +232,17 @@ class ScoreDrawer:
                     int(max(5.0, self.__cell_height * 0.2)),
                     "black"
                 )
-                small_font = Paint.load_ttf_font(self.__ttf_font_file_path, int(self.__font_size * 2 / 3.0))
                 self.aimed_text(
                     int(self.__left_offset + (ts_start_cell_index + ts_end_cell_index) / 2 * self.__cell_width),
                     int(ts_above_y - max(5.0, self.__cell_height * 0.2) - 2),
                     "3",
-                    small_font,
+                    self.__options.get_font_for_score_note(),
                     "black",
                     background_color="white"
                 )
                 continue
             elif note in ("|", "||", "||:", ":||", "|:", ":|"):
-                self.__print_text_to_cell(
+                self.__print_text_to_score_cell(
                     note,
                     cell_index,
                     line_index,
@@ -253,7 +258,7 @@ class ScoreDrawer:
                 cell_index += 1
             else:
                 # 0, 1-7
-                self.__print_text_to_cell(
+                self.__print_text_to_score_cell(
                     note,
                     cell_index,
                     line_index,
@@ -270,7 +275,7 @@ class ScoreDrawer:
                 if su.get_right_line_count() > 0:
                     for right_line_index in range(su.get_right_line_count()):
                         cell_index += 1
-                        self.__print_text_to_cell(
+                        self.__print_text_to_score_cell(
                             "－",
                             cell_index,
                             line_index,
@@ -348,7 +353,7 @@ class ScoreDrawer:
                 box = self.__paint.textbbox(
                     xy=(0, 0),
                     text=lyric_line.get_prefix(),
-                    font=self.__font,
+                    font=self.__options.get_font_for_lyric_prefix(),
                     align="right"
                 )
                 self.__paint.text(
@@ -357,7 +362,7 @@ class ScoreDrawer:
                         line_index * self.__cell_height
                     ),
                     text=lyric_line.get_prefix(),
-                    font=self.__font,
+                    font=self.__options.get_font_for_lyric_prefix(),
                     align="right",
                     fill="black"
                 )
@@ -378,17 +383,17 @@ class ScoreDrawer:
                     line_index * self.__cell_height
                 ),
                 text=lyric_line.get_lyric_char(i),
-                font=self.__font,
+                font=self.__options.get_font_for_lyric(),
                 align="center",
                 fill="black"
             )
 
-    def __print_text_to_cell(self, text, cell_index, line_index, left_offset: int = 0):
+    def __print_text_to_score_cell(self, text, cell_index, line_index, left_offset: int = 0):
         self.aimed_text(
             int((cell_index + 0.5) * self.__cell_width + left_offset),
             int((line_index + 0.5) * self.__cell_height),
             text,
-            self.__font
+            self.__options.get_font_for_score()
         )
 
     def aimed_text(self, center_x, center_y, text, font, fill="black", background_color=None):
