@@ -51,7 +51,7 @@ class NotationTextParser:
             if prefix == "":
                 prefix = None
             content_align_type = r.group(3)
-            if content_align_type is None or content_align_type == "":
+            if content_align_type not in ("<", "="):
                 content_align_type = ">"
             content = r.group(4)
 
