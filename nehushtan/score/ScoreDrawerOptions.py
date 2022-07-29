@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional
 
 from nehushtan.paint.Paint import Paint
 
@@ -30,6 +30,8 @@ class ScoreDrawerOptions:
 
         self.__lyric_prefix_font_path = None
         self.__lyric_prefix_font_size = None
+
+        self.__total_cells_in_one_line = None
 
     def get_default_font_size(self):
         return self.__default_font_size
@@ -165,3 +167,10 @@ class ScoreDrawerOptions:
         if size is None:
             size = self.__default_font_size
         return Paint.load_ttf_font(file, size)
+
+    def set_total_cells_in_one_line(self, x: Optional[int]):
+        self.__total_cells_in_one_line = x
+        return self
+
+    def get_total_cells_in_one_line(self) -> Optional[int]:
+        return self.__total_cells_in_one_line
