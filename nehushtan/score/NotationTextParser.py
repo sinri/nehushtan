@@ -1,6 +1,7 @@
 import json
 import re
 
+from nehushtan.score.ParsedLineAsBlank import ParsedLineAsBlank
 from nehushtan.score.ParsedLineAsLyric import ParsedLineAsLyric
 from nehushtan.score.ParsedLineAsScore import ParsedLineAsScore
 from nehushtan.score.ParsedLineAsTitle import ParsedLineAsTitle
@@ -27,8 +28,8 @@ class NotationTextParser:
     def parse(self):
         for line in self.__lines:
             if line is None or line == "" or len(line.strip()) == 0:
-                continue
-            if line.startswith("~"):
+                self.__parsed_lines.append(ParsedLineAsBlank())
+            elif line.startswith("~"):
                 self.__parse_title_line(line)
             elif line.startswith(">"):
                 self.__parse_lyric_line(line)

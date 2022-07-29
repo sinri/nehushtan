@@ -26,12 +26,18 @@ class ParsedLineAsTitle(ParsedLine):
             self.__right_component = components[2]
 
     def get_left_componet(self):
+        if self.__left_component == "":
+            return None
         return self.__left_component
 
     def get_middle_component(self):
+        if self.__middle_component is None:
+            return ""
         return self.__middle_component
 
     def get_right_component(self):
+        if self.__right_component == "":
+            return None
         return self.__right_component
 
     def __str__(self):

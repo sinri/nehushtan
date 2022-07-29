@@ -2,6 +2,7 @@ from typing import List, Optional
 
 from nehushtan.paint.Paint import Paint
 from nehushtan.score.ParsedLine import ParsedLine
+from nehushtan.score.ParsedLineAsBlank import ParsedLineAsBlank
 from nehushtan.score.ParsedLineAsLyric import ParsedLineAsLyric
 from nehushtan.score.ParsedLineAsScore import ParsedLineAsScore
 from nehushtan.score.ParsedLineAsTitle import ParsedLineAsTitle
@@ -16,12 +17,6 @@ class ScoreDrawer:
         self.__parsed_lines = parsed_lines
 
         self.__options = options
-
-        # self.__ttf_font_file_path = ttf_font_file_path
-        # self.__font_size = font_size
-        # self.__font = Paint.load_ttf_font(self.__ttf_font_file_path, self.__font_size)
-
-        # self.__title_font_size = title_font_size
 
         cell_size_param = self.__options.get_default_font_size()
 
@@ -45,20 +40,15 @@ class ScoreDrawer:
     def show(self, title: Optional[str] = None):
         self.__paint.show(title)
 
+    def save(self, output_file_path):
+        self.__paint.save(output_file_path, "png")
+
     def __compute_cells(self):
         max_columns = 0
         max_prefix_columns = 0
         max_score_columns = 0
         for line in self.__parsed_lines:
-            if isinstance(line, ParsedLineAsTitle):
-                total_chars = len(line.get_middle_component())
-                if line.get_left_componet() is not None:
-                    total_chars += 1 + len(line.get_left_componet())
-                if line.get_right_component() is not None:
-                    total_chars += 1 + len(line.get_right_component())
-                if total_chars > max_columns:
-                    max_columns = total_chars
-            elif isinstance(line, ParsedLineAsScore):
+            if isinstance(line, ParsedLineAsScore):
                 # compute for score
                 cells = 0
                 for su in line.get_score_units():
@@ -77,14 +67,24 @@ class ScoreDrawer:
                 total_chars += len(line.get_content())
                 if total_chars > max_columns:
                     max_columns = total_chars
+            elif isinstance(line, ParsedLineAsTitle):
+                # do not care title?
+                if False:
+                    total_chars = len(line.get_middle_component())
+                    if line.get_left_componet() is not None:
+                        total_chars += 1 + len(line.get_left_componet())
+                    if line.get_right_component() is not None:
+                        total_chars += 1 + len(line.get_right_component())
+                    if int(total_chars * 0.8) > max_columns:
+                        max_columns = int(total_chars * 0.8)
 
         self.__max_columns = max_columns
         self.__max_prefix_columns = max_prefix_columns
         self.__max_score_columns = max_score_columns
 
-        # print(f"self.__max_columns = {self.__max_columns}")
-        # print(f"self.__max_prefix_columns = {self.__max_prefix_columns}")
-        # print(f"self.__max_score_columns = {self.__max_score_columns}")
+        print(f"self.__max_columns = {self.__max_columns}")
+        print(f"self.__max_prefix_columns = {self.__max_prefix_columns}")
+        print(f"self.__max_score_columns = {self.__max_score_columns}")
 
     def __prepare_image_paper(self):
         with Paint(400, 400) as p:
@@ -123,6 +123,8 @@ class ScoreDrawer:
                 self.__draw_score_line(line_index, line)
             elif isinstance(line, ParsedLineAsLyric):
                 self.__draw_lyric_line(line_index, line)
+            elif isinstance(line, ParsedLineAsBlank):
+                pass
             else:
                 self.__paint.text(
                     (self.__cell_width, line_index * self.__cell_height),
@@ -139,49 +141,55 @@ class ScoreDrawer:
                 xy=(0, 0),
                 text=title_line.get_left_componet(),
                 font=self.__options.get_font_for_title_left_component(),
-                align="left"
+                align="left",
+                anchor="lm"
             )
             self.__paint.text(
-                xy=(self.__cell_width, line_index * self.__cell_height),
+                xy=(self.__cell_width, int((line_index + 0.5) * self.__cell_height)),
                 text=title_line.get_left_componet(),
                 font=self.__options.get_font_for_title_left_component(),
                 align="left",
-                fill="black"
+                fill="black",
+                anchor="lm"
             )
         if title_line.get_middle_component() is not None:
             box = self.__paint.textbbox(
                 xy=(0, 0),
                 text=title_line.get_middle_component(),
                 font=self.__options.get_font_for_title_middle_component(),
-                align="center"
+                align="center",
+                anchor="mm"
             )
             self.__paint.text(
                 xy=(
-                    self.__paint.get_image().width / 2 - box[2] / 2,
-                    line_index * self.__cell_height
+                    self.__paint.get_image().width / 2,  # - box[2] / 2,
+                    int((line_index + 0.5) * self.__cell_height)
                 ),
                 text=title_line.get_middle_component(),
                 font=self.__options.get_font_for_title_middle_component(),
                 align="center",
                 fill="black",
+                anchor="mm"
             )
         if title_line.get_right_component() is not None:
             box = self.__paint.textbbox(
                 xy=(0, 0),
                 text=title_line.get_right_component(),
                 font=self.__options.get_font_for_title_right_component(),
-                align="right"
+                align="right",
+                anchor="lm"
             )
             xy = (
                 self.__paint.get_image().width - self.__cell_width * 1 - box[2],
-                line_index * self.__cell_height
+                int((line_index + 0.5) * self.__cell_height)
             )
             self.__paint.text(
                 xy=xy,
                 text=title_line.get_right_component(),
                 font=self.__options.get_font_for_title_right_component(),
                 align="right",
-                fill="black"
+                fill="black",
+                anchor="lm"
             )
 
     def __draw_score_line(self, line_index: int, score_line: ParsedLineAsScore):
@@ -197,8 +205,15 @@ class ScoreDrawer:
         this_score_columns = 0
         for su in score_line.get_score_units():
             this_score_columns += su.get_cell_needed()
-        self.__left_offset = int(
-            cell_index - 2 + (self.__max_score_columns - this_score_columns) / 2) * self.__cell_width
+
+        if self.__max_prefix_columns > 0:
+            self.__left_offset = int(
+                (self.__max_prefix_columns + (self.__max_score_columns - this_score_columns) / 2) * self.__cell_width
+            )
+        else:
+            self.__left_offset = int(
+                (1 + (self.__max_score_columns - this_score_columns + 1) / 2) * self.__cell_width
+            )
 
         for i in range(len(score_line.get_score_units())):
             su = score_line.get_score_unit(i)
