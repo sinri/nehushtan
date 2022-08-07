@@ -234,8 +234,8 @@ class ScoreDrawer:
             # debug cells outline
             # self.__paint.rectangle(
             #     xy=(
-            #         (cell_index * self.__cell_width, line_index * self.__cell_height),
-            #         ((cell_index + 1) * self.__cell_width, (line_index + 1) * self.__cell_height),
+            #         (self.__left_offset+(cell_index) * self.__cell_width, line_index * self.__cell_height),
+            #         (self.__left_offset+(cell_index + 1) * self.__cell_width, (line_index + 1) * self.__cell_height),
             #     ),
             #     outline="red"
             # )
@@ -343,9 +343,9 @@ class ScoreDrawer:
                     #         self.__left_offset
                     #     )
                 if su.get_dot():
-                    cell_index += 1
+                    # cell_index += 1
                     self.aimed_point(
-                        self.__left_offset + int((cell_index + 0.6) * self.__cell_width),
+                        self.__left_offset + int((cell_index + 0.9) * self.__cell_width),
                         int((line_index + 0.6) * self.__cell_height),
                         self.__point_width,
                         "black"
@@ -364,7 +364,7 @@ class ScoreDrawer:
                             fill="black",
                             width=self.__line_width
                         )
-                        under_y += int(self.__line_width * 1.5)
+                        under_y += int(1 + self.__line_width * 1.5)
                 if su.get_below_point_count() > 0:
                     for below_point_index in range(su.get_below_point_count()):
                         self.aimed_point(
@@ -373,7 +373,7 @@ class ScoreDrawer:
                             self.__point_width,
                             "black"
                         )
-                        under_y += int(self.__point_width * 1.5)
+                        under_y += int(1 + self.__point_width * 1.5)
 
                 above_y = int((line_index + 0.25) * self.__cell_height)
                 if su.get_above_point_count() > 0:
@@ -384,7 +384,7 @@ class ScoreDrawer:
                             self.__point_width,
                             "black"
                         )
-                        above_y -= int(self.__point_width * 1.5)
+                        above_y -= int(1 + self.__point_width * 1.5)
 
                 if su.get_fermata():
                     self.aimed_fermata(
@@ -446,11 +446,11 @@ class ScoreDrawer:
                     xy=(0, 0),
                     text=lyric_line.get_prefix(),
                     font=self.__options.get_font_for_lyric_prefix(),
-                    align="right"
+                    align="center"
                 )
                 self.__paint.text(
                     xy=(
-                        self.__cell_width * (1 + self.__max_prefix_columns) - box[2],
+                        self.__cell_width * (1 + self.__max_prefix_columns) - box[2] + box[0],
                         line_index * self.__cell_height
                     ),
                     text=lyric_line.get_prefix(),

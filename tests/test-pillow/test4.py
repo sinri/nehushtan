@@ -3,7 +3,7 @@ from nehushtan.score.ScoreDrawer import ScoreDrawer
 from nehushtan.score.ScoreDrawerOptions import ScoreDrawerOptions
 
 if __name__ == '__main__':
-    file = "/Users/leqee/code/nehushtan/debug/score/book/00"
+    file = "/debug/score/00"
     parser = NotationTextParser(file=file)
     parser.parse()
     # parser.debug()

@@ -27,7 +27,7 @@ def make(name: str):
 
 
 if __name__ == '__main__':
-    for i in range(26):
+    for i in range(17):
         name = i + 1
         if name < 10:
             name = f'0{name}'

@@ -113,7 +113,7 @@ class ScoreUnit:
             if self.__right_line_count > 0:
                 x += self.__right_line_count
             if self.__dot:
-                x += 1
+                x += 1 * 0
             return x
 
     @staticmethod
