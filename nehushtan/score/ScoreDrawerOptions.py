@@ -127,7 +127,8 @@ class ScoreDrawerOptions:
             file = self.__default_ttf_font_file_path
         if size is None:
             size = self.__default_font_size
-        size = int(size * 2 / 3.0)
+        # size = int(size * 2 / 3.0)
+        size = int(size * 0.5)
         return Paint.load_ttf_font(file, size)
 
     def set_lyric_font_path(self, x):

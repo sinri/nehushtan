@@ -139,7 +139,7 @@ class ScoreUnit:
         if not r1:
             raise SystemError("score note error: " + code)
 
-        print(f"debug: 0: {r1.group(0)} 1: {r1.group(1)} 2: {r1.group(2)} 3: {r1.group(3)}")
+        # print(f"debug: 0: {r1.group(0)} 1: {r1.group(1)} 2: {r1.group(2)} 3: {r1.group(3)}")
 
         accidental = r1.group(1)
         if accidental == "":
@@ -148,7 +148,7 @@ class ScoreUnit:
         code = r1.group(3)
 
         if code is None or len(code) == 0:
-            print("biaozhun si fen yin fu")
+            # print("biaozhun si fen yin fu")
             return ScoreUnit(note=note, accidental=accidental, remark_style=remark_style, remark_text=remark_text)
 
         above_point_count = 0

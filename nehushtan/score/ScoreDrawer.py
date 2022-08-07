@@ -27,10 +27,10 @@ class ScoreDrawer:
         self.__max_prefix_columns = 0
         self.__max_score_columns = 0
 
-        self.__compute_cells()
+        self.__total_cells_as_width = 0
+        self.__total_cells_as_height = 0
 
-        if self.__options.get_total_cells_in_one_line() is not None:
-            self.__max_columns = self.__options.get_total_cells_in_one_line()
+        self.__compute_cells()
 
         self.__cell_width = cell_size_param
         self.__cell_height = cell_size_param
@@ -102,19 +102,28 @@ class ScoreDrawer:
             self.__cell_height = int((x[3] + 2) * 1.5)
             # print(f'self.__cell_width={self.__cell_width} self.__cell_height={self.__cell_height}')
 
-        width = self.__max_prefix_columns
-        if width > 0:
-            width += 1
-        width += self.__max_score_columns
-        if self.__max_columns > width:
-            width = self.__max_columns
-        width += 2
-        width = width * self.__cell_width
+        if self.__options.get_total_cells_in_one_line() is not None:
+            self.__total_cells_as_width = (2 + self.__options.get_total_cells_in_one_line())
+            print(f"width in cells: {self.__total_cells_as_width}")
+            width = self.__cell_width * self.__total_cells_as_width
+        else:
+            self.__total_cells_as_width = self.__max_prefix_columns
+            if self.__total_cells_as_width > 0:
+                self.__total_cells_as_width += 1
+            self.__total_cells_as_width += self.__max_score_columns
+            if self.__max_columns > self.__total_cells_as_width:
+                self.__total_cells_as_width = self.__max_columns
+            self.__total_cells_as_width += 2
+            print(f"width in cells: {self.__total_cells_as_width}")
+            width = self.__total_cells_as_width * self.__cell_width
 
-        height = (len(self.__parsed_lines) + 1 + 2) * self.__cell_height
+        self.__total_cells_as_height = (len(self.__parsed_lines) + 1 + 2)
+        print(f"height in cells: {self.__total_cells_as_height}")
+
+        height = self.__cell_height * self.__total_cells_as_height
 
         self.__paint = Paint(width, height, mode="RGB", background_color="white")
-        # print(f'width={width} height={height}')
+        print(f'width={width} height={height}')
 
     def __draw_lines(self):
         line_index = 1
@@ -210,17 +219,29 @@ class ScoreDrawer:
             this_score_columns += su.get_cell_needed()
 
         if self.__max_prefix_columns > 0:
-            self.__left_offset = int(
-                (self.__max_prefix_columns + (self.__max_score_columns - this_score_columns) / 2) * self.__cell_width
-            )
+            # 1 | PREFIX + 1 + X + REAL + X + 1 = WIDTH
+            y = self.__total_cells_as_width - 2 - this_score_columns - self.__max_prefix_columns
+            x = y / 2
+            self.__left_offset = int((self.__total_cells_as_width - 1 - x - this_score_columns) * self.__cell_width)
+            # self.__left_offset = int((self.__max_prefix_columns + (self.__max_score_columns - this_score_columns) / 2) * self.__cell_width)
         else:
-            self.__left_offset = int(
-                (1 + (self.__max_score_columns - this_score_columns + 1) / 2) * self.__cell_width
-            )
+            # 1 | X + REAL + X + 1 = WIDTH
+            x = (self.__total_cells_as_width - 1 - this_score_columns) / 2
+            self.__left_offset = int((self.__total_cells_as_width - 1 - x - this_score_columns) * self.__cell_width)
+            # self.__left_offset = int(((self.__max_score_columns - this_score_columns + 1) / 2) * self.__cell_width)
 
         for i in range(len(score_line.get_score_units())):
+            # debug cells outline
+            # self.__paint.rectangle(
+            #     xy=(
+            #         (cell_index * self.__cell_width, line_index * self.__cell_height),
+            #         ((cell_index + 1) * self.__cell_width, (line_index + 1) * self.__cell_height),
+            #     ),
+            #     outline="red"
+            # )
+
             su = score_line.get_score_unit(i)
-            # print(f"draw su: {su}")
+            # print(f"now at cell [{cell_index}] to draw su note [{su.get_note()}]")
 
             # draw su
             note = su.get_note()
@@ -299,24 +320,33 @@ class ScoreDrawer:
                 if su.get_right_line_count() > 0:
                     for right_line_index in range(su.get_right_line_count()):
                         cell_index += 1
-                        self.__print_text_to_score_cell(
-                            "－",
-                            cell_index,
-                            line_index,
-                            self.__left_offset
+                        self.__paint.line(
+                            xy=(
+                                (
+                                    int(self.__left_offset + (cell_index + 0.2) * self.__cell_width),
+                                    int((line_index + 0.55) * self.__cell_height)
+                                ),
+                                (
+                                    int(self.__left_offset + (cell_index + 0.8) * self.__cell_width),
+                                    int((line_index + 0.55) * self.__cell_height)
+                                )
+                            ),
+                            fill="black",
+                            width=self.__line_width
                         )
-                        # self.aimed_text(
-                        #     int((cell_index + 0.5) * self.__cell_width),
-                        #     int((line_index + 0.5) * self.__cell_height),
-                        #     text="-",
-                        #     font=self.__font,
-                        #     fill="black"
-                        # )
+                    # for right_line_index in range(su.get_right_line_count()):
+                    #     cell_index += 1
+                    #     self.__print_text_to_score_cell(
+                    #         "－",
+                    #         cell_index,
+                    #         line_index,
+                    #         self.__left_offset
+                    #     )
                 if su.get_dot():
                     cell_index += 1
                     self.aimed_point(
-                        self.__left_offset + int((cell_index + 0.5) * self.__cell_width),
-                        int((line_index + 0.5) * self.__cell_height),
+                        self.__left_offset + int((cell_index + 0.6) * self.__cell_width),
+                        int((line_index + 0.6) * self.__cell_height),
                         self.__point_width,
                         "black"
                     )
@@ -367,6 +397,44 @@ class ScoreDrawer:
                 if in_tie_or_slur:
                     if ts_above_y is None or ts_above_y > above_y:
                         ts_above_y = above_y
+
+                if su.get_remark_text() is not None and su.get_remark_text() != "":
+                    if su.get_remark_style() == ":<":
+                        self.__paint.text(
+                            xy=(
+                                self.__left_offset + under_line_start_cell_index * self.__cell_width,
+                                line_index * self.__cell_height
+                            ),
+                            text=su.get_remark_text(),
+                            font=self.__options.get_font_for_score_note(),
+                            align="left",
+                            fill="black",
+                            anchor="lm"
+                        )
+                    elif su.get_remark_style() == ":=":
+                        self.__paint.text(
+                            xy=(
+                                int(self.__left_offset + (under_line_start_cell_index + 0.5) * self.__cell_width),
+                                line_index * self.__cell_height
+                            ),
+                            text=su.get_remark_text(),
+                            font=self.__options.get_font_for_score_note(),
+                            align="left",
+                            fill="black",
+                            anchor="mm"
+                        )
+                    elif su.get_remark_style() == ":>":
+                        self.__paint.text(
+                            xy=(
+                                self.__left_offset + (under_line_start_cell_index + 1) * self.__cell_width,
+                                line_index * self.__cell_height
+                            ),
+                            text=su.get_remark_text(),
+                            font=self.__options.get_font_for_score_note(),
+                            align="left",
+                            fill="black",
+                            anchor="rm"
+                        )
 
                 cell_index += 1
 

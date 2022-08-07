@@ -1,4 +1,3 @@
-import json
 import re
 
 from nehushtan.score.ParsedLineAsBlank import ParsedLineAsBlank
@@ -65,12 +64,12 @@ class NotationTextParser:
             self.__parsed_lines.append(ParsedLineAsLyric(content, prefix, content_align_type))
 
     def __parse_score_line(self, line):
-        print(line)
+        # print(line)
         compiled = re.compile("\s+")
         items = compiled.split(line.strip())
         score_unit_list = []
         for item in items:
-            print(json.dumps(item))
+            #print(json.dumps(item))
             score_unit = ScoreUnit.parse_code_to_score(item)
             score_unit_list.append(score_unit)
         self.__parsed_lines.append(ParsedLineAsScore(score_unit_list))
