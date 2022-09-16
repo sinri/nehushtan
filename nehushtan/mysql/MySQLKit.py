@@ -217,15 +217,16 @@ class MySQLKit:
         :param transaction_callable: 事务处理具体代码所在的闭包，可以使用lambda表达式或者def方法，参数为本类实例，并返回结果
         :return: 返回闭包的返回值
         """
-        self.get_raw_connection().begin()
+        connection = self.get_raw_connection()
+        connection.begin()
         try:
             result = transaction_callable(self)
             print('to commit', result)
-            self._connection.commit()
+            connection.commit()
             return result
         except Exception as e:
             print('to rollback')
-            self._connection.rollback()
+            connection.rollback()
             raise e
 
     def quote(self, value):
