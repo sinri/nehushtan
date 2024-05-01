@@ -1,4 +1,4 @@
-import time
+import select
 from abc import abstractmethod
 from typing import List
 
@@ -45,7 +45,8 @@ class NehushtanQueueDelegate:
         config_key might be amongst `CONFIG_KEY_SLEEP_TIME_FOR_*`
         """
         x = self.read_config_of_delegate((config_key,), 1)
-        time.sleep(x)
+        # time.sleep(x)
+        _, _, _ = select.select([], [], [], x)
 
     def read_latest_command(self) -> str:
         """

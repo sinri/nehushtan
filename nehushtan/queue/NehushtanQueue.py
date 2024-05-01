@@ -1,5 +1,5 @@
 import os
-import time
+import select
 from multiprocessing import Process
 
 from nehushtan.queue.NehushtanQueueDelegate import NehushtanQueueDelegate
@@ -109,7 +109,8 @@ class NehushtanQueue:
 
             # need to do some wait
             if total_alive_current_workers >= wait_till_processes_become_less_than > 0:
-                time.sleep(2)
+                # time.sleep(2)
+                _, _, _ = select.select([], [], [], 2)
             else:
                 return total_alive_current_workers
 
