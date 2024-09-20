@@ -1,10 +1,13 @@
 #  Copyright (c) 2020. Sinri Edogawa
+from logging import FATAL, ERROR
 from typing import Callable
 
 import pymysql
 from pymysql.connections import Connection
 from pymysql.cursors import DictCursor
 
+from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
+from nehushtan.logger.NehushtanLogging import NehushtanLogging
 from nehushtan.mysql import constant
 from nehushtan.mysql.MySQLKitConfig import MySQLKitConfig
 
@@ -37,6 +40,14 @@ class MySQLKit:
         self._connection = None
         if len(self._mysql_config.get_host()) > 0:
             self.connect()
+
+        self.__logger = NehushtanFileLogger(log_level=NehushtanLogging.FATAL)
+
+    def set_logger(self, logger: NehushtanFileLogger):
+        self.__logger = logger
+
+    def get_logger(self) -> NehushtanFileLogger:
+        return self.__logger
 
     def __del__(self):
         """
@@ -118,6 +129,11 @@ class MySQLKit:
         """
         connection = self.get_raw_connection()
         cursor = connection.cursor()
+
+        self.get_logger().info(f'nehushtan.mysql.MySQLKit.MySQLKit.raw_query_for_all_tuple_rows to go', {
+            'sql': sql, 'args': args,
+        })
+
         cursor.execute(sql, args)
         rows_tuple = cursor.fetchall()
         cursor.close()
@@ -132,6 +148,11 @@ class MySQLKit:
         """
         connection = self.get_raw_connection()
         cursor = connection.cursor(DictCursor)
+
+        self.get_logger().info(f'nehushtan.mysql.MySQLKit.MySQLKit.raw_query_for_all_dict_rows to go', {
+            'sql': sql, 'args': args,
+        })
+
         cursor.execute(sql, args)
         rows_tuple = cursor.fetchall()
         cursor.close()
@@ -147,6 +168,11 @@ class MySQLKit:
         """
         connection = self.get_raw_connection()
         cursor = connection.cursor()
+
+        self.get_logger().info(f'nehushtan.mysql.MySQLKit.MySQLKit.raw_query_to_modify_one to go', {
+            'sql': sql, 'args': args,
+        })
+
         afx = cursor.execute(sql, args)
         if commit_immediately is None:
             commit_immediately = self._auto_commit_default
@@ -165,6 +191,11 @@ class MySQLKit:
         """
         connection = self.get_raw_connection()
         cursor = connection.cursor()
+
+        self.get_logger().info(f'nehushtan.mysql.MySQLKit.MySQLKit.raw_query_to_insert_one to go', {
+            'sql': sql, 'args': args,
+        })
+
         cursor.execute(sql, args)
         last_row_id = cursor.lastrowid
         if commit_immediately is None:
@@ -184,6 +215,11 @@ class MySQLKit:
         """
         connection = self.get_raw_connection()
         cursor = connection.cursor()
+
+        self.get_logger().info(f'nehushtan.mysql.MySQLKit.MySQLKit.raw_query_to_modify_many to go', {
+            'sql': sql, 'args': args,
+        })
+
         afx = cursor.executemany(sql, args)
         if commit_immediately is None:
             commit_immediately = self._auto_commit_default
@@ -202,6 +238,11 @@ class MySQLKit:
         """
         connection = self.get_raw_connection()
         cursor = connection.cursor()
+
+        self.get_logger().info(f'nehushtan.mysql.MySQLKit.MySQLKit.raw_query_to_insert_many to go', {
+            'sql': sql, 'args': args,
+        })
+
         cursor.executemany(sql, args)
         last_row_id = cursor.lastrowid
         if commit_immediately is None:
@@ -221,11 +262,11 @@ class MySQLKit:
         connection.begin()
         try:
             result = transaction_callable(self)
-            print('to commit', result)
+            self.get_logger().notice(f'to commit with result {result}')
             connection.commit()
             return result
         except Exception as e:
-            print('to rollback')
+            self.get_logger().notice(f'to rollback with exception {e}')
             connection.rollback()
             raise e
 

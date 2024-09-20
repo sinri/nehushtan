@@ -114,7 +114,7 @@ class MySQLQueryResult:
 
     def get_fetched_rows_as_tuple(self):
         if self._status != constant.MYSQL_QUERY_STATUS_QUERIED:
-            raise IOError('Cannot fetch query result as status is not QUERIED.')
+            raise IOError(f'Cannot fetch query result as status is not QUERIED: {self.get_error()}')
         return tuple(self._result_rows)
 
     def get_column_from_fetched_rows_as_tuple(self, field_key) -> tuple:
@@ -122,7 +122,7 @@ class MySQLQueryResult:
         Since 0.3.2
         """
         if self._status != constant.MYSQL_QUERY_STATUS_QUERIED:
-            raise IOError('Cannot fetch query result as status is not QUERIED.')
+            raise IOError(f'Cannot fetch query result as status is not QUERIED: {self.get_error()}')
 
         column = []
         for row in self._result_rows:
@@ -136,7 +136,7 @@ class MySQLQueryResult:
         Since 0.3.2
         """
         if self._status != constant.MYSQL_QUERY_STATUS_QUERIED:
-            raise IOError('Cannot fetch query result as status is not QUERIED.')
+            raise IOError(f'Cannot fetch query result as status is not QUERIED: {self.get_error()}')
         if self._row_type != constant.MYSQL_QUERY_ROW_TYPE_TUPLE:
             raise AssertionError('Row format is not tuple')
         return self._result_rows[0]
@@ -146,7 +146,7 @@ class MySQLQueryResult:
         Since 0.3.2
         """
         if self._status != constant.MYSQL_QUERY_STATUS_QUERIED:
-            raise IOError('Cannot fetch query result as status is not QUERIED.')
+            raise IOError(f'Cannot fetch query result as status is not QUERIED: {self.get_error()}')
         if self._row_type != constant.MYSQL_QUERY_ROW_TYPE_DICT:
             raise AssertionError('Row format is not tuple')
         return self._result_rows[0]
@@ -156,7 +156,7 @@ class MySQLQueryResult:
         Since 0.3.2
         """
         if self._status != constant.MYSQL_QUERY_STATUS_QUERIED:
-            raise IOError('Cannot fetch query result as status is not QUERIED.')
+            raise IOError(f'Cannot fetch query result as status is not QUERIED: {self.get_error()}')
         return self._result_rows[0][field_key]
 
     @staticmethod

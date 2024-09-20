@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='nehushtan',
-    version='0.4.31',
+    version='0.5.0',
     packages=find_packages(),
     url='https://sinri.github.io/nehushtan/',
     license='MIT',
@@ -21,6 +21,6 @@ setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        'psutil~=5.8.0',
+        'psutil~=6.0.0',
     ]
 )
