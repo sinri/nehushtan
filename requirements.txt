@@ -16,3 +16,5 @@ kaleido~=0.2.1
 Pillow~=10.4.0
 
 mido~=1.3.2
+
+aliyun-log-python-sdk~=0.9.11

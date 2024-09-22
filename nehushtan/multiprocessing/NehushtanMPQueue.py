@@ -4,8 +4,7 @@ from multiprocessing.context import Process
 from typing import List
 
 from nehushtan.helper.SignalHandler import SignalHandler
-from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
-from nehushtan.logger.NehushtanLogging import NehushtanLogging
+from nehushtan.logger.NehushtanLogger import NehushtanLogger, NehushtanLogLevel
 from nehushtan.multiprocessing.NehushtanMPJob import NehushtanMPJob
 from nehushtan.multiprocessing.NehushtanMPTerminatedSituation import NehushtanMPTerminatedSituation
 
@@ -29,13 +28,13 @@ class NehushtanMPQueue(SignalHandler):
 
         self.__received_terminate_signal = False
 
-    def set_logger(self, logger: NehushtanFileLogger):
+    def set_logger(self, logger: NehushtanLogger):
         self._logger = logger
         return self
 
-    def get_logger(self) -> NehushtanFileLogger:
+    def get_logger(self) -> NehushtanLogger:
         if self._logger is None:
-            self._logger = NehushtanFileLogger(log_level=NehushtanLogging.NOTICE)
+            self._logger = NehushtanLogger(log_level=NehushtanLogLevel.NOTICE)
         return self._logger
 
     def get_max_workers(self):

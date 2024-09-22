@@ -1,8 +1,8 @@
 import asyncio
 
-from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
+from nehushtan.logger.NehushtanLogger import NehushtanLogger
 
-logger = NehushtanFileLogger()
+logger = NehushtanLogger()
 
 
 async def mirai(future_instance, p):

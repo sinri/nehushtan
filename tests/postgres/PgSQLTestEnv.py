@@ -1,6 +1,6 @@
 from psycopg2 import ProgrammingError
 
-from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
+from nehushtan.logger.NehushtanLogger import NehushtanLogger
 from nehushtan.postgres.PgSQLKit import PgSQLKit
 from nehushtan.postgres.PgSQLKitConfig import PgSQLKitConfig
 from nehushtan.postgres.PgSQLResultSet import PgSQLResultSet
@@ -8,7 +8,7 @@ from nehushtan.postgres.PgSQLResultSet import PgSQLResultSet
 
 class PgSQLTestEnv:
     def __init__(self):
-        self.__logger = NehushtanFileLogger()
+        self.__logger = NehushtanLogger()
 
     def get_pg_kit_instance(self):
         return PgSQLKit(PgSQLKitConfig(

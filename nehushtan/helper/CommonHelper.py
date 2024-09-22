@@ -1,10 +1,13 @@
 import importlib
 import platform
 import secrets
+import socket
 import string
 import uuid
 import warnings
 from typing import Union
+
+import psutil
 
 
 class CommonHelper:
@@ -181,3 +184,16 @@ class CommonHelper:
         """
         x = platform.python_version_tuple()
         return int(x[0]) >= big_version and int(x[1]) >= middle_version and int(x[2]) >= small_version
+
+    @staticmethod
+    def get_local_ip():
+        addresses = psutil.net_if_addrs()
+
+        for interface, addr_list in addresses.items():
+            for addr in addr_list:
+                if addr.family == socket.AF_INET:
+                    ip_address = addr.address
+                    if ip_address != '127.0.0.1':
+                        return ip_address
+
+        return '127.0.0.1'

@@ -1,4 +1,4 @@
-from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
+from nehushtan.logger.legacy.NehushtanFileLogger import NehushtanFileLogger
 
 if __name__ == '__main__':
     log_dir = '/Users/leqee/code/nehushtan/log/x'

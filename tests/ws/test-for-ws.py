@@ -2,14 +2,17 @@ import asyncio
 
 import websockets
 
-from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
+from nehushtan.logger.NehushtanLogger import NehushtanLogger, NehushtanLoggerAdapterWithFileWriter
 from tests.ws.TestWebsocketAgent import TestWebsocketAgent
 from tests.ws.TestWebsocketRegisterAgent import TestWebsocketRegisterAgent
 
 
 def daemon():
-    request_handle_logger = NehushtanFileLogger('ws-request', '/Users/leqee/code/nehushtan/log/ws')
-    broadcast_logger = NehushtanFileLogger('ws-broadcast', '/Users/leqee/code/nehushtan/log/ws')
+    request_handle_logger = NehushtanLogger(topic='ws-request',
+                                            adapter=NehushtanLoggerAdapterWithFileWriter(
+                                                log_dir='/Users/leqee/code/nehushtan/log/ws'))
+    broadcast_logger = NehushtanLogger(topic='ws-broadcast', adapter=NehushtanLoggerAdapterWithFileWriter(
+        log_dir='/Users/leqee/code/nehushtan/log/ws'))
 
     TestWebsocketAgent.register_agent = TestWebsocketRegisterAgent()
     agent = TestWebsocketAgent(

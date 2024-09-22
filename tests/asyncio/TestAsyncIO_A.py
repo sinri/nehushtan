@@ -1,14 +1,14 @@
 import asyncio
 
-from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
+from nehushtan.logger.NehushtanLogger import NehushtanLogger
 
-logger = NehushtanFileLogger()
+logger = NehushtanLogger()
 
 
 async def async_func_1(task_id: int):
-    logger.info("async_func_1 start", task_id)
+    logger.info(f"async_func_1 start: {task_id}")
     await asyncio.sleep(1)
-    logger.info("async_func_1 end", task_id)
+    logger.info(f"async_func_1 end: {task_id}")
 
 
 async def async_func_0():

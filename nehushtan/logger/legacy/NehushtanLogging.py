@@ -1,4 +1,7 @@
 class NehushtanLogging:
+    """
+    Deprecated since 0.5.1
+    """
     CRITICAL = 50
     FATAL = 50
     ERROR = 40

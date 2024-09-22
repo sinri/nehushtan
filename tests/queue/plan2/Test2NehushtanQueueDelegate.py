@@ -2,7 +2,7 @@ import time
 from random import random
 from typing import List
 
-from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
+from nehushtan.logger.NehushtanLogger import NehushtanLogger
 from nehushtan.queue.NehushtanQueueDelegate import NehushtanQueueDelegate
 from nehushtan.queue.NehushtanQueueTask import NehushtanQueueTask
 from nehushtan.queue.situation.NoNextTaskSituation import NoNextTaskSituation
@@ -24,7 +24,7 @@ class Test2NehushtanQueueDelegate(NehushtanQueueDelegate):
         self.logger.info('handle_command_queue, actually do nothing')
         return 0
 
-    def __init__(self, config_dictionary: dict = None, logger: NehushtanFileLogger = None):
+    def __init__(self, config_dictionary: dict = None, logger: NehushtanLogger = None):
         super().__init__(config_dictionary, logger)
         self.last_task_id = 1000
 
@@ -32,7 +32,7 @@ class Test2NehushtanQueueDelegate(NehushtanQueueDelegate):
         if cause_exception:
             self.logger.exception(error_message, cause_exception)
         else:
-            self.logger.error('Test2NehushtanQueueDelegate when_loop_reports_error', error_message)
+            self.logger.error(f'Test2NehushtanQueueDelegate when_loop_reports_error: {error_message}')
 
     def when_loop_terminates(self):
         self.logger.critical('Test2NehushtanQueueDelegate when_loop_terminates')

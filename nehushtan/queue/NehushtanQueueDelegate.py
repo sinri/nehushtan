@@ -3,7 +3,7 @@ from abc import abstractmethod
 from typing import List
 
 from nehushtan.helper.CommonHelper import CommonHelper
-from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
+from nehushtan.logger.NehushtanLogger import NehushtanLogger
 from nehushtan.queue.NehushtanQueueTask import NehushtanQueueTask
 
 
@@ -20,7 +20,7 @@ class NehushtanQueueDelegate:
     CONFIG_KEY_SLEEP_TIME_FOR_BUSY = 'SLEEP_TIME_FOR_BUSY'
     CONFIG_KEY_SLEEP_TIME_FOR_PAUSE = 'SLEEP_TIME_FOR_PAUSE'
 
-    def __init__(self, config_dictionary: dict = None, logger: NehushtanFileLogger = None):
+    def __init__(self, config_dictionary: dict = None, logger: NehushtanLogger = None):
         """
         @since 0.1.25 logger changed to NehushtanFileLogger
         """
@@ -29,13 +29,13 @@ class NehushtanQueueDelegate:
         self.config_dictionary = config_dictionary
 
         if logger is None:
-            logger = NehushtanFileLogger(f"{self.__class__.__name__}-Logger", )
+            logger = NehushtanLogger(topic=f"{self.__class__.__name__}-Logger", )
         self.logger = logger
 
         self.latest_command = NehushtanQueueDelegate.QUEUE_RUNTIME_COMMAND_CONTINUE
 
     def read_config_of_delegate(self, keychain: tuple, default):
-        return CommonHelper.read_dictionary(self.config_dictionary, keychain, default)
+        return CommonHelper.read_target(self.config_dictionary, keychain, default)
 
     def get_configured_pool_capacity(self) -> int:
         return self.read_config_of_delegate((NehushtanQueueDelegate.CONFIG_KEY_POOL_CAPACITY,), 1)

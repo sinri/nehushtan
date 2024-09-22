@@ -4,7 +4,7 @@ from typing import List
 
 from websockets.exceptions import ConnectionClosedError
 
-from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
+from nehushtan.logger.NehushtanLogger import NehushtanLogger
 from nehushtan.ws.NehushtanWebsocketConnectionEntity import NehushtanWebsocketConnectionEntity
 
 
@@ -12,8 +12,8 @@ class NehushtanWebsocketAgent:
     def __init__(
             self,
             broadcast_sleep_seconds: int,
-            request_handle_logger: NehushtanFileLogger,
-            broadcast_logger: NehushtanFileLogger
+            request_handle_logger: NehushtanLogger,
+            broadcast_logger: NehushtanLogger
     ):
         self.__request_handle_logger = request_handle_logger
         self.__broadcast_logger = broadcast_logger

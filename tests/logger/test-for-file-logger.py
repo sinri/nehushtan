@@ -1,10 +1,17 @@
 import logging
+from datetime import datetime
 
-from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
-from nehushtan.logger.NehushtanLogging import NehushtanLogging
+from nehushtan.logger.legacy.NehushtanFileLogger import NehushtanFileLogger
+from nehushtan.logger.legacy.NehushtanLogging import NehushtanLogging
+from nehushtan.logger.NehushtanLogger import NehushtanLogger, NehushtanLoggerAdapterWithStdOut, \
+    NehushtanLoggerAdapterWithFileWriter
+from tests.config import LOGGER_CONFIG
 
-if __name__ == '__main__':
-    file_logger = NehushtanFileLogger('test', '/Users/leqee/code/nehushtan/log', log_level=logging.INFO,
+log_dir = LOGGER_CONFIG['log_dir']
+
+
+def test_nehushtan_file_logger():
+    file_logger = NehushtanFileLogger('test', log_dir, log_level=logging.INFO,
                                       print_higher_than_this_level=NehushtanLogging.INFO,
                                       record_millisecond=True)
 
@@ -38,3 +45,34 @@ if __name__ == '__main__':
     total = 36
     for i in range(total):
         progress_logger.log_progress('TEST', i, total, desc=f'now done[{i}]')
+
+
+def test_nehushtan_logger_with_stdout_adapter():
+    logger = NehushtanLogger(
+        topic='default',
+        adapter=NehushtanLoggerAdapterWithStdOut(),
+    )
+    logger.info('kakaka', {"d": "g"})
+
+
+def test_nehushtan_logger_with_file_writer_adapter():
+    logger = NehushtanLogger(
+        topic='test/file/log',
+        adapter=NehushtanLoggerAdapterWithFileWriter(
+            log_dir=log_dir,
+            record_millisecond=True
+        )
+    )
+    logger.info('kakaka', {"d": "g"})
+
+    try:
+        d = {"k": datetime(year=2024, month=1, day=1), }
+        logger.notice('date', d)
+        p = d['p']
+    except Exception as error:
+        logger.exception('error', error)
+
+
+if __name__ == '__main__':
+    test_nehushtan_logger_with_stdout_adapter()
+    test_nehushtan_logger_with_file_writer_adapter()

@@ -1,7 +1,7 @@
 import time
 from random import random
 
-from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
+from nehushtan.logger.NehushtanLogger import NehushtanLogger, NehushtanLoggerAdapterWithFileWriter
 from nehushtan.queue.NehushtanQueueTask import NehushtanQueueTask
 
 
@@ -10,11 +10,12 @@ class Test2NehushtanQueueTask(NehushtanQueueTask):
         super().__init__()
 
         self._task_id = task_id
-        self.logger = NehushtanFileLogger(
-            f'task-{self._task_id}',
-            '/Users/leqee/code/nehushtan/log/queue-plan2/task',
-            categorize=False,
-            date_rotate=False
+        self.logger = NehushtanLogger(
+            topic=f'task-{self._task_id}',
+            adapter=NehushtanLoggerAdapterWithFileWriter(log_dir='/Users/leqee/code/nehushtan/log/queue-plan2/task',
+                                                         categorize=False,
+                                                         date_rotate=False
+                                                         ),
         )
 
     def get_task_reference(self):

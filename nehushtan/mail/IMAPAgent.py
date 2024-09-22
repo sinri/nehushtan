@@ -3,8 +3,7 @@ import re
 import warnings
 from typing import Iterable, List
 
-from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
-from nehushtan.logger.NehushtanLogging import NehushtanLogging
+from nehushtan.logger.NehushtanLogger import NehushtanLogger, NehushtanLogLevel
 from nehushtan.mail.rfc3501.SearchCommandKit import SearchCommandKit
 from nehushtan.mail.rfc822.NehushtanEmailMessage import NehushtanEmailMessage
 
@@ -29,7 +28,7 @@ class IMAPAgent:
     STATUS_NAME_UIDVALIDITY = 'UIDVALIDITY'  # 邮箱的唯一标识符有效性值。
     STATUS_NAME_UNSEEN = 'UNSEEN'  # 没有设置 .een 标志的消息数。
 
-    def __init__(self, host: str, port: int, use_ssl: bool, logger: NehushtanFileLogger = None):
+    def __init__(self, host: str, port: int, use_ssl: bool, logger: NehushtanLogger = None):
         if use_ssl:
             self._connection = imaplib.IMAP4_SSL(host, port)
         else:
@@ -38,7 +37,7 @@ class IMAPAgent:
         if logger:
             self.logger = logger
         else:
-            self.logger = NehushtanFileLogger(log_level=NehushtanLogging.CRITICAL)
+            self.logger = NehushtanLogger(log_level=NehushtanLogLevel.CRITICAL,)
 
     def login(self, username: str, password: str):
         self._connection.login(username, password)

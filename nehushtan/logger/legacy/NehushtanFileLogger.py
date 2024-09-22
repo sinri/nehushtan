@@ -10,13 +10,14 @@ from datetime import datetime
 import psutil
 
 from nehushtan.helper.CommonHelper import CommonHelper
-from nehushtan.logger.NehushtanLogging import NehushtanLogging
+from nehushtan.logger.legacy.NehushtanLogging import NehushtanLogging
 
 
 class NehushtanFileLogger:
     """
     @since 0.1.25
     Another solution for logging, just use raw writing method to target file.
+    Deprecated since 0.5.1
     """
 
     def __init__(
@@ -100,7 +101,7 @@ class NehushtanFileLogger:
 
         return target_file
 
-    def get_target_file_hander(self, target_file_path: str):
+    def get_target_file_handler(self, target_file_path: str):
         if not target_file_path:
             return None
 
@@ -122,7 +123,7 @@ class NehushtanFileLogger:
         target_file = self.get_target_file()
 
         if target_file != '':
-            file = self.get_target_file_hander(target_file)
+            file = self.get_target_file_handler(target_file)
             file.write(text + end)
             file.flush()
 
@@ -137,10 +138,6 @@ class NehushtanFileLogger:
 
         return self
 
-    @staticmethod
-    def get_level_label(level: int):
-        return NehushtanLogging.get_label_of_level(level)
-
     def write_formatted_line_to_log(self, level: int, message: str, extra=None, hide_extra: bool = False):
         """
         Since 0.3.7 add `hide_extra`
@@ -152,7 +149,7 @@ class NehushtanFileLogger:
             time_format_string += '.%f'
         # now = time.strftime(time_format_string, time.localtime())
         now = datetime.now().strftime(time_format_string)
-        level_label = NehushtanFileLogger.get_level_label(level)
+        level_label = NehushtanLogging.get_label_of_level(level)
         pid = os.getpid()
         thread = threading.currentThread()
         line = f'{now} <{self.title}> [{level_label}] <{pid}:{thread.getName()}> {message}'

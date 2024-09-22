@@ -3,7 +3,7 @@ import time
 from threading import Thread
 from typing import Optional
 
-from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
+from nehushtan.logger.NehushtanLogger import NehushtanLogger, NehushtanLoggerAdapterWithFileWriter, NehushtanLogLevel
 from nehushtan.socket.SocketHandleThreadManager import SocketHandlerThreadManager
 
 
@@ -35,12 +35,18 @@ class NehushtanWormholeWorker:
         # self.__data_queue_from_downstream = Queue()
 
         # socket_name = f"{time.time()}#{CommonHelper.generate_random_uuid_hex()}"
-        self.__logger = NehushtanFileLogger(f"WormholeSocket/{socket_name}", log_dir)
+        if log_dir is None:
+            self.__logger = NehushtanLogger(topic=f"WormholeSocket/{socket_name}")
+        else:
+            self.__logger = NehushtanLogger(topic=f"WormholeSocket/{socket_name}",
+                                            adapter=NehushtanLoggerAdapterWithFileWriter(
+                                                log_dir=log_dir,
+                                            ))
         self.__logger.notice(f"From {upstream_address}")
 
         self.__thread_manager = thread_manager
 
-    def set_logger(self, logger: NehushtanFileLogger):
+    def set_logger(self, logger: NehushtanLogger):
         self.__logger = logger
         return self
 
@@ -94,7 +100,7 @@ class NehushtanWormholeWorker:
         self.__logger.debug("registered two threads and finish work method")
 
     @staticmethod
-    def read_all_available_from_socket(stream_socket: socket.socket, buffer_size: int, logger: NehushtanFileLogger):
+    def read_all_available_from_socket(stream_socket: socket.socket, buffer_size: int, logger: NehushtanLogger):
         total_buffer = b""
         while True:
             try:
@@ -128,7 +134,7 @@ class NehushtanWormholeWorker:
                 self.__logger.error("Upstream Dead")
                 break
 
-            self.__logger.write_raw_line_to_log(f"{buffer}")
+            self.__logger.write_one_log(NehushtanLogLevel.DEBUG, {'buffer': f"{buffer}"})
             try:
                 write_byte_count = self.__downstream_socket.send(buffer)
                 if write_byte_count > 0:
@@ -164,7 +170,7 @@ class NehushtanWormholeWorker:
                 self.__logger.error("Downstream Dead")
                 break
 
-            self.__logger.write_raw_line_to_log(f"{buffer}")
+            self.__logger.write_one_log(NehushtanLogLevel.DEBUG, {'buffer': f"{buffer}"})
             try:
                 write_byte_count = self.__upstream_socket.send(buffer)
                 if write_byte_count > 0:

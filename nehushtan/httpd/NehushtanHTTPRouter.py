@@ -2,7 +2,7 @@ from typing import List
 
 from nehushtan.httpd.NehushtanHTTPRoute import NehushtanHTTPRoute
 from nehushtan.httpd.exceptions.NehushtanNoRouteMatchedError import NehushtanNoRouteMatchedError
-from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
+from nehushtan.logger.NehushtanLogger import NehushtanLogger
 
 
 class NehushtanHTTPRouter:
@@ -10,7 +10,7 @@ class NehushtanHTTPRouter:
     Since 0.4.0
     """
 
-    def __init__(self, logger: NehushtanFileLogger = None):
+    def __init__(self, logger: NehushtanLogger = None):
         self.__route_list: List[NehushtanHTTPRoute] = []
         self.__logger = logger
 

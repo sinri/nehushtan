@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
+from nehushtan.logger.NehushtanLogger import NehushtanLogger
 from nehushtan.queue.NehushtanQueueTask import NehushtanQueueTask
 
 
@@ -9,13 +9,13 @@ class NehushtanQueueTaskDelegate:
     Since 0.4.11
     """
 
-    def __init__(self, config_dictionary: dict = None, logger: NehushtanFileLogger = None):
+    def __init__(self, config_dictionary: dict = None, logger: NehushtanLogger = None):
         if config_dictionary is None:
             config_dictionary = {}
         self.config_dictionary = config_dictionary
 
         if logger is None:
-            logger = NehushtanFileLogger(f"{self.__class__.__name__}-Logger", )
+            logger = NehushtanLogger(topic=f"{self.__class__.__name__}-Logger", )
         self.logger = logger
 
     @abstractmethod

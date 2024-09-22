@@ -1,11 +1,11 @@
-from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
+from nehushtan.logger.NehushtanLogger import NehushtanLogger
 from nehushtan.mysql import constant
 from nehushtan.mysql.MySQLKit import MySQLKit
 from nehushtan.mysql.MySQLKitConfig import MySQLKitConfig
 from tests.config import MYSQL_CONFIG
 
 if __name__ == '__main__':
-    logger = NehushtanFileLogger('default')
+    logger = NehushtanLogger('default')
 
     config = MySQLKitConfig(MYSQL_CONFIG)
     db = MySQLKit(config)

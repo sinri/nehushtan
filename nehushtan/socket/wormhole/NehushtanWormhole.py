@@ -2,7 +2,7 @@ import socket
 import time
 from typing import Optional
 
-from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
+from nehushtan.logger.NehushtanLogger import NehushtanLogger, NehushtanLoggerAdapterWithFileWriter
 from nehushtan.socket.SocketHandleThreadManager import SocketHandlerThreadManager
 from nehushtan.socket.wormhole.NehushtanWormholeWorker import NehushtanWormholeWorker
 
@@ -26,9 +26,15 @@ class NehushtanWormhole:
         # logger: NehushtanFileLogger
         # self.__logger = logger
         self.__log_dir = log_dir
-        self.__logger = NehushtanFileLogger("Wormhole", log_dir)
+        if self.__log_dir is None:
+            self.__logger = NehushtanLogger(topic="Wormhole", )
+        else:
+            self.__logger = NehushtanLogger(topic="Wormhole",
+                                            adapter=NehushtanLoggerAdapterWithFileWriter(
+                                                log_dir=self.__log_dir,
+                                            ))
 
-    def set_logger(self, logger: NehushtanFileLogger):
+    def set_logger(self, logger: NehushtanLogger):
         self.__logger = logger
         return self
 

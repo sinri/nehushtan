@@ -1,13 +1,11 @@
 #  Copyright (c) 2020. Sinri Edogawa
-from logging import FATAL, ERROR
 from typing import Callable
 
 import pymysql
 from pymysql.connections import Connection
 from pymysql.cursors import DictCursor
 
-from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
-from nehushtan.logger.NehushtanLogging import NehushtanLogging
+from nehushtan.logger.NehushtanLogger import NehushtanLogLevel, NehushtanLogger
 from nehushtan.mysql import constant
 from nehushtan.mysql.MySQLKitConfig import MySQLKitConfig
 
@@ -41,12 +39,12 @@ class MySQLKit:
         if len(self._mysql_config.get_host()) > 0:
             self.connect()
 
-        self.__logger = NehushtanFileLogger(log_level=NehushtanLogging.FATAL)
+        self.__logger = NehushtanLogger(log_level=NehushtanLogLevel.FATAL)
 
-    def set_logger(self, logger: NehushtanFileLogger):
+    def set_logger(self, logger: NehushtanLogger):
         self.__logger = logger
 
-    def get_logger(self) -> NehushtanFileLogger:
+    def get_logger(self) -> NehushtanLogger:
         return self.__logger
 
     def __del__(self):

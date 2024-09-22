@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
+from nehushtan.logger.NehushtanLogger import NehushtanLogger
 
 
 class NehushtanMPJob:
@@ -20,7 +20,7 @@ class NehushtanMPJob:
         return self.__name
 
     @abstractmethod
-    def get_logger(self) -> NehushtanFileLogger:
+    def get_logger(self) -> NehushtanLogger:
         """
         Since 0.2.16
         """

@@ -1,142 +1,293 @@
-#  Copyright (c) 2020. Sinri Edogawa
-
 import json
-import logging
-import logging.handlers
-import sys
-import warnings
-from typing import Iterable
+import os
+import threading
+import time
+import traceback
+from abc import ABC, abstractmethod
+from datetime import datetime
+from enum import Enum
+from typing import Optional
+
+from nehushtan.helper.CommonHelper import CommonHelper
+
+
+class NehushtanLogLevel(Enum):
+    """
+    Since 0.5.1.
+    """
+    CRITICAL = 50
+    FATAL = 50
+    ERROR = 40
+    WARNING = 30
+    WARN = 30
+    NOTICE = 25
+    INFO = 20
+    DEBUG = 10
+    NOTSET = 0
+
+
+class NehushtanLoggerAdapter(ABC):
+    """
+    Since 0.5.1.
+    """
+
+    def __init__(self):
+        self.__topic = 'default'
+
+    def ensure_serializable_dict(self, d: dict) -> dict:
+        """
+        Since 0.1.25, add ensure_ascii as False to allow Unicode chars
+        """
+        s = json.dumps(d, default=lambda inner_x: inner_x.__str__(), ensure_ascii=False)
+        return json.loads(s)
+
+    def transform_exception(self, e: BaseException):
+        if CommonHelper.is_python_version_at_least(3, 10):
+            return traceback.format_exception(e)
+        else:
+            return traceback.format_exception(
+                etype=type(e),
+                value=e,
+                tb=e.__traceback__
+            )
+
+    @abstractmethod
+    def write_one_log(self, level: NehushtanLogLevel, contents: dict):
+        pass
+
+    def set_topic(self, topic: str):
+        self.__topic = topic
+
+    def get_topic(self) -> str:
+        return self.__topic
+
+
+class NehushtanLoggerAdapterWithStdOut(NehushtanLoggerAdapter):
+    """
+    Since 0.5.1.
+    """
+
+    def __init__(self, record_millisecond=False, ):
+        super().__init__()
+        self.__record_millisecond = record_millisecond
+
+    def _is_record_millisecond(self) -> bool:
+        return self.__record_millisecond
+
+    def prepare_log_text(self, level: NehushtanLogLevel, contents: dict):
+        time_format_string = "%Y-%m-%d %H:%M:%S"
+        if self.__record_millisecond:
+            time_format_string += '.%f'
+        now = datetime.now().strftime(time_format_string)
+        level_label = f'{level.name}'
+        pid = os.getpid()
+
+        if CommonHelper.is_python_version_at_least(3, 10):
+            thread = threading.current_thread()
+        else:
+            thread = threading.currentThread()
+
+        clean_contents = self.ensure_serializable_dict(contents)
+        message = clean_contents.get('message', '')
+        del clean_contents['message']
+
+        line = f'{now} <{self.get_topic()}> [{level_label}] <{pid}:{thread.name}> {message}'
+        if len(clean_contents.keys()) > 0:
+            extra_json = json.dumps(clean_contents, ensure_ascii=False)
+            line += f' | {extra_json}'
+        return line
+
+    def write_one_log(self, level: NehushtanLogLevel, contents: dict):
+        line = self.prepare_log_text(level, contents)
+        print(line)
+
+
+class NehushtanLoggerAdapterWithFileWriter(NehushtanLoggerAdapterWithStdOut):
+    """
+    Since 0.5.1.
+    """
+
+    def __init__(self,
+                 log_dir: str = None,
+                 categorize: bool = True,
+                 date_rotate: bool = True,
+                 record_millisecond=False,
+                 file_encoding='utf-8',
+                 ):
+        super().__init__(record_millisecond=record_millisecond)
+
+        self.__categorize = categorize
+        self.__log_dir = log_dir
+
+        self.__date_rotate = date_rotate
+
+        # Since 0.4.20 CACHED FILE HANDLER
+        self.__keep_file_open = True
+        self.__opened_files = {}
+        # Since 0.4.20 TARGET FILE ENCODING
+        self.__file_encoding = file_encoding
+
+    def set_topic(self, topic: str):
+        super().set_topic(topic)
+        # This logic is since 0.4.19
+        if self.__categorize:
+            x = topic.split('/')
+            last_title = None
+            y = []
+            for xx in x:
+                if xx:
+                    if last_title:
+                        y.append(last_title)
+                    last_title = xx
+            if y and self.__log_dir:
+                self.__log_dir = self.__log_dir + '/' + ('/'.join(y))
+            if last_title:
+                super().set_topic(last_title)
+
+    def __del__(self):
+        if len(self.__opened_files.items()) > 0:
+            for name, file in self.__opened_files.items():
+                file.close()
+                # print(name, 'closed')
+
+    def __get_target_file(self):
+        if self.__log_dir is None:
+            return ''
+
+        category_dir = self.__log_dir
+
+        # a -> a/a-DATE.log
+        # a/b -> a/b-DATE.log
+        # a/b/c -> a/b/c-DATE.log
+
+        if self.__categorize:
+            category_dir = os.path.join(self.__log_dir, self.get_topic())
+
+        today = ''
+        if self.__date_rotate:
+            today = time.strftime("%Y%m%d", time.localtime())
+            today = f'-{today}'
+
+        target_file = os.path.join(category_dir, f'{self.get_topic()}{today}.log')
+
+        final_dir = os.path.dirname(target_file)
+        if not os.path.exists(final_dir):
+            os.makedirs(final_dir)
+
+        return target_file
+
+    def __get_target_file_handler(self, target_file_path: str):
+        if not target_file_path:
+            return None
+
+        if self.__keep_file_open:
+            file = self.__opened_files.get(target_file_path)
+            if not file:
+                file = open(target_file_path, 'a', encoding=self.__file_encoding)
+                self.__opened_files[target_file_path] = file
+        else:
+            file = open(target_file_path, 'a', encoding=self.__file_encoding)
+
+        return file
+
+    def write_raw_line_to_log(self, text: str, end=os.linesep):
+        target_file = self.__get_target_file()
+
+        if target_file != '':
+            file = self.__get_target_file_handler(target_file)
+            file.write(text + end)
+            file.flush()
+
+            if not self.__keep_file_open:
+                file.close()
+
+        return self
+
+    def write_one_log(self, level: NehushtanLogLevel, contents: dict):
+        """
+        Since 0.3.7 add `hide_extra`
+        """
+        line = self.prepare_log_text(level, contents)
+        return self.write_raw_line_to_log(line)
 
 
 class NehushtanLogger:
     """
-    A Logger Class For Shovel
-    DEPRECATED SINCE 0.2.5.
+    Since 0.5.1.
     """
 
-    def __init__(
-            self,
-            logger_name: str,
-            handlers: Iterable[logging.Handler] = None,
-            universal_log_level=logging.DEBUG,
-            with_process_info=False,
-            with_thread_info=False
-    ):
-        """
-        Reusable Logger, determined by name
-        If parameter `handlers` provided and not None, all previous handlers would be cleared and newly given ones set.
-        """
-        warnings.warn('Deprecated since 0.2.5. Use NehushtanFileLogger instead!', DeprecationWarning)
+    def __init__(self,
+                 topic: str = 'default',
+                 adapter: NehushtanLoggerAdapter = NehushtanLoggerAdapterWithStdOut(),
+                 log_level: NehushtanLogLevel = NehushtanLogLevel.DEBUG,
+                 print_higher_than_this_level: NehushtanLogLevel = NehushtanLogLevel.CRITICAL,
+                 ):
+        self.__topic = topic
+        self.__adapter = adapter
+        self.__adapter.set_topic(topic)
+        self.__log_level = log_level
 
-        self.with_process_info = with_process_info
-        self.with_thread_info = with_thread_info
-        self.logger = logging.getLogger(logger_name)
-        self.logger.setLevel(universal_log_level)
-        if handlers is not None:
-            self.logger.handlers = []
-            for handler in handlers:
-                # https://docs.python.org/3/library/logging.html#formatter-objects
+        # self.print_as_well = print_as_well <-- should use print_higher_than_this_level=NehushtanLogging.NOTSET
+        # If all, use NOTSET; if none, use FATAL
+        self.__print_higher_than_this_level = print_higher_than_this_level
+        if self.__print_higher_than_this_level.value < NehushtanLogLevel.FATAL.value:
+            self.__adapter_with_stdout = NehushtanLoggerAdapterWithStdOut()
 
-                format_string = "%(asctime)s <%(name)s> [%(levelname)s]"
-                if self.with_process_info:
-                    format_string += " <%(process)d:%(processName)s>"
-                if self.with_thread_info:
-                    format_string += " <%(thread)d:%(threadName)s>"
-                format_string += " %(message)s | %(json_string)s"
-
-                handler.setFormatter(
-                    logging.Formatter(format_string)
-                )
-                self.logger.addHandler(handler)
-
-    def debug(self, message: str, extra=None):
-        self.logger.debug(
-            msg=message,
-            extra=self.ensure_extra_as_dict(extra)
-        )
-
-    def info(self, message: str, extra=None):
-        self.logger.info(
-            msg=message,
-            extra=self.ensure_extra_as_dict(extra)
-        )
-
-    def warning(self, message: str, extra=None):
-        self.logger.warning(
-            msg=message,
-            extra=self.ensure_extra_as_dict(extra)
-        )
-
-    def error(self, message: str, extra=None):
-        self.logger.error(
-            msg=message,
-            extra=self.ensure_extra_as_dict(extra)
-        )
-
-    def exception(self, message: str, exception: BaseException):
-        """
-        Since version 1.2 彭启航之野望
-        :param message:
-        :param exception:
-        :return:
-        """
-        self.logger.exception(
-            msg=message,
-            extra=self.ensure_extra_as_dict(exception.__str__()),
-            stack_info=True,
-        )
-
-    def critical(self, message: str, extra=None):
-        self.logger.critical(
-            msg=message,
-            extra=self.ensure_extra_as_dict(extra)
-        )
+    def _get_adapter(self) -> NehushtanLoggerAdapter:
+        return self.__adapter
 
     @staticmethod
-    def make_silent_handler():
-        s_handler = logging.NullHandler()
-        return s_handler
+    def get_traceback_info_from_exception_as_array(e: BaseException) -> list[str]:
+        if CommonHelper.is_python_version_at_least(3, 10):
+            lines = traceback.format_exception(e)
+        else:
+            lines = traceback.format_exception(
+                etype=type(e),
+                value=e,
+                tb=e.__traceback__
+            )
+        return lines
 
-    @staticmethod
-    def make_stdout_handler(logger_level=logging.DEBUG):
-        s_handler = logging.StreamHandler(stream=sys.stdout)
-        s_handler.setLevel(logger_level)
-        return s_handler
+    def write_one_log(self, level: NehushtanLogLevel, contents: dict):
+        self._get_adapter().write_one_log(level, contents)
+        if level.value > self.__print_higher_than_this_level.value:
+            self.__adapter_with_stdout.write_one_log(level, contents)
 
-    @staticmethod
-    def make_stderr_handler(logger_level=logging.WARN):
-        s_handler = logging.StreamHandler(stream=sys.stderr)
-        s_handler.setLevel(logger_level)
-        return s_handler
+    def _log(self, level: NehushtanLogLevel, message: str, context: Optional[dict] = None):
+        if level.value >= self.__log_level.value:
+            contents = {'message': message}
+            if context is not None:
+                contents['context'] = context
+            self.write_one_log(level=level, contents=contents)
 
-    @staticmethod
-    def make_timed_rotating_file_handler(file_name='shovel.log', logger_level=logging.DEBUG, backup_count=7):
-        rf_handler = logging.handlers.TimedRotatingFileHandler(
-            filename=file_name,
-            when='midnight',
-            interval=1,
-            backupCount=backup_count
-        )
-        rf_handler.setLevel(logger_level)
-        return rf_handler
+    def debug(self, message: str, extra: Optional[dict] = None):
+        self._log(level=NehushtanLogLevel.DEBUG, message=message, context=extra)
 
-    @staticmethod
-    def make_fixed_file_handler(file_name='shovel.log', logger_level=logging.DEBUG):
-        f_handler = logging.FileHandler(file_name)
-        f_handler.setLevel(logger_level)
-        return f_handler
+    def info(self, message: str, extra: Optional[dict] = None):
+        self._log(level=NehushtanLogLevel.INFO, message=message, context=extra)
 
-    def ensure_extra_as_dict(self, extra):
-        """
-        Since 0.1.16, add ensure_ascii as False to allow unicode chars
-        """
-        return {
-            "json_string": json.dumps(extra, default=lambda inner_x: inner_x.__str__(), ensure_ascii=False),
-        }
+    def notice(self, message: str, extra: Optional[dict] = None):
+        self._log(level=NehushtanLogLevel.NOTICE, message=message, context=extra)
 
-    @staticmethod
-    def get_silent_logger(logger_name: str):
-        return NehushtanLogger(
-            logger_name=logger_name,
-            handlers=[NehushtanLogger.make_silent_handler()]
-        )
+    def warning(self, message: str, extra: Optional[dict] = None):
+        self._log(level=NehushtanLogLevel.WARNING, message=message, context=extra)
+
+    def error(self, message: str, extra: Optional[dict] = None):
+        self._log(level=NehushtanLogLevel.ERROR, message=message, context=extra)
+
+    def critical(self, message: str, extra: Optional[dict] = None):
+        self._log(level=NehushtanLogLevel.CRITICAL, message=message, context=extra)
+
+    def exception(self, message: str, e: BaseException):
+        level = NehushtanLogLevel.ERROR
+        traces = self._get_adapter().transform_exception(e)
+        if level.value >= self.__log_level.value:
+            contents = {
+                'message': message,
+                'exception': {
+                    'class': e.__class__.__name__,
+                    'message': e.__str__(),
+                    'trace': traces,
+                }
+            }
+            self.write_one_log(level=level, contents=contents)

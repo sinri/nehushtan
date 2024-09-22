@@ -1,7 +1,7 @@
 import unittest
 
 from nehushtan.helper.CommonHelper import CommonHelper
-from nehushtan.logger.NehushtanFileLogger import NehushtanFileLogger
+from nehushtan.logger.NehushtanLogger import NehushtanLogger
 
 
 class TestForCommonHelper(unittest.TestCase):
@@ -136,6 +136,6 @@ class TestForCommonHelper(unittest.TestCase):
 
     def test_seek_class(self):
         self.assertIsInstance(
-            NehushtanFileLogger(),
-            CommonHelper.class_with_class_path('nehushtan.logger.NehushtanFileLogger', 'NehushtanFileLogger')
+            NehushtanLogger(),
+            CommonHelper.class_with_class_path('nehushtan.logger.NehushtanLogger', 'NehushtanLogger')
         )
