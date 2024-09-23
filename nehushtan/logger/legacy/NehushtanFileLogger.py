@@ -147,7 +147,6 @@ class NehushtanFileLogger:
         time_format_string = "%Y-%m-%d %H:%M:%S"
         if self.record_millisecond:
             time_format_string += '.%f'
-        # now = time.strftime(time_format_string, time.localtime())
         now = datetime.now().strftime(time_format_string)
         level_label = NehushtanLogging.get_label_of_level(level)
         pid = os.getpid()
@@ -213,7 +212,7 @@ class NehushtanFileLogger:
     def log_current_memory_usage_of_process(self, pid: int = None, level: int = NehushtanLogging.INFO):
         """
         Since 0.2.10
-        Filed `pid` would use os.getpid() for None.
+        Filed `pid` would use `os.getpid()` for None.
         """
         memory_usage = psutil.Process(pid=pid).memory_info()
         self.write_formatted_line_to_log(
@@ -268,7 +267,7 @@ class NehushtanFileLogger:
     def get_traceback_info_from_exception(exception: BaseException) -> str:
         """
         Since 0.4.4
-        Since 0.4.26 -> try to make it compitable with 3.10
+        Since 0.4.26 -> try to make it compatible with 3.10
         """
         if CommonHelper.is_python_version_at_least(3, 10):
             return ''.join(traceback.format_exception(exception))

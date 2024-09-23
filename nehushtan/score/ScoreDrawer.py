@@ -74,8 +74,8 @@ class ScoreDrawer:
                 # do not care title?
                 if False:
                     total_chars = len(line.get_middle_component())
-                    if line.get_left_componet() is not None:
-                        total_chars += 1 + len(line.get_left_componet())
+                    if line.get_left_component() is not None:
+                        total_chars += 1 + len(line.get_left_component())
                     if line.get_right_component() is not None:
                         total_chars += 1 + len(line.get_right_component())
                     if int(total_chars * 0.8) > max_columns:
@@ -148,7 +148,7 @@ class ScoreDrawer:
             line_index += 1
 
     def __draw_title_line(self, line_index: int, title_line: ParsedLineAsTitle):
-        if title_line.get_left_componet() is not None:
+        if title_line.get_left_component() is not None:
             # box = self.__paint.textbbox(
             #     xy=(0, 0),
             #     text=title_line.get_left_componet(),
@@ -158,7 +158,7 @@ class ScoreDrawer:
             # )
             self.__paint.text(
                 xy=(self.__cell_width, int((line_index + 0.5) * self.__cell_height)),
-                text=title_line.get_left_componet(),
+                text=title_line.get_left_component(),
                 font=self.__options.get_font_for_title_left_component(),
                 align="left",
                 fill="black",

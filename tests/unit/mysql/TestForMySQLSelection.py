@@ -4,7 +4,7 @@ from nehushtan.mysql.MySQLAnyTable import MySQLAnyTable
 from nehushtan.mysql.MySQLCondition import MySQLCondition
 from nehushtan.mysql.MySQLKit import MySQLKit
 from nehushtan.mysql.MySQLKitConfig import MySQLKitConfig
-from nehushtan.mysql.MySQLUnionSelection import MySQLUnionSeletion
+from nehushtan.mysql.MySQLUnionSelection import MySQLUnionSelection
 from tests.config import MYSQL_CONFIG
 
 
@@ -45,7 +45,7 @@ class TestForMySQLSelection(unittest.TestCase):
         s2 = self.table.select_in_table() \
             .add_condition(MySQLCondition.make_between('value', 400, 800))
 
-        result = MySQLUnionSeletion() \
+        result = MySQLUnionSelection() \
             .add_sub_selection(s1) \
             .add_sub_selection(s2) \
             .query_for_result_as_tuple_of_dict()
@@ -64,7 +64,7 @@ class TestForMySQLSelection(unittest.TestCase):
         s2 = self.table.select_in_table() \
             .add_condition(MySQLCondition.make_between('value', 200, 800))
 
-        result = MySQLUnionSeletion() \
+        result = MySQLUnionSelection() \
             .add_sub_selection(s1) \
             .add_sub_selection(s2, True) \
             .query_for_result_as_tuple_of_dict()

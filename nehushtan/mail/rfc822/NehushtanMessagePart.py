@@ -48,15 +48,15 @@ class NehushtanMessagePart:
         x: bytes = self.__message.get_payload(i=i, decode=True)
         return x.decode(encoding=self.__message.get_content_charset('ascii'))
 
-    def get_attachement_filename_of_this_part(self) -> Optional[str]:
+    def get_attachment_filename_of_this_part(self) -> Optional[str]:
         if self.__message.is_attachment():
             return self.__message.get_filename()
 
-    def get_attachement_content_of_this_part(self, i=None):
+    def get_attachment_content_of_this_part(self, i=None):
         if self.__message.is_attachment():
             attachment_content = self.__message.get_payload(i=i, decode=True)
             return attachment_content
 
-    def save_attachement_of_this_part(self, target_file_path: str, i=None):
+    def save_attachment_of_this_part(self, target_file_path: str, i=None):
         with open(target_file_path, 'wb') as fp:
-            fp.write(self.get_attachement_content_of_this_part(i=i))
+            fp.write(self.get_attachment_content_of_this_part(i=i))

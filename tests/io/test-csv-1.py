@@ -26,7 +26,7 @@ csv_file = "/Users/leqee/code/nehushtan/debug/attachments/1.csv"
 #     return d
 
 
-def row_handler_1(row, index: int, result: CSVReaderRowHandleResult) -> bool:
+def row_handler_1(row, index: int, result: CSVReaderRowHandleResult):
     if index == 2 or index == 4:
         result.set_should_continue(False)
     print(index, row, result.get_should_continue())

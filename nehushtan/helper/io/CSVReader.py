@@ -19,7 +19,7 @@ class CSVReader:
         self.__csv_reader = csv.reader(self.__csv_file, **(options.to_dict()))
         self.__current_index_of_line_to_read = 0
 
-        self.__row_handler = None
+        self.__row_handler: Optional[Callable[[any, int, CSVReaderRowHandleResult], None]] = None
         self.__should_handle_next_row_judge = None
         self.__row_transformer = None
 
@@ -47,12 +47,13 @@ class CSVReader:
             self.set_field_names(row)
             break
 
-    def set_row_handler(self, row_handler: Callable[[any, int], any]):
+    def set_row_handler(self, row_handler: Callable[[any, int, CSVReaderRowHandleResult], None]):
         self.__row_handler = row_handler
         return self
 
-    def _row_handler(self, row, index: int, result: CSVReaderRowHandleResult):
-        self.__row_handler(row, index, result)
+    def _handle_row(self, row, index: int, result: CSVReaderRowHandleResult):
+        if self.__row_handler is not None:
+            self.__row_handler(row, index, result)
 
     def set_row_transformer(self, row_transformer: Callable[[any, int, Optional[Sequence[str]]], any]):
         self.__row_transformer = row_transformer
@@ -73,7 +74,7 @@ class CSVReader:
             if result is None:
                 result = CSVReaderRowHandleResult()
             transformed_row = self._transform_row(row, self.__current_index_of_line_to_read)
-            self._row_handler(transformed_row, self.__current_index_of_line_to_read, result)
+            self._handle_row(transformed_row, self.__current_index_of_line_to_read, result)
             self.__current_index_of_line_to_read += 1
             break
 
@@ -87,7 +88,7 @@ class CSVReader:
             if result is None:
                 result = CSVReaderRowHandleResult()
             transformed_row = self._transform_row(row, self.__current_index_of_line_to_read)
-            self._row_handler(transformed_row, self.__current_index_of_line_to_read, result)
+            self._handle_row(transformed_row, self.__current_index_of_line_to_read, result)
             self.__current_index_of_line_to_read += 1
             if not result.get_should_continue():
                 break

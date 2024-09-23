@@ -6,12 +6,12 @@ from nehushtan.socket.NehushtanTCPSocketClient import NehushtanTCPSocketClient
 
 
 class QAClient(NehushtanTCPSocketClient):
-    def handle_client_conneciton(self):
+    def handle_client_connection(self):
         for i in range(10):
             r = random.Random()
             count = r.randint(2, 5)
             x = []
-            for i in range(count):
+            for j in range(count):
                 x.append(f'{r.randint(10, 20)}')
             x = '+'.join(x)
 
@@ -33,6 +33,6 @@ def client_call():
 
 if __name__ == '__main__':
 
-    for i in range(20):
+    for k in range(20):
         Thread(target=client_call).start()
         time.sleep(random.Random().random() * 5)

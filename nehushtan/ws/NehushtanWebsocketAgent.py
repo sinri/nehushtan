@@ -45,7 +45,7 @@ class NehushtanWebsocketAgent:
     @abstractmethod
     def unregister_raw_websocket_connection(self, websocket_key: str):
         """
-        Remove the connection from the registeration according to its key `websocket_key`
+        Remove the connection from the registration according to its key `websocket_key`
         """
         pass
 

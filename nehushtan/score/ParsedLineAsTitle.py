@@ -14,7 +14,7 @@ class ParsedLineAsTitle(ParsedLine):
         self.__right_component: Optional[str] = None
 
         if components is None or len(components) == 0:
-            raise SyntaxError("title line componets empty")
+            raise SyntaxError("title line components empty")
         if len(components) == 1:
             self.__middle_component = components[0]
         elif len(components) == 2:
@@ -25,7 +25,7 @@ class ParsedLineAsTitle(ParsedLine):
             self.__middle_component = components[1]
             self.__right_component = components[2]
 
-    def get_left_componet(self):
+    def get_left_component(self):
         if self.__left_component == "":
             return None
         return self.__left_component

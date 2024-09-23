@@ -24,9 +24,9 @@ class NehushtanTCPSocketClient:
         prepare_error = None
 
         for address_entry in address_entries:
-            af, socktype, proto, canonname, sa = address_entry
+            af, socket_type, proto, canon_name, sa = address_entry
             try:
-                self.__socket_instance = socket.socket(af, socktype, proto)
+                self.__socket_instance = socket.socket(af, socket_type, proto)
                 self.__socket_instance.connect(sa)
             except OSError as msg:
                 prepare_error = msg
@@ -40,13 +40,13 @@ class NehushtanTCPSocketClient:
             raise prepare_error
 
         with self.__socket_instance:
-            self.handle_client_conneciton()
+            self.handle_client_connection()
 
     def get_connection(self):
         return self.__socket_instance
 
     @abstractmethod
-    def handle_client_conneciton(self):
+    def handle_client_connection(self):
         """
         Override it to implement it with your own logic.
         """

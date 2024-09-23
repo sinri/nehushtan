@@ -5,7 +5,7 @@ from nehushtan.cli.CSISequence import CSISequence
 from nehushtan.cli.ISO6429 import ISO6429
 
 
-class ANSITermialHelper:
+class ANSITerminalHelper:
     """
     Since 0.4.13
     """
@@ -143,11 +143,11 @@ class ANSITermialHelper:
         """
         self.write(CSISequence.csi_for_scroll_down(n))
 
-    def select_graphic_redition(self, sgr: Union[str, int, List[Union[str, int]]] = None):
+    def select_graphic_rendition(self, sgr: Union[str, int, List[Union[str, int]]] = None):
         """
         选择图形再现（Select Graphic Rendition）
         """
-        self.write(CSISequence.csi_for_select_graphic_redition(sgr))
+        self.write(CSISequence.csi_for_select_graphic_rendition(sgr))
 
     def device_status_report(self):
         """
@@ -171,6 +171,6 @@ class ANSITermialHelper:
         """
         Since 0.4.14
         """
-        self.select_graphic_redition([foreground_color, background_color])
+        self.select_graphic_rendition([foreground_color, background_color])
         self.write(text)
-        self.select_graphic_redition(ISO6429.SGR_RESET)
+        self.select_graphic_rendition(ISO6429.SGR_RESET)

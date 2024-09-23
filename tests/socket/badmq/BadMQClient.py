@@ -29,8 +29,8 @@ class BadMQClient(NehushtanUDPSocketClient):
         else:
             raise IOError('pop failed')
 
-    def enqueue(self, x: str):
-        self.__command = MQCommand(MQCommand.COMMAND_ENQUEUE, 'QueueA', x)
+    def enqueue(self, xx: str):
+        self.__command = MQCommand(MQCommand.COMMAND_ENQUEUE, 'QueueA', xx)
         self.handle_communication()
         if self.__command:
             return self.__command.value

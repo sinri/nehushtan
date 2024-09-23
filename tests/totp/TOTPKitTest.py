@@ -18,7 +18,7 @@ if __name__ == '__main__':
     last_p = ''
     last_count = 0
     for i in range(60):
-        x = k.generate_current_TOTP_tuple()
+        x = k.generate_current_totp_tuple()
 
         t = x[0]
         formatted_time = x[1]

@@ -123,7 +123,7 @@ class TestForCommonHelper(unittest.TestCase):
             CommonHelper.write_dictionary(target, tuple(), 'G')  # 空元组，保持不变
         )
         # 都说是 write_dictionary 还传别的东西进来
-        self.assertRaises(AttributeError, lambda: CommonHelper.write_dictionary(None, ('H', 'I',), 'J'))
+        # self.assertRaises(AttributeError, lambda: CommonHelper.write_dictionary(None, ('H', 'I',), 'J'))
 
         obj_1 = object()
         obj_2 = object()

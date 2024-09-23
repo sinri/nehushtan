@@ -1,6 +1,6 @@
 import signal
 import time
-from multiprocessing.context import Process
+from multiprocessing import Process
 from typing import List
 
 from nehushtan.helper.SignalHandler import SignalHandler
@@ -178,7 +178,7 @@ class NehushtanMPQueue(SignalHandler):
 
         self.get_logger().info(
             'NehushtanMPQueue::refresh_running_sub_process_count now still alive process',
-            self.__running_dict.keys()
+            {'keys': self.__running_dict.keys()}
         )
 
         return len(self.__running_dict.items())

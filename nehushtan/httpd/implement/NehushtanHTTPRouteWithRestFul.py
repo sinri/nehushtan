@@ -21,7 +21,7 @@ class NehushtanHTTPRouteWithRestFul(NehushtanHTTPRoute):
         `path_template` is expected as '/PRE../..FIX',
             would be mapped to URL '/PRE../..FIX/PACKAGE...S/CLASS/METHOD'
             or '/PRE../..FIX/PACKAGE...S/CLASS/METHOD/ARGS[0]/ARGS[1]/...'
-        `process_chain_base_package` should be a package namespace naem, e.g. 'a.b.c',
+        `process_chain_base_package` should be a package namespace name, e.g. 'a.b.c',
             (thus, the target class-method pair for '/d/e/f' would be (`a.b.c.d.e`,`f`)
         """
         super().__init__()
@@ -50,7 +50,6 @@ class NehushtanHTTPRouteWithRestFul(NehushtanHTTPRoute):
 
         class_full_path = self.process_chain_base_package
         for i in range(len(components)):
-            # print(f'components[{i}]')
             component = components[i]
             class_full_path += '.' + component
             try:

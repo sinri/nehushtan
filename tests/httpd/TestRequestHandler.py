@@ -10,7 +10,7 @@ class TestRequestHandler(NehushtanHTTPRequestHandler):
     router = NehushtanHTTPRouter()
     mq = NehushtanMemoryMessageQueue()
 
-    def __init__(self, request: bytes, client_address: Tuple[str, int], server: socketserver.BaseServer):
+    def __init__(self, request, client_address: Tuple[str, int], server: socketserver.BaseServer):
         # self.prepare_router()
         super().__init__(request, client_address, server)
 

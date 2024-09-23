@@ -72,7 +72,7 @@ class TOTPKit:
         lsb_31 = p & 0x7FFFFFFF  # Return only the lower 31 bits
         return lsb_31
 
-    def __generate_TOTP_tuple(self, apply_time: int) -> Tuple[int, int, int, str]:
+    def __generate_totp_tuple(self, apply_time: int) -> Tuple[int, int, int, str]:
         """
         With an apply time, generate TOTP for it.
 
@@ -92,7 +92,7 @@ class TOTPKit:
         totp = ("{:0" + str(self.__Digits) + "}").format(trc_hash % (10 ** self.__Digits))
         return apply_time, formated_time * self.__F, formated_time * self.__F + self.__F, totp
 
-    def generate_current_TOTP_tuple(self) -> Tuple[int, int, int, str]:
+    def generate_current_totp_tuple(self) -> Tuple[int, int, int, str]:
         """
         Generate TOTP for current time.
 
@@ -103,5 +103,5 @@ class TOTPKit:
             TOTP
         """
         t0 = int(time.time())
-        totp_now = self.__generate_TOTP_tuple(t0)
+        totp_now = self.__generate_totp_tuple(t0)
         return totp_now

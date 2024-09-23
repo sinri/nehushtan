@@ -1,5 +1,7 @@
 import json
+import math
 import os
+import sys
 import threading
 import time
 import traceback
@@ -7,6 +9,8 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from enum import Enum
 from typing import Optional
+
+import psutil
 
 from nehushtan.helper.CommonHelper import CommonHelper
 
@@ -291,3 +295,47 @@ class NehushtanLogger:
                 }
             }
             self.write_one_log(level=level, contents=contents)
+
+    def log_progress(
+            self,
+            title: str,
+            done_task_count: int,
+            total_task_count: int = 100,
+            progress_bar_length: int = 20,
+            desc: str = None,
+            level: NehushtanLogLevel = NehushtanLogLevel.NOTICE
+    ):
+        percent = 100.0 * done_task_count / total_task_count
+        bar = ''
+        done_bar_chars = math.floor(progress_bar_length * percent / 100.0)
+        for i in range(done_bar_chars):
+            bar += '='
+        for j in range(progress_bar_length - done_bar_chars):
+            bar += '-'
+
+        content = f'{title}: {percent:2.2f}% ({done_task_count}/{total_task_count}) [{bar}]'
+        if desc is not None:
+            content += f' {desc}'
+
+        self._log(level=level, message=content, )
+
+    def log_current_memory_usage_of_process(self, pid: int = None, level: NehushtanLogLevel = NehushtanLogLevel.INFO):
+        """
+        Filed `pid` would use os.getpid() for None.
+        """
+        memory_usage = psutil.Process(pid=pid).memory_info()
+        self._log(
+            level,
+            'Current Memory Usage Snapshot (in MB)',
+            {'rss': memory_usage.rss / 1024.0 / 1024.0, 'vms': memory_usage.vms / 1024.0 / 1024.0}
+        )
+
+    def log_current_memory_usage_of_object(self, target_name: str, target,
+                                           level: NehushtanLogLevel = NehushtanLogLevel.INFO):
+
+        memory_usage = sys.getsizeof(target)
+        self._log(
+            level,
+            f'Current Memory Usage used by {target_name} (in MB)',
+            {'size': memory_usage / 1024.0 / 1024.0}
+        )

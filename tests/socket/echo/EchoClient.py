@@ -3,7 +3,7 @@ from nehushtan.socket.NehushtanTCPSocketClient import NehushtanTCPSocketClient
 
 class EchoClient(NehushtanTCPSocketClient):
 
-    def handle_client_conneciton(self):
+    def handle_client_connection(self):
         connection = self.get_connection()
 
         while True:
@@ -12,7 +12,7 @@ class EchoClient(NehushtanTCPSocketClient):
                 break
 
             sent = connection.send(x.encode())
-            print(f'[DEBUG] handle_client_conneciton sent bytes: {sent}')
+            print(f'[DEBUG] handle_client_connection sent bytes: {sent}')
             received = connection.recv(1024)
             print(f'Heard from {connection.getpeername()}: {received}')
 

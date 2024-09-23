@@ -109,7 +109,7 @@ class NehushtanQueueDelegate:
         """
         This works in MASTER
         It is a hook before `check_next_task`.
-        A scnerio is, here delegate prepares a list of task candidates,
+        A scenario is, here delegate prepares a list of task candidates,
         And be consumed in `check_next_task` in order.
         Since 0.2.19
         """

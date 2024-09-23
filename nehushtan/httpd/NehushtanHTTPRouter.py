@@ -32,6 +32,6 @@ class NehushtanHTTPRouter:
                 return route
 
         raise NehushtanNoRouteMatchedError(
-            http_error_message=f'Request [{method} {path}] Matched No Rotue.',
+            http_error_message=f'Request [{method} {path}] Matched No Route.',
             http_code=404
         )

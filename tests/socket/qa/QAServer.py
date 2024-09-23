@@ -15,7 +15,6 @@ event = SampleEvent()
 
 class QAServer(NehushtanTCPSocketServer):
     def handle_incoming_connection(self, connection: socket.socket, address):
-        # peer = connection.getpeername()
 
         event.set()
 
@@ -57,14 +56,14 @@ def with_monitor_fork():
         server.listen()
 
 
-def with_monitor_thread(server: NehushtanTCPSocketServer):
-    thread = Thread(target=monitor_thread_worker, args=(server,))
+def with_monitor_thread(the_server: NehushtanTCPSocketServer):
+    thread = Thread(target=monitor_thread_worker, args=(the_server,))
     thread.start()
 
 
-def monitor_thread_worker(server: NehushtanTCPSocketServer):
+def monitor_thread_worker(the_server: NehushtanTCPSocketServer):
     while event.wait():
-        print(f'[MONITOR] total threads: {server.get_thread_manager().check_alive_thread_count()}')
+        print(f'[MONITOR] total threads: {the_server.get_thread_manager().check_alive_thread_count()}')
         event.clear()
 
     print('[MONITOR] OVER')

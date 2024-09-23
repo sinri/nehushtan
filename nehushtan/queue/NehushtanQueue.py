@@ -212,7 +212,7 @@ class NehushtanQueue:
         """
         Since 0.3.0
         When a found task:
-            successfully genereate a process to execute, return True.
+            successfully generate a process to execute, return True.
             not executable, return False.
         """
         task_id = task.get_task_reference()

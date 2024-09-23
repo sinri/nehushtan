@@ -15,6 +15,6 @@ class TestMQ(NehushtanHTTPRequestController):
         else:
             self._reply_with_ok({"mq_empty": False, 'message': x})
 
-    def statAll(self):
+    def stat_all(self):
         x = TestRequestHandler.mq.stat_for_all()
         self._reply_with_ok({"mq_stat": x})

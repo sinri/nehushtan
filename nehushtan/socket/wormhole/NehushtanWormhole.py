@@ -51,9 +51,9 @@ class NehushtanWormhole:
         prepare_error = None
 
         for address_entry in address_entries:
-            af, socktype, proto, canonname, sa = address_entry
+            af, socket_type, proto, canon_name, sa = address_entry
             try:
-                self.__socket_instance = socket.socket(af, socktype, proto)
+                self.__socket_instance = socket.socket(af, socket_type, proto)
                 self.__socket_instance.bind(sa)
                 self.__socket_instance.listen(self.__wait_queue_size)
             except OSError as msg:
@@ -67,7 +67,7 @@ class NehushtanWormhole:
         if self.__socket_instance is None:
             raise prepare_error
 
-        # let the process of accept could be interupted (Since 0.4.17)
+        # let the process of accept could be interrupted (Since 0.4.17)
         self.__socket_instance.settimeout(1)
 
         self.__logger.notice(f"Wormhole Entrance is open, liston on {self.__listen_port}")

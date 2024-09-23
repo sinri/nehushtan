@@ -19,7 +19,7 @@ class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
     Since 0.4.0
     """
 
-    def __init__(self, request: bytes, client_address: Tuple[str, int], server: socketserver.BaseServer):
+    def __init__(self, request, client_address: Tuple[str, int], server: socketserver.BaseServer):
         # fulfilled by calling method `parse_path`
         self.parsed_path = '/'
         self.parsed_query_dict = {}

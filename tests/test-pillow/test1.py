@@ -9,7 +9,8 @@ if __name__ == '__main__':
     draw.line((0, image.size[1], image.size[0], 0), fill=128)
 
     # write to stdout
-    image.save(sys.stdout, "PNG")
+    stdout_buffer = sys.stdout.buffer
+    image.save(stdout_buffer, "PNG")
 
     image.show("aaa")
 

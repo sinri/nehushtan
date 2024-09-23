@@ -5,7 +5,7 @@ from nehushtan.mysql.MySQLSelectionMixin import MySQLSelectionMixin
 from nehushtan.mysql.MySQLTableSelection import MySQLTableSelection
 
 
-class MySQLUnionSeletion(MySQLSelectionMixin):
+class MySQLUnionSelection(MySQLSelectionMixin):
     """
     Since 0.3.6
     """

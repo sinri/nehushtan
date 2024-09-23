@@ -6,12 +6,12 @@ from tests.queue.plan2.Test2NehushtanQueueDelegate import Test2NehushtanQueueDel
 from tests.queue.plan2.Test2NehushtanQueueTaskDelegate import Test2NehushtanQueueTaskDelegate
 
 if __name__ == '__main__':
-    shutil.rmtree('/Users/leqee/code/nehushtan/log/queue-plan2')
+    shutil.rmtree('path/to/nehushtan/log/queue-plan2')
 
     config_dictionary = {}
     logger = NehushtanLogger(topic='loop',
                              adapter=NehushtanLoggerAdapterWithFileWriter(
-                                 log_dir='/Users/leqee/code/nehushtan/log/queue-plan2'))
+                                 log_dir='path/to/nehushtan/log/queue-plan2'))
     delegate = Test2NehushtanQueueDelegate(config_dictionary, logger)
     task_delegate = Test2NehushtanQueueTaskDelegate(config_dictionary, logger)
 

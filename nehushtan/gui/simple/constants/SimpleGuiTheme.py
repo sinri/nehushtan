@@ -10,619 +10,619 @@ class SimpleGuiTheme:
         return self.__theme_name
 
     @staticmethod
-    def useSystemDefault():
+    def use_system_default():
         return SimpleGuiTheme("SystemDefault")
 
     @staticmethod
-    def useSystemDefaultForReal():
+    def use_system_default_for_real():
         return SimpleGuiTheme("SystemDefaultForReal")
 
     @staticmethod
-    def useSystemDefault1():
+    def use_system_default_1():
         return SimpleGuiTheme("SystemDefault1")
 
     @staticmethod
-    def useMaterial1():
+    def use_material_1():
         return SimpleGuiTheme("Material1")
 
     @staticmethod
-    def useMaterial2():
+    def use_material_2():
         return SimpleGuiTheme("Material2")
 
     @staticmethod
-    def useReddit():
+    def use_reddit():
         return SimpleGuiTheme("Reddit")
 
     @staticmethod
-    def useTopanga():
+    def use_topanga():
         return SimpleGuiTheme("Topanga")
 
     @staticmethod
-    def useGreenTan():
+    def use_green_tan():
         return SimpleGuiTheme("GreenTan")
 
     @staticmethod
-    def useDark():
+    def use_dark():
         return SimpleGuiTheme("Dark")
 
     @staticmethod
-    def useLightGreen():
+    def use_light_green():
         return SimpleGuiTheme("LightGreen")
 
     @staticmethod
-    def useDark2():
+    def use_dark_2():
         return SimpleGuiTheme("Dark2")
 
     @staticmethod
-    def useBlack():
+    def use_black():
         return SimpleGuiTheme("Black")
 
     @staticmethod
-    def useTan():
+    def use_tan():
         return SimpleGuiTheme("Tan")
 
     @staticmethod
-    def useTanBlue():
+    def use_tan_blue():
         return SimpleGuiTheme("TanBlue")
 
     @staticmethod
-    def useDarkTanBlue():
+    def use_dark_tan_blue():
         return SimpleGuiTheme("DarkTanBlue")
 
     @staticmethod
-    def useDarkAmber():
+    def use_dark_amber():
         return SimpleGuiTheme("DarkAmber")
 
     @staticmethod
-    def useDarkBlue():
+    def use_dark_blue():
         return SimpleGuiTheme("DarkBlue")
 
     @staticmethod
-    def useReds():
+    def use_reds():
         return SimpleGuiTheme("Reds")
 
     @staticmethod
-    def useGreen():
+    def use_green():
         return SimpleGuiTheme("Green")
 
     @staticmethod
-    def useBluePurple():
+    def use_blue_purple():
         return SimpleGuiTheme("BluePurple")
 
     @staticmethod
-    def usePurple():
+    def use_purple():
         return SimpleGuiTheme("Purple")
 
     @staticmethod
-    def useBlueMono():
+    def use_blue_mono():
         return SimpleGuiTheme("BlueMono")
 
     @staticmethod
-    def useGreenMono():
+    def use_green_mono():
         return SimpleGuiTheme("GreenMono")
 
     @staticmethod
-    def useBrownBlue():
+    def use_brown_blue():
         return SimpleGuiTheme("BrownBlue")
 
     @staticmethod
-    def useBrightColors():
+    def use_bright_colors():
         return SimpleGuiTheme("BrightColors")
 
     @staticmethod
-    def useNeutralBlue():
+    def use_neutral_blue():
         return SimpleGuiTheme("NeutralBlue")
 
     @staticmethod
-    def useKayak():
+    def use_kayak():
         return SimpleGuiTheme("Kayak")
 
     @staticmethod
-    def useSandyBeach():
+    def use_sandy_beach():
         return SimpleGuiTheme("SandyBeach")
 
     @staticmethod
-    def useTealMono():
+    def use_teal_mono():
         return SimpleGuiTheme("TealMono")
 
     @staticmethod
-    def useDefault():
+    def use_default():
         return SimpleGuiTheme("Default")
 
     @staticmethod
-    def useDefault1():
+    def use_default_1():
         return SimpleGuiTheme("Default1")
 
     @staticmethod
-    def useDefaultNoMoreNagging():
+    def use_default_no_more_nagging():
         return SimpleGuiTheme("DefaultNoMoreNagging")
 
     @staticmethod
-    def useGrayGrayGray():
+    def use_gray_gray_gray():
         return SimpleGuiTheme("GrayGrayGray")
 
     @staticmethod
-    def useLightBlue():
+    def use_light_blue():
         return SimpleGuiTheme("LightBlue")
 
     @staticmethod
-    def useLightGrey():
+    def use_light_grey():
         return SimpleGuiTheme("LightGrey")
 
     @staticmethod
-    def useLightGrey1():
+    def use_light_grey_1():
         return SimpleGuiTheme("LightGrey1")
 
     @staticmethod
-    def useDarkBrown():
+    def use_dark_brown():
         return SimpleGuiTheme("DarkBrown")
 
     @staticmethod
-    def useLightGreen1():
+    def use_light_green_1():
         return SimpleGuiTheme("LightGreen1")
 
     @staticmethod
-    def useDarkGrey():
+    def use_dark_grey():
         return SimpleGuiTheme("DarkGrey")
 
     @staticmethod
-    def useLightGreen2():
+    def use_light_green_2():
         return SimpleGuiTheme("LightGreen2")
 
     @staticmethod
-    def useDarkGrey1():
+    def use_dark_grey_1():
         return SimpleGuiTheme("DarkGrey1")
 
     @staticmethod
-    def useDarkBlack():
+    def use_dark_black():
         return SimpleGuiTheme("DarkBlack")
 
     @staticmethod
-    def useLightBrown():
+    def use_light_brown():
         return SimpleGuiTheme("LightBrown")
 
     @staticmethod
-    def useLightBrown1():
+    def use_light_brown_1():
         return SimpleGuiTheme("LightBrown1")
 
     @staticmethod
-    def useDarkBlue1():
+    def use_dark_blue_1():
         return SimpleGuiTheme("DarkBlue1")
 
     @staticmethod
-    def useDarkBrown1():
+    def use_dark_brown_1():
         return SimpleGuiTheme("DarkBrown1")
 
     @staticmethod
-    def useDarkBlue2():
+    def use_dark_blue_2():
         return SimpleGuiTheme("DarkBlue2")
 
     @staticmethod
-    def useDarkBrown2():
+    def use_dark_brown_2():
         return SimpleGuiTheme("DarkBrown2")
 
     @staticmethod
-    def useDarkGreen():
+    def use_dark_green():
         return SimpleGuiTheme("DarkGreen")
 
     @staticmethod
-    def useLightBlue1():
+    def use_light_blue_1():
         return SimpleGuiTheme("LightBlue1")
 
     @staticmethod
-    def useLightPurple():
+    def use_light_purple():
         return SimpleGuiTheme("LightPurple")
 
     @staticmethod
-    def useLightBlue2():
+    def use_light_blue_2():
         return SimpleGuiTheme("LightBlue2")
 
     @staticmethod
-    def useLightGreen3():
+    def use_light_green_3():
         return SimpleGuiTheme("LightGreen3")
 
     @staticmethod
-    def useDarkBlue3():
+    def use_dark_blue_3():
         return SimpleGuiTheme("DarkBlue3")
 
     @staticmethod
-    def useLightGreen4():
+    def use_light_green_4():
         return SimpleGuiTheme("LightGreen4")
 
     @staticmethod
-    def useLightGreen5():
+    def use_light_green_5():
         return SimpleGuiTheme("LightGreen5")
 
     @staticmethod
-    def useLightBrown2():
+    def use_light_brown_2():
         return SimpleGuiTheme("LightBrown2")
 
     @staticmethod
-    def useLightBrown3():
+    def use_light_brown_3():
         return SimpleGuiTheme("LightBrown3")
 
     @staticmethod
-    def useLightBlue3():
+    def use_light_blue_3():
         return SimpleGuiTheme("LightBlue3")
 
     @staticmethod
-    def useLightBrown4():
+    def use_light_brown_4():
         return SimpleGuiTheme("LightBrown4")
 
     @staticmethod
-    def useDarkTeal():
+    def use_dark_teal():
         return SimpleGuiTheme("DarkTeal")
 
     @staticmethod
-    def useDarkPurple():
+    def use_dark_purple():
         return SimpleGuiTheme("DarkPurple")
 
     @staticmethod
-    def useLightGreen6():
+    def use_light_green_6():
         return SimpleGuiTheme("LightGreen6")
 
     @staticmethod
-    def useDarkGrey2():
+    def use_dark_grey_2():
         return SimpleGuiTheme("DarkGrey2")
 
     @staticmethod
-    def useLightBrown6():
+    def use_light_brown_6():
         return SimpleGuiTheme("LightBrown6")
 
     @staticmethod
-    def useDarkTeal1():
+    def use_dark_teal_1():
         return SimpleGuiTheme("DarkTeal1")
 
     @staticmethod
-    def useLightBrown7():
+    def use_light_brown_7():
         return SimpleGuiTheme("LightBrown7")
 
     @staticmethod
-    def useDarkPurple1():
+    def use_dark_purple_1():
         return SimpleGuiTheme("DarkPurple1")
 
     @staticmethod
-    def useDarkGrey3():
+    def use_dark_grey_3():
         return SimpleGuiTheme("DarkGrey3")
 
     @staticmethod
-    def useLightBrown8():
+    def use_light_brown_8():
         return SimpleGuiTheme("LightBrown8")
 
     @staticmethod
-    def useDarkBlue4():
+    def use_dark_blue_4():
         return SimpleGuiTheme("DarkBlue4")
 
     @staticmethod
-    def useLightBlue4():
+    def use_light_blue_4():
         return SimpleGuiTheme("LightBlue4")
 
     @staticmethod
-    def useDarkTeal2():
+    def use_dark_teal_2():
         return SimpleGuiTheme("DarkTeal2")
 
     @staticmethod
-    def useDarkTeal3():
+    def use_dark_teal_3():
         return SimpleGuiTheme("DarkTeal3")
 
     @staticmethod
-    def useDarkPurple5():
+    def use_dark_purple_5():
         return SimpleGuiTheme("DarkPurple5")
 
     @staticmethod
-    def useDarkPurple2():
+    def use_dark_purple_2():
         return SimpleGuiTheme("DarkPurple2")
 
     @staticmethod
-    def useDarkBlue5():
+    def use_dark_blue_5():
         return SimpleGuiTheme("DarkBlue5")
 
     @staticmethod
-    def useLightGrey2():
+    def use_light_grey_2():
         return SimpleGuiTheme("LightGrey2")
 
     @staticmethod
-    def useLightGrey3():
+    def use_light_grey_3():
         return SimpleGuiTheme("LightGrey3")
 
     @staticmethod
-    def useDarkBlue6():
+    def use_dark_blue_6():
         return SimpleGuiTheme("DarkBlue6")
 
     @staticmethod
-    def useDarkBlue7():
+    def use_dark_blue_7():
         return SimpleGuiTheme("DarkBlue7")
 
     @staticmethod
-    def useLightBrown9():
+    def use_light_brown_9():
         return SimpleGuiTheme("LightBrown9")
 
     @staticmethod
-    def useDarkPurple3():
+    def use_dark_purple_3():
         return SimpleGuiTheme("DarkPurple3")
 
     @staticmethod
-    def useLightBrown10():
+    def use_light_brown_10():
         return SimpleGuiTheme("LightBrown10")
 
     @staticmethod
-    def useDarkPurple4():
+    def use_dark_purple_4():
         return SimpleGuiTheme("DarkPurple4")
 
     @staticmethod
-    def useLightBlue5():
+    def use_light_blue_5():
         return SimpleGuiTheme("LightBlue5")
 
     @staticmethod
-    def useDarkTeal4():
+    def use_dark_teal_4():
         return SimpleGuiTheme("DarkTeal4")
 
     @staticmethod
-    def useLightTeal():
+    def use_light_teal():
         return SimpleGuiTheme("LightTeal")
 
     @staticmethod
-    def useDarkTeal5():
+    def use_dark_teal_5():
         return SimpleGuiTheme("DarkTeal5")
 
     @staticmethod
-    def useLightGrey4():
+    def use_light_grey_4():
         return SimpleGuiTheme("LightGrey4")
 
     @staticmethod
-    def useLightGreen7():
+    def use_light_green_7():
         return SimpleGuiTheme("LightGreen7")
 
     @staticmethod
-    def useLightGrey5():
+    def use_light_grey_5():
         return SimpleGuiTheme("LightGrey5")
 
     @staticmethod
-    def useDarkBrown3():
+    def use_dark_brown_3():
         return SimpleGuiTheme("DarkBrown3")
 
     @staticmethod
-    def useLightBrown11():
+    def use_light_brown1_1():
         return SimpleGuiTheme("LightBrown11")
 
     @staticmethod
-    def useDarkRed():
+    def use_dark_red():
         return SimpleGuiTheme("DarkRed")
 
     @staticmethod
-    def useDarkTeal6():
+    def use_dark_teal_6():
         return SimpleGuiTheme("DarkTeal6")
 
     @staticmethod
-    def useDarkBrown4():
+    def use_dark_brown_4():
         return SimpleGuiTheme("DarkBrown4")
 
     @staticmethod
-    def useLightYellow():
+    def use_light_yellow():
         return SimpleGuiTheme("LightYellow")
 
     @staticmethod
-    def useDarkGreen1():
+    def use_dark_green_1():
         return SimpleGuiTheme("DarkGreen1")
 
     @staticmethod
-    def useLightGreen8():
+    def use_light_green_8():
         return SimpleGuiTheme("LightGreen8")
 
     @staticmethod
-    def useDarkTeal7():
+    def use_dark_teal_7():
         return SimpleGuiTheme("DarkTeal7")
 
     @staticmethod
-    def useDarkBlue8():
+    def use_dark_blue_8():
         return SimpleGuiTheme("DarkBlue8")
 
     @staticmethod
-    def useDarkBlue9():
+    def use_dark_blue_9():
         return SimpleGuiTheme("DarkBlue9")
 
     @staticmethod
-    def useDarkBlue10():
+    def use_dark_blue_10():
         return SimpleGuiTheme("DarkBlue10")
 
     @staticmethod
-    def useDarkBlue11():
+    def use_dark_blue_11():
         return SimpleGuiTheme("DarkBlue11")
 
     @staticmethod
-    def useDarkTeal8():
+    def use_dark_teal_8():
         return SimpleGuiTheme("DarkTeal8")
 
     @staticmethod
-    def useDarkRed1():
+    def use_dark_red_1():
         return SimpleGuiTheme("DarkRed1")
 
     @staticmethod
-    def useLightBrown5():
+    def use_light_brown_5():
         return SimpleGuiTheme("LightBrown5")
 
     @staticmethod
-    def useLightGreen9():
+    def use_light_green_9():
         return SimpleGuiTheme("LightGreen9")
 
     @staticmethod
-    def useDarkGreen2():
+    def use_dark_green_2():
         return SimpleGuiTheme("DarkGreen2")
 
     @staticmethod
-    def useLightGray1():
+    def use_light_gray_1():
         return SimpleGuiTheme("LightGray1")
 
     @staticmethod
-    def useDarkGrey4():
+    def use_dark_grey_4():
         return SimpleGuiTheme("DarkGrey4")
 
     @staticmethod
-    def useDarkBlue12():
+    def use_dark_blue_12():
         return SimpleGuiTheme("DarkBlue12")
 
     @staticmethod
-    def useDarkPurple6():
+    def use_dark_purple_6():
         return SimpleGuiTheme("DarkPurple6")
 
     @staticmethod
-    def useDarkPurple7():
+    def use_dark_purple_7():
         return SimpleGuiTheme("DarkPurple7")
 
     @staticmethod
-    def useDarkBlue13():
+    def use_dark_blue_13():
         return SimpleGuiTheme("DarkBlue13")
 
     @staticmethod
-    def useDarkBrown5():
+    def use_dark_brown_5():
         return SimpleGuiTheme("DarkBrown5")
 
     @staticmethod
-    def useDarkGreen3():
+    def use_dark_green_3():
         return SimpleGuiTheme("DarkGreen3")
 
     @staticmethod
-    def useDarkBlack1():
+    def use_dark_black_1():
         return SimpleGuiTheme("DarkBlack1")
 
     @staticmethod
-    def useDarkGrey5():
+    def use_dark_grey_5():
         return SimpleGuiTheme("DarkGrey5")
 
     @staticmethod
-    def useLightBrown12():
+    def use_light_brown_12():
         return SimpleGuiTheme("LightBrown12")
 
     @staticmethod
-    def useDarkTeal9():
+    def use_dark_teal_9():
         return SimpleGuiTheme("DarkTeal9")
 
     @staticmethod
-    def useDarkBlue14():
+    def use_dark_blue_14():
         return SimpleGuiTheme("DarkBlue14")
 
     @staticmethod
-    def useLightBlue6():
+    def use_light_blue_6():
         return SimpleGuiTheme("LightBlue6")
 
     @staticmethod
-    def useDarkGreen4():
+    def use_dark_green_4():
         return SimpleGuiTheme("DarkGreen4")
 
     @staticmethod
-    def useDarkGreen5():
+    def use_dark_green_5():
         return SimpleGuiTheme("DarkGreen5")
 
     @staticmethod
-    def useDarkTeal10():
+    def use_dark_teal_10():
         return SimpleGuiTheme("DarkTeal10")
 
     @staticmethod
-    def useDarkGrey6():
+    def use_dark_grey_6():
         return SimpleGuiTheme("DarkGrey6")
 
     @staticmethod
-    def useDarkTeal11():
+    def use_dark_teal_11():
         return SimpleGuiTheme("DarkTeal11")
 
     @staticmethod
-    def useLightBlue7():
+    def use_light_blue_7():
         return SimpleGuiTheme("LightBlue7")
 
     @staticmethod
-    def useLightGreen10():
+    def use_light_green_10():
         return SimpleGuiTheme("LightGreen10")
 
     @staticmethod
-    def useDarkBlue15():
+    def use_dark_blue_15():
         return SimpleGuiTheme("DarkBlue15")
 
     @staticmethod
-    def useDarkBlue16():
+    def use_dark_blue_16():
         return SimpleGuiTheme("DarkBlue16")
 
     @staticmethod
-    def useDarkTeal12():
+    def use_dark_teal_12():
         return SimpleGuiTheme("DarkTeal12")
 
     @staticmethod
-    def useLightBrown13():
+    def use_light_brown_13():
         return SimpleGuiTheme("LightBrown13")
 
     @staticmethod
-    def useDarkBlue17():
+    def use_dark_blue_17():
         return SimpleGuiTheme("DarkBlue17")
 
     @staticmethod
-    def useDarkBrown6():
+    def use_dark_brown_6():
         return SimpleGuiTheme("DarkBrown6")
 
     @staticmethod
-    def useDarkGreen6():
+    def use_dark_green_6():
         return SimpleGuiTheme("DarkGreen6")
 
     @staticmethod
-    def useDarkGreen7():
+    def use_dark_green_7():
         return SimpleGuiTheme("DarkGreen7")
 
     @staticmethod
-    def useDarkGrey7():
+    def use_dark_grey_7():
         return SimpleGuiTheme("DarkGrey7")
 
     @staticmethod
-    def useDarkRed2():
+    def use_dark_red_2():
         return SimpleGuiTheme("DarkRed2")
 
     @staticmethod
-    def useLightGrey6():
+    def use_light_grey_6():
         return SimpleGuiTheme("LightGrey6")
 
     @staticmethod
-    def useHotDogStand():
+    def use_hot_dog_stand():
         return SimpleGuiTheme("HotDogStand")
 
     @staticmethod
-    def useDarkGrey8():
+    def use_dark_grey_8():
         return SimpleGuiTheme("DarkGrey8")
 
     @staticmethod
-    def useDarkGrey9():
+    def use_dark_grey_9():
         return SimpleGuiTheme("DarkGrey9")
 
     @staticmethod
-    def useDarkGrey10():
+    def use_dark_grey_10():
         return SimpleGuiTheme("DarkGrey10")
 
     @staticmethod
-    def useDarkGrey11():
+    def use_dark_grey_11():
         return SimpleGuiTheme("DarkGrey11")
 
     @staticmethod
-    def useDarkGrey12():
+    def use_dark_grey_12():
         return SimpleGuiTheme("DarkGrey12")
 
     @staticmethod
-    def useDarkGrey13():
+    def use_dark_grey_13():
         return SimpleGuiTheme("DarkGrey13")
 
     @staticmethod
-    def useDarkGrey14():
+    def use_dark_grey_14():
         return SimpleGuiTheme("DarkGrey14")
 
     @staticmethod
-    def useDarkGrey15():
+    def use_dark_grey_15():
         return SimpleGuiTheme("DarkGrey15")
 
     @staticmethod
-    def useDarkBrown7():
+    def use_dark_brown_7():
         return SimpleGuiTheme("DarkBrown7")
 
     @staticmethod
-    def usePython():
+    def use_python():
         return SimpleGuiTheme("Python")
 
     @staticmethod
-    def usePythonPlus():
+    def use_python_plus():
         return SimpleGuiTheme("PythonPlus")
 
 

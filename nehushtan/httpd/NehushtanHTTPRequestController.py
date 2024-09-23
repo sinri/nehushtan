@@ -24,7 +24,7 @@ class NehushtanHTTPRequestController:
         return self.__response_buffer
 
     @staticmethod
-    def __clean_paramter_with_regex(read_value, value_regex: str, key: str, key_type: str):
+    def __clean_parameter_with_regex(read_value, value_regex: str, key: str, key_type: str):
         if read_value is None:
             raise NehushtanRequestParameterError(
                 key,
@@ -47,14 +47,14 @@ class NehushtanHTTPRequestController:
 
     def _read_query_indispensably(self, key: tuple, value_regex: str = None):
         x = self._read_query(key)
-        return self.__clean_paramter_with_regex(x, value_regex, f'{key}', NehushtanRequestParameterError.TYPE_QUERY)
+        return self.__clean_parameter_with_regex(x, value_regex, f'{key}', NehushtanRequestParameterError.TYPE_QUERY)
 
     def _read_body(self, key: tuple, default=None):
         return CommonHelper.read_target(self._get_http_handler().parsed_body_data, key, default)
 
     def _read_body_indispensably(self, key: tuple, value_regex: str = None):
         x = self._read_body(key)
-        return self.__clean_paramter_with_regex(x, value_regex, f'{key}', NehushtanRequestParameterError.TYPE_BODY)
+        return self.__clean_parameter_with_regex(x, value_regex, f'{key}', NehushtanRequestParameterError.TYPE_BODY)
 
     def _read_header(self, key: str, default: str = None):
         return self._get_http_handler().headers.get(key, default)

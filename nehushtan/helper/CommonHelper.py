@@ -79,7 +79,7 @@ class CommonHelper:
     def class_with_module_and_name(module_base: str, sub_module_name: str):
         """
         Since 0.1.21
-        Since 0.2.19 It is not so convinence to use, consider using `class_with_class_path`.
+        Since 0.2.19 It is not so convenience to use, consider using `class_with_class_path`.
 
         For a/b.py -> class b
         module_base is a
@@ -111,7 +111,7 @@ class CommonHelper:
         Since 0.4.21
         Parameters named as `least_*` are following one rule:
         - if it is less than 0, this kind of chars would not appear;
-        - else, the total appearence count in generated password would be no less than it.
+        - else, the total appearance count in generated password would be no less than it.
         The sum of them (if less than 0, count it as 0) should not be longer than `length`.
         """
 

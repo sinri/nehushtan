@@ -28,7 +28,7 @@ class NehushtanQueueTask:
     @abstractmethod
     def execute(self):
         """
-        This works in WORKER - EMBEDED
+        This works in WORKER - EMBEDDED
 
         Need to override and fulfill
         self.done: bool
@@ -39,7 +39,7 @@ class NehushtanQueueTask:
 
     def after_execute(self):
         """
-        This works in WORKER - EMBEDED
+        This works in WORKER - EMBEDDED
         """
         self.ready_to_finish = True
         return self.ready_to_finish

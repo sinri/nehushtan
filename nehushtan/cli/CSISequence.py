@@ -121,7 +121,7 @@ class CSISequence:
         return CSISequence(f'{n}', '', 'T')
 
     @staticmethod
-    def csi_for_select_graphic_redition(sgr: Union[str, int, List[Union[str, int]]] = None):
+    def csi_for_select_graphic_rendition(sgr: Union[str, int, List[Union[str, int]]] = None):
         """
         选择图形再现（Select Graphic Rendition）
         """
