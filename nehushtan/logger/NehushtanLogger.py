@@ -240,23 +240,14 @@ class NehushtanLogger:
         if self.__print_higher_than_this_level.value < NehushtanLogLevel.FATAL.value:
             self.__adapter_with_stdout = NehushtanLoggerAdapterWithStdOut()
 
-    def _get_adapter(self) -> NehushtanLoggerAdapter:
+    def get_adapter(self) -> NehushtanLoggerAdapter:
         return self.__adapter
 
-    @staticmethod
-    def get_traceback_info_from_exception_as_array(e: BaseException) -> list[str]:
-        if CommonHelper.is_python_version_at_least(3, 10):
-            lines = traceback.format_exception(e)
-        else:
-            lines = traceback.format_exception(
-                etype=type(e),
-                value=e,
-                tb=e.__traceback__
-            )
-        return lines
+    def get_traceback_info_from_exception(self, e: BaseException) -> list[str]:
+        return self.__adapter.transform_exception(e)
 
     def write_one_log(self, level: NehushtanLogLevel, contents: dict):
-        self._get_adapter().write_one_log(level, contents)
+        self.get_adapter().write_one_log(level, contents)
         if level.value > self.__print_higher_than_this_level.value:
             self.__adapter_with_stdout.write_one_log(level, contents)
 
@@ -287,7 +278,7 @@ class NehushtanLogger:
 
     def exception(self, message: str, e: BaseException):
         level = NehushtanLogLevel.ERROR
-        traces = self._get_adapter().transform_exception(e)
+        traces = self.get_adapter().transform_exception(e)
         if level.value >= self.__log_level.value:
             contents = {
                 'message': message,
