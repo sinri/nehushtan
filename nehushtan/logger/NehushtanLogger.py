@@ -8,7 +8,7 @@ import traceback
 from abc import ABC, abstractmethod
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import Optional, List
 
 import psutil
 
@@ -243,7 +243,7 @@ class NehushtanLogger:
     def get_adapter(self) -> NehushtanLoggerAdapter:
         return self.__adapter
 
-    def get_traceback_info_from_exception(self, e: BaseException) -> list[str]:
+    def get_traceback_info_from_exception(self, e: BaseException) -> List[str]:
         return self.__adapter.transform_exception(e)
 
     def write_one_log(self, level: NehushtanLogLevel, contents: dict):
