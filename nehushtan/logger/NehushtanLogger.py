@@ -112,7 +112,7 @@ class NehushtanLoggerAdapterWithFileWriter(NehushtanLoggerAdapterWithStdOut):
     """
 
     def __init__(self,
-                 log_dir: str = None,
+                 log_dir: str,
                  categorize: bool = True,
                  date_rotate: bool = True,
                  record_millisecond=False,
@@ -121,6 +121,9 @@ class NehushtanLoggerAdapterWithFileWriter(NehushtanLoggerAdapterWithStdOut):
         super().__init__(record_millisecond=record_millisecond)
 
         self.__categorize = categorize
+
+        if log_dir is None:
+            raise Exception('NehushtanLoggerAdapterWithFileWriter: log_dir is None')
         self.__log_dir = log_dir
 
         self.__date_rotate = date_rotate
@@ -156,7 +159,7 @@ class NehushtanLoggerAdapterWithFileWriter(NehushtanLoggerAdapterWithStdOut):
 
     def __get_target_file(self):
         if self.__log_dir is None:
-            return ''
+            raise Exception('NehushtanLoggerAdapterWithFileWriter: log_dir is None')
 
         category_dir = self.__log_dir
 
@@ -182,7 +185,7 @@ class NehushtanLoggerAdapterWithFileWriter(NehushtanLoggerAdapterWithStdOut):
 
     def __get_target_file_handler(self, target_file_path: str):
         if not target_file_path:
-            return None
+            raise Exception('NehushtanLoggerAdapterWithFileWriter: target_file_path is None')
 
         if self.__keep_file_open:
             file = self.__opened_files.get(target_file_path)
