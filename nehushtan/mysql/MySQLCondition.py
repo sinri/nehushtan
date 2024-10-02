@@ -1,5 +1,5 @@
 #  Copyright (c) 2020. Sinri Edogawa
-from typing import Iterable, Union
+from typing import Iterable, Union, Optional, Tuple, List
 
 from nehushtan.mysql import constant
 from nehushtan.mysql.MySQLKit import MySQLKit
@@ -7,7 +7,9 @@ from nehushtan.mysql.MySQLKit import MySQLKit
 
 class MySQLCondition:
 
-    def __init__(self, field: str, operate: str, value: any, addition: any = None):
+    def __init__(self, field: str, operate: str, value: any, addition: any = None,
+                 field_qualifier: Optional[str] = None):
+        self._field_qualifier = field_qualifier
         self._field = field
         self._operate = operate
         self._value = value
@@ -22,95 +24,116 @@ class MySQLCondition:
                 self._value = f"concat('%',{self._value},'%')"
             # else treat as EQUAL of string
 
-    @staticmethod
-    def make_equal(field: str, value: any):
-        return MySQLCondition(field, constant.MYSQL_CONDITION_OP_EQ, value)
+    def get_field_expression(self) -> str:
+        e = f'`{self._field}`'
+        if self._field_qualifier is not None:
+            e = f'`{self._field_qualifier}`.{e}'
+        return e
 
     @staticmethod
-    def make_equal_null_safe(field: str, value: any):
-        return MySQLCondition(field, constant.MYSQL_CONDITION_OP_NULL_SAFE_EQUAL, value)
+    def make_equal(field: str, value: any, field_qualifier: Optional[str] = None):
+        return MySQLCondition(field=field, operate=constant.MYSQL_CONDITION_OP_EQ, value=value,
+                              field_qualifier=field_qualifier)
 
     @staticmethod
-    def make_not_equal(field: str, value: any):
-        return MySQLCondition(field, constant.MYSQL_CONDITION_OP_NEQ, value)
+    def make_equal_null_safe(field: str, value: any, field_qualifier: Optional[str] = None):
+        return MySQLCondition(field=field, operate=constant.MYSQL_CONDITION_OP_NULL_SAFE_EQUAL, value=value,
+                              field_qualifier=field_qualifier)
 
     @staticmethod
-    def make_in_array(field: str, array: Union[tuple, list]):
-        return MySQLCondition(field, constant.MYSQL_CONDITION_OP_IN, array)
+    def make_not_equal(field: str, value: any, field_qualifier: Optional[str] = None):
+        return MySQLCondition(field=field, operate=constant.MYSQL_CONDITION_OP_NEQ, value=value,
+                              field_qualifier=field_qualifier)
 
     @staticmethod
-    def make_not_in_array(field: str, array: Union[tuple, list]):
-        return MySQLCondition(field, constant.MYSQL_CONDITION_OP_NOT_IN, array)
+    def make_in_array(field: str, array: Union[tuple, list], field_qualifier: Optional[str] = None):
+        return MySQLCondition(field=field, operate=constant.MYSQL_CONDITION_OP_IN, value=array,
+                              field_qualifier=field_qualifier)
 
     @staticmethod
-    def make_greater_than(field: str, value: any):
-        return MySQLCondition(field, constant.MYSQL_CONDITION_OP_GT, value)
+    def make_not_in_array(field: str, array: Union[tuple, list], field_qualifier: Optional[str] = None):
+        return MySQLCondition(field=field, operate=constant.MYSQL_CONDITION_OP_NOT_IN, value=array,
+                              field_qualifier=field_qualifier)
 
     @staticmethod
-    def make_equal_or_greater_than(field: str, value: any):
-        return MySQLCondition(field, constant.MYSQL_CONDITION_OP_EGT, value)
+    def make_greater_than(field: str, value: any, field_qualifier: Optional[str] = None):
+        return MySQLCondition(field=field, operate=constant.MYSQL_CONDITION_OP_GT, value=value,
+                              field_qualifier=field_qualifier)
 
     @staticmethod
-    def make_less_than(field: str, value: any):
-        return MySQLCondition(field, constant.MYSQL_CONDITION_OP_LT, value)
+    def make_equal_or_greater_than(field: str, value: any, field_qualifier: Optional[str] = None):
+        return MySQLCondition(field=field, operate=constant.MYSQL_CONDITION_OP_EGT, value=value,
+                              field_qualifier=field_qualifier)
 
     @staticmethod
-    def make_equal_or_less_than(field: str, value: any):
-        return MySQLCondition(field, constant.MYSQL_CONDITION_OP_ELT, value)
+    def make_less_than(field: str, value: any, field_qualifier: Optional[str] = None):
+        return MySQLCondition(field=field, operate=constant.MYSQL_CONDITION_OP_LT, value=value,
+                              field_qualifier=field_qualifier)
 
     @staticmethod
-    def make_is_null(field: str):
-        return MySQLCondition(field, constant.MYSQL_CONDITION_OP_IS, constant.MYSQL_CONDITION_CONST_NULL)
+    def make_equal_or_less_than(field: str, value: any, field_qualifier: Optional[str] = None):
+        return MySQLCondition(field=field, operate=constant.MYSQL_CONDITION_OP_ELT, value=value,
+                              field_qualifier=field_qualifier)
 
     @staticmethod
-    def make_is_not_null(field: str):
-        return MySQLCondition(field, constant.MYSQL_CONDITION_OP_IS_NOT, constant.MYSQL_CONDITION_CONST_NULL)
+    def make_is_null(field: str, field_qualifier: Optional[str] = None):
+        return MySQLCondition(field=field, operate=constant.MYSQL_CONDITION_OP_IS,
+                              value=constant.MYSQL_CONDITION_CONST_NULL, field_qualifier=field_qualifier)
 
     @staticmethod
-    def make_between(field: str, left, right):
-        return MySQLCondition(field, constant.MYSQL_CONDITION_OP_BETWEEN, (left, right))
+    def make_is_not_null(field: str, field_qualifier: Optional[str] = None):
+        return MySQLCondition(field=field, operate=constant.MYSQL_CONDITION_OP_IS_NOT,
+                              value=constant.MYSQL_CONDITION_CONST_NULL, field_qualifier=field_qualifier)
 
     @staticmethod
-    def make_not_between(field: str, left, right):
-        return MySQLCondition(field, constant.MYSQL_CONDITION_OP_NOT_BETWEEN, (left, right))
+    def make_between(field: str, left, right, field_qualifier: Optional[str] = None):
+        return MySQLCondition(field=field, operate=constant.MYSQL_CONDITION_OP_BETWEEN, value=(left, right),
+                              field_qualifier=field_qualifier)
 
     @staticmethod
-    def make_string_with_prefix(field: str, prefix: str):
-        return MySQLCondition(field, constant.MYSQL_CONDITION_OP_LIKE, prefix,
-                              constant.MYSQL_CONDITION_LIKE_RIGHT_WILDCARD)
+    def make_not_between(field: str, left, right, field_qualifier: Optional[str] = None):
+        return MySQLCondition(field=field, operate=constant.MYSQL_CONDITION_OP_NOT_BETWEEN, value=(left, right),
+                              field_qualifier=field_qualifier)
 
     @staticmethod
-    def make_string_with_suffix(field: str, suffix: str):
-        return MySQLCondition(field, constant.MYSQL_CONDITION_OP_LIKE, suffix,
-                              constant.MYSQL_CONDITION_LIKE_LEFT_WILDCARD)
+    def make_string_with_prefix(field: str, prefix: str, field_qualifier: Optional[str] = None):
+        return MySQLCondition(field=field, operate=constant.MYSQL_CONDITION_OP_LIKE, value=prefix,
+                              addition=constant.MYSQL_CONDITION_LIKE_RIGHT_WILDCARD, field_qualifier=field_qualifier)
 
     @staticmethod
-    def make_string_contains(field: str, sub_string: str):
-        return MySQLCondition(field, constant.MYSQL_CONDITION_OP_LIKE, sub_string,
-                              constant.MYSQL_CONDITION_LIKE_BOTH_WILDCARD)
+    def make_string_with_suffix(field: str, suffix: str, field_qualifier: Optional[str] = None):
+        return MySQLCondition(field=field, operate=constant.MYSQL_CONDITION_OP_LIKE, value=suffix,
+                              addition=constant.MYSQL_CONDITION_LIKE_LEFT_WILDCARD, field_qualifier=field_qualifier)
 
     @staticmethod
-    def make_string_without_prefix(field: str, prefix: str):
-        return MySQLCondition(field, constant.MYSQL_CONDITION_OP_NOT_LIKE, prefix,
-                              constant.MYSQL_CONDITION_LIKE_RIGHT_WILDCARD)
+    def make_string_contains(field: str, sub_string: str, field_qualifier: Optional[str] = None):
+        return MySQLCondition(field=field, operate=constant.MYSQL_CONDITION_OP_LIKE, value=sub_string,
+                              addition=constant.MYSQL_CONDITION_LIKE_BOTH_WILDCARD, field_qualifier=field_qualifier)
 
     @staticmethod
-    def make_string_without_suffix(field: str, suffix: str):
-        return MySQLCondition(field, constant.MYSQL_CONDITION_OP_NOT_LIKE, suffix,
-                              constant.MYSQL_CONDITION_LIKE_LEFT_WILDCARD)
+    def make_string_without_prefix(field: str, prefix: str, field_qualifier: Optional[str] = None):
+        return MySQLCondition(field=field, operate=constant.MYSQL_CONDITION_OP_NOT_LIKE, value=prefix,
+                              addition=constant.MYSQL_CONDITION_LIKE_RIGHT_WILDCARD, field_qualifier=field_qualifier)
 
     @staticmethod
-    def make_string_contains_not(field: str, sub_string: str):
-        return MySQLCondition(field, constant.MYSQL_CONDITION_OP_NOT_LIKE, sub_string,
-                              constant.MYSQL_CONDITION_LIKE_BOTH_WILDCARD)
+    def make_string_without_suffix(field: str, suffix: str, field_qualifier: Optional[str] = None):
+        return MySQLCondition(field=field, operate=constant.MYSQL_CONDITION_OP_NOT_LIKE, value=suffix,
+                              addition=constant.MYSQL_CONDITION_LIKE_LEFT_WILDCARD, field_qualifier=field_qualifier)
 
     @staticmethod
-    def make_string_is_null_or_empty(field: str):
-        return MySQLCondition(field, constant.MYSQL_CONDITION_MACRO_IS_NULL_OR_EMPTY_STRING, None)
+    def make_string_contains_not(field: str, sub_string: str, field_qualifier: Optional[str] = None):
+        return MySQLCondition(field=field, operate=constant.MYSQL_CONDITION_OP_NOT_LIKE, value=sub_string,
+                              addition=constant.MYSQL_CONDITION_LIKE_BOTH_WILDCARD, field_qualifier=field_qualifier)
 
     @staticmethod
-    def make_string_is_not_null_nor_empty(field: str):
-        return MySQLCondition(field, constant.MYSQL_CONDITION_MACRO_IS_NOT_NULL_NOR_EMPTY_STRING, None)
+    def make_string_is_null_or_empty(field: str, field_qualifier: Optional[str] = None):
+        return MySQLCondition(field=field, operate=constant.MYSQL_CONDITION_MACRO_IS_NULL_OR_EMPTY_STRING, value=None,
+                              field_qualifier=field_qualifier)
+
+    @staticmethod
+    def make_string_is_not_null_nor_empty(field: str, field_qualifier: Optional[str] = None):
+        return MySQLCondition(field=field, operate=constant.MYSQL_CONDITION_MACRO_IS_NOT_NULL_NOR_EMPTY_STRING,
+                              value=None, field_qualifier=field_qualifier)
 
     @staticmethod
     def make_and(conditions: Iterable["MySQLCondition"]):
@@ -149,7 +172,7 @@ class MySQLCondition:
                 constant.MYSQL_CONDITION_OP_NEQ,
                 constant.MYSQL_CONDITION_OP_NULL_SAFE_EQUAL,
         ).__contains__(self._operate):
-            return f"`{self._field}` {self._operate} " + MySQLKit.quote_offline(self._value)
+            return f"`{self.get_field_expression()}` {self._operate} " + MySQLKit.quote_offline(self._value)
 
         elif (
                 constant.MYSQL_CONDITION_OP_IS,
@@ -160,7 +183,7 @@ class MySQLCondition:
                     constant.MYSQL_CONDITION_CONST_FALSE,
                     constant.MYSQL_CONDITION_CONST_NULL,
             ).__contains__(self._value):
-                return f"`{self._field}` {self._operate} {self._value}"
+                return f"`{self.get_field_expression()}` {self._operate} {self._value}"
             else:
                 raise Exception("YOU MUST USE CONSTANT FOR IS COMPARISON!")
 
@@ -174,7 +197,7 @@ class MySQLCondition:
                 x = []
                 for item in self._value:
                     x.append(MySQLKit.quote_offline(item))
-                return f"`{self._field}` {self._operate} ({','.join(x)})"
+                return f"`{self.get_field_expression()}` {self._operate} ({','.join(x)})"
             else:
                 raise Exception("YOU MUST USE AN ARRAY FOR IN!")
 
@@ -182,7 +205,7 @@ class MySQLCondition:
                 constant.MYSQL_CONDITION_OP_LIKE,
                 constant.MYSQL_CONDITION_OP_NOT_LIKE,
         ).__contains__(self._operate):
-            return f"`{self._field}` {self._operate} {self._value}"
+            return f"`{self.get_field_expression()}` {self._operate} {self._value}"
 
         elif (
                 constant.MYSQL_CONDITION_OP_BETWEEN,
@@ -193,7 +216,7 @@ class MySQLCondition:
                     raise Exception("NOT ENOUGH VALUES TO TEST IN BETWEEN!")
                 left = MySQLKit.quote_offline(self._value[0])
                 right = MySQLKit.quote_offline(self._value[1])
-                return f"`{self._field}` {self._operate} {left} AND {right}"
+                return f"`{self.get_field_expression()}` {self._operate} {left} AND {right}"
             else:
                 raise Exception("YOU MUST USE AN ARRAY FOR BETWEEN!")
 
@@ -225,10 +248,10 @@ class MySQLCondition:
                 raise Exception("YOU MUST USE AN ARRAY FOR CONDITIONS!")
 
         elif self._operate == constant.MYSQL_CONDITION_MACRO_IS_NULL_OR_EMPTY_STRING:
-            return f"(`{self._field}` IS NULL OR `{self._field}` = '')"
+            return f"(`{self.get_field_expression()}` IS NULL OR `{self.get_field_expression()}` = '')"
 
         elif self._operate == constant.MYSQL_CONDITION_MACRO_IS_NOT_NULL_NOR_EMPTY_STRING:
-            return f"(`{self._field}` IS NOT NULL AND `{self._field}` <> '')"
+            return f"(`{self.get_field_expression()}` IS NOT NULL AND `{self.get_field_expression()}` <> '')"
 
         elif self._operate == constant.MYSQL_CONDITION_MACRO_RAW_EXPRESSION:
             return self._value
@@ -250,3 +273,30 @@ class MySQLCondition:
             return "1=1"
         else:
             return " AND ".join(parts)
+
+
+class MySQLJoinOnCondition:
+    def __init__(self, left_field_expression: str, right_field_expression: str):
+        self.__left_field_expression = left_field_expression
+        self.__right_field_expression = right_field_expression
+
+    def __str__(self):
+        return self.organize_to_sql()
+
+    def organize_to_sql(self):
+        return self.__left_field_expression + " = " + self.__right_field_expression
+
+    @staticmethod
+    def make_field_equal(left: Iterable[str], right: Iterable[str]):
+        """
+        Provide `left` and `right` each as
+            1) a string for table name (alias);
+        or  2) a tuple of two strings, for schema and table names (aliases).
+        """
+        left_field_expression = '`' + '`.`'.join(left) + '`'
+        right_field_expression = '`' + '`.`'.join(right) + '`'
+
+        return MySQLJoinOnCondition(
+            left_field_expression=left_field_expression,
+            right_field_expression=right_field_expression,
+        )
