@@ -172,7 +172,7 @@ class MySQLCondition:
                 constant.MYSQL_CONDITION_OP_NEQ,
                 constant.MYSQL_CONDITION_OP_NULL_SAFE_EQUAL,
         ).__contains__(self._operate):
-            return f"`{self.get_field_expression()}` {self._operate} " + MySQLKit.quote_offline(self._value)
+            return f"{self.get_field_expression()} {self._operate} " + MySQLKit.quote_offline(self._value)
 
         elif (
                 constant.MYSQL_CONDITION_OP_IS,
@@ -183,7 +183,7 @@ class MySQLCondition:
                     constant.MYSQL_CONDITION_CONST_FALSE,
                     constant.MYSQL_CONDITION_CONST_NULL,
             ).__contains__(self._value):
-                return f"`{self.get_field_expression()}` {self._operate} {self._value}"
+                return f"{self.get_field_expression()} {self._operate} {self._value}"
             else:
                 raise Exception("YOU MUST USE CONSTANT FOR IS COMPARISON!")
 
@@ -197,7 +197,7 @@ class MySQLCondition:
                 x = []
                 for item in self._value:
                     x.append(MySQLKit.quote_offline(item))
-                return f"`{self.get_field_expression()}` {self._operate} ({','.join(x)})"
+                return f"{self.get_field_expression()} {self._operate} ({','.join(x)})"
             else:
                 raise Exception("YOU MUST USE AN ARRAY FOR IN!")
 
@@ -205,7 +205,7 @@ class MySQLCondition:
                 constant.MYSQL_CONDITION_OP_LIKE,
                 constant.MYSQL_CONDITION_OP_NOT_LIKE,
         ).__contains__(self._operate):
-            return f"`{self.get_field_expression()}` {self._operate} {self._value}"
+            return f"{self.get_field_expression()} {self._operate} {self._value}"
 
         elif (
                 constant.MYSQL_CONDITION_OP_BETWEEN,
@@ -216,7 +216,7 @@ class MySQLCondition:
                     raise Exception("NOT ENOUGH VALUES TO TEST IN BETWEEN!")
                 left = MySQLKit.quote_offline(self._value[0])
                 right = MySQLKit.quote_offline(self._value[1])
-                return f"`{self.get_field_expression()}` {self._operate} {left} AND {right}"
+                return f"{self.get_field_expression()} {self._operate} {left} AND {right}"
             else:
                 raise Exception("YOU MUST USE AN ARRAY FOR BETWEEN!")
 
@@ -248,10 +248,10 @@ class MySQLCondition:
                 raise Exception("YOU MUST USE AN ARRAY FOR CONDITIONS!")
 
         elif self._operate == constant.MYSQL_CONDITION_MACRO_IS_NULL_OR_EMPTY_STRING:
-            return f"(`{self.get_field_expression()}` IS NULL OR `{self.get_field_expression()}` = '')"
+            return f"({self.get_field_expression()} IS NULL OR {self.get_field_expression()} = '')"
 
         elif self._operate == constant.MYSQL_CONDITION_MACRO_IS_NOT_NULL_NOR_EMPTY_STRING:
-            return f"(`{self.get_field_expression()}` IS NOT NULL AND `{self.get_field_expression()}` <> '')"
+            return f"({self.get_field_expression()} IS NOT NULL AND {self.get_field_expression()} <> '')"
 
         elif self._operate == constant.MYSQL_CONDITION_MACRO_RAW_EXPRESSION:
             return self._value
