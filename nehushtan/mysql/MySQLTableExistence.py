@@ -3,15 +3,16 @@
 from abc import abstractmethod, ABC
 
 from nehushtan.mysql.MySQLKit import MySQLKit
+from nehushtan.mysql.MySQLSelectionMixin import MySQLSelectionTarget
 
 
-class MySQLTableExistence(ABC):
+class MySQLTableExistence(MySQLSelectionTarget, ABC):
 
     def __init__(self):
         """
         Since 0.2.17 Remove `self._mysql_kit`, it is not defined here anymore
         """
-        pass
+        super().__init__()
 
     @abstractmethod
     def get_mysql_kit(self) -> MySQLKit:
@@ -31,3 +32,9 @@ class MySQLTableExistence(ABC):
             e += f'`{self.mapping_schema_name()}`.'
         e += f'`{self.mapping_table_name()}`'
         return e
+
+    def as_selection_target(self) -> str:
+        """
+        Since 0.5.8
+        """
+        return self.get_table_expression()

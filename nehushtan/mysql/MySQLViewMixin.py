@@ -2,6 +2,8 @@ import time
 from abc import ABC
 from typing import Optional
 
+from requests.packages import target
+
 from nehushtan.mysql.MySQLTableExistence import MySQLTableExistence
 from nehushtan.mysql.MySQLTableSelection import MySQLTableSelection
 
@@ -21,4 +23,7 @@ class MySQLViewMixin(MySQLTableExistence, ABC):
         return time.strftime("%Y-%m-%d", time.localtime())
 
     def select_in_table(self, alias: Optional[str] = None):
-        return MySQLTableSelection(model=self, alias=alias)
+        return MySQLTableSelection(
+            target=self
+            #    model=self, alias=alias
+        )

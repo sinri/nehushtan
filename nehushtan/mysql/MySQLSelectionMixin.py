@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 
 import pymysql
 from pymysql.cursors import SSDictCursor, SSCursor
@@ -6,6 +6,23 @@ from pymysql.cursors import SSDictCursor, SSCursor
 from nehushtan.mysql import constant
 from nehushtan.mysql.MySQLKit import MySQLKit
 from nehushtan.mysql.MySQLQueryResult import MySQLQueryResult
+
+
+class MySQLSelectionTarget(ABC):
+    """
+    Since 0.5.8
+    """
+
+    def __init__(self):
+        pass
+
+    @abstractmethod
+    def get_mysql_kit(self) -> MySQLKit:
+        pass
+
+    @abstractmethod
+    def as_selection_target(self) -> str:
+        pass
 
 
 class MySQLSelectionMixin:

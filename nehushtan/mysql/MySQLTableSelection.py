@@ -1,10 +1,93 @@
 #  Copyright (c) 2020. Sinri Edogawa
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Union, List
 
 from nehushtan.mysql.MySQLCondition import MySQLCondition, MySQLJoinOnCondition
 from nehushtan.mysql.MySQLKit import MySQLKit
-from nehushtan.mysql.MySQLSelectionMixin import MySQLSelectionMixin
+from nehushtan.mysql.MySQLSelectionMixin import MySQLSelectionMixin, MySQLSelectionTarget
 from nehushtan.mysql.MySQLTableExistence import MySQLTableExistence
+
+
+class MySQLJoinedTables(MySQLSelectionTarget):
+    def __init__(self):
+        super().__init__()
+        self.__join_target_list = []
+        self.__db: Optional[MySQLKit] = None
+
+    def add_join_target(self,
+                        join_type: str,
+                        target: Union[MySQLSelectionMixin, MySQLTableExistence],
+                        alias: Optional[str] = None,
+                        on_conditions: Optional[List[MySQLJoinOnCondition]] = None,
+                        index_hint: Optional[str] = None,
+                        ):
+        db = target.get_mysql_kit()
+        if db is not None:
+            self.__db = db
+
+        x = join_type + " "
+        if isinstance(target, MySQLTableExistence):
+            x += target.get_table_expression()
+        elif isinstance(target, MySQLSelectionMixin):
+            x += target.generate_sql()
+        else:
+            raise TypeError(
+                'target for nehushtan.mysql.MySQLJoinSelection.MySQLJoinSelection.add_join_target should not be this')
+
+        if alias is not None:
+            x += ' as `' + alias + '`'
+
+        if index_hint is not None:
+            x += ' ' + index_hint
+
+        if on_conditions is not None and len(on_conditions) > 0:
+            a = []
+            for condition in on_conditions:
+                a.append(condition.organize_to_sql())
+            x += ' on ' + ' and '.join(a)
+
+        self.__join_target_list.append(x)
+        return self
+
+    def based_on(self,
+                 target: Union[MySQLSelectionMixin, MySQLTableExistence],
+                 alias: Optional[str] = None,
+                 index_hint: Optional[str] = None,
+                 ):
+        return self.add_join_target(join_type='',
+                                    target=target, alias=alias,
+                                    on_conditions=None,
+                                    index_hint=index_hint)
+
+    def left_join(self,
+                  target: Union[MySQLSelectionMixin, MySQLTableExistence],
+                  alias: Optional[str] = None,
+                  index_hint: Optional[str] = None,
+                  on_conditions: Optional[List[MySQLJoinOnCondition]] = None,
+                  ):
+        return self.add_join_target(join_type='LEFT JOIN',
+                                    target=target, alias=alias,
+                                    on_conditions=on_conditions,
+                                    index_hint=index_hint)
+
+    def inner_join(self,
+                   target: Union[MySQLSelectionMixin, MySQLTableExistence],
+                   alias: Optional[str] = None,
+                   index_hint: Optional[str] = None,
+                   on_conditions: Optional[List[MySQLJoinOnCondition]] = None,
+                   ):
+        return self.add_join_target(join_type='INNER JOIN',
+                                    target=target, alias=alias,
+                                    on_conditions=on_conditions,
+                                    index_hint=index_hint)
+
+    def get_mysql_kit(self) -> MySQLKit:
+        return self.__db
+
+    def as_selection_target(self) -> str:
+        return ' '.join(self.__join_target_list)
+
+    def select_in_joined_tables(self):
+        return MySQLTableSelection(target=self, )
 
 
 class MySQLTableSelection(MySQLSelectionMixin):
@@ -12,12 +95,16 @@ class MySQLTableSelection(MySQLSelectionMixin):
     As of version 0.3.6, move some features to MySQLSelectionMixin
     """
 
-    def __init__(self, model: MySQLTableExistence, alias: Optional[str] = None):
+    def __init__(self,
+                 target: MySQLSelectionTarget,
+                 # model: MySQLTableExistence, alias: Optional[str] = None,
+                 ):
         super().__init__()
-        self._model = model
-        self._alias = alias
+        # self._model = model
+        # self._alias = alias
+        self._target = target
         self._select_fields = []
-        self._join_metas = []
+        # self._join_metas = []
         self._conditions = []
         self._group_by_fields = []
         self._sort_expression = ''
@@ -29,7 +116,7 @@ class MySQLTableSelection(MySQLSelectionMixin):
         self._for_update = False
 
     def get_mysql_kit(self) -> MySQLKit:
-        return self._model.get_mysql_kit()
+        return self._target.get_mysql_kit()
 
     def get_limit(self) -> int:
         return self._limit
@@ -69,58 +156,58 @@ class MySQLTableSelection(MySQLSelectionMixin):
             self._select_fields.append(item)
         return self
 
-    def add_left_join_table(self, table_name: str, schema_name: Optional[str] = None,
-                            alias: Optional[str] = None,
-                            on_conditions: Optional[Iterable[MySQLJoinOnCondition]] = None, ):
-        return self._add_join_table(join_type="LEFT JOIN", table_name=table_name, schema_name=schema_name, alias=alias,
-                                    on_conditions=on_conditions)
+    # def add_left_join_table(self, table_name: str, schema_name: Optional[str] = None,
+    #                         alias: Optional[str] = None,
+    #                         on_conditions: Optional[Iterable[MySQLJoinOnCondition]] = None, ):
+    #     return self._add_join_table(join_type="LEFT JOIN", table_name=table_name, schema_name=schema_name, alias=alias,
+    #                                 on_conditions=on_conditions)
+    #
+    # def add_inner_join_table(self, table_name: str, schema_name: Optional[str] = None,
+    #                          alias: Optional[str] = None,
+    #                          on_conditions: Optional[Iterable[MySQLJoinOnCondition]] = None, ):
+    #     return self._add_join_table(join_type="INNER JOIN", table_name=table_name, schema_name=schema_name, alias=alias,
+    #                                 on_conditions=on_conditions)
 
-    def add_inner_join_table(self, table_name: str, schema_name: Optional[str] = None,
-                             alias: Optional[str] = None,
-                             on_conditions: Optional[Iterable[MySQLJoinOnCondition]] = None, ):
-        return self._add_join_table(join_type="INNER JOIN", table_name=table_name, schema_name=schema_name, alias=alias,
-                                    on_conditions=on_conditions)
+    # def _add_join_table(self, join_type: str, table_name: str, schema_name: Optional[str] = None,
+    #                     alias: Optional[str] = None, on_conditions: Optional[Iterable[MySQLJoinOnCondition]] = None, ):
+    #     e = f'`{table_name}`'
+    #     if schema_name is not None:
+    #         e = f'`{schema_name}`.{e}'
+    #     if alias is not None:
+    #         e = f'{e} as `{alias}`'
+    #     c = ''
+    #     if on_conditions is not None:
+    #         c_array = []
+    #         for condition in on_conditions:
+    #             c_array.append(f'({condition.organize_to_sql()})')
+    #         c_c = ' AND '.join(c_array)
+    #         c = f' ON {c_c}'
+    #
+    #     j = f'{join_type} {e}{c}'
+    #
+    #     self._join_metas.append(j)
+    #     return self
 
-    def _add_join_table(self, join_type: str, table_name: str, schema_name: Optional[str] = None,
-                        alias: Optional[str] = None, on_conditions: Optional[Iterable[MySQLJoinOnCondition]] = None, ):
-        e = f'`{table_name}`'
-        if schema_name is not None:
-            e = f'`{schema_name}`.{e}'
-        if alias is not None:
-            e = f'{e} as `{alias}`'
-        c = ''
-        if on_conditions is not None:
-            c_array = []
-            for condition in on_conditions:
-                c_array.append(f'({condition.organize_to_sql()})')
-            c_c = ' AND '.join(c_array)
-            c = f' ON {c_c}'
-
-        j = f'{join_type} {e}{c}'
-
-        self._join_metas.append(j)
-        return self
-
-    def add_left_join_sub_query(self, selection: MySQLSelectionMixin, alias: str,
-                                on_conditions: Optional[Iterable[MySQLJoinOnCondition]] = None, ):
-        return self._add_join_sub_query("LEFT JOIN", selection=selection, alias=alias, on_conditions=on_conditions)
-
-    def add_inner_join_sub_query(self, selection: MySQLSelectionMixin, alias: str,
-                                 on_conditions: Optional[Iterable[MySQLJoinOnCondition]] = None, ):
-        return self._add_join_sub_query("INNER JOIN", selection=selection, alias=alias, on_conditions=on_conditions)
-
-    def _add_join_sub_query(self, join_type: str, selection: MySQLSelectionMixin, alias: str,
-                            on_conditions: Optional[Iterable[MySQLJoinOnCondition]] = None, ):
-        c = ''
-        if on_conditions is not None:
-            c_array = []
-            for condition in on_conditions:
-                c_array.append(f'({condition.organize_to_sql()})')
-            c_c = ' AND '.join(c_array)
-            c = f' ON {c_c}'
-        j = f'{join_type} ({selection.generate_sql()}) as `{alias}`{c}'
-        self._join_metas.append(j)
-        return self
+    # def add_left_join_sub_query(self, selection: MySQLSelectionMixin, alias: str,
+    #                             on_conditions: Optional[Iterable[MySQLJoinOnCondition]] = None, ):
+    #     return self._add_join_sub_query("LEFT JOIN", selection=selection, alias=alias, on_conditions=on_conditions)
+    #
+    # def add_inner_join_sub_query(self, selection: MySQLSelectionMixin, alias: str,
+    #                              on_conditions: Optional[Iterable[MySQLJoinOnCondition]] = None, ):
+    #     return self._add_join_sub_query("INNER JOIN", selection=selection, alias=alias, on_conditions=on_conditions)
+    #
+    # def _add_join_sub_query(self, join_type: str, selection: MySQLSelectionMixin, alias: str,
+    #                         on_conditions: Optional[Iterable[MySQLJoinOnCondition]] = None, ):
+    #     c = ''
+    #     if on_conditions is not None:
+    #         c_array = []
+    #         for condition in on_conditions:
+    #             c_array.append(f'({condition.organize_to_sql()})')
+    #         c_c = ' AND '.join(c_array)
+    #         c = f' ON {c_c}'
+    #     j = f'{join_type} ({selection.generate_sql()}) as `{alias}`{c}'
+    #     self._join_metas.append(j)
+    #     return self
 
     def add_condition(self, condition: MySQLCondition):
         self._conditions.append(condition)
@@ -171,10 +258,12 @@ class MySQLTableSelection(MySQLSelectionMixin):
         self._for_update = value
 
     def generate_sql(self) -> str:
-        table = self._model.get_table_expression()
+        # table = self._model.get_table_expression()
+        #
+        # if self._alias is not None:
+        #     table += f' AS `{self._alias}` '
 
-        if self._alias is not None:
-            table += f' AS `{self._alias}` '
+        target = self._target.as_selection_target()
 
         fields = "*"
         if len(self._select_fields) > 0:
@@ -182,17 +271,21 @@ class MySQLTableSelection(MySQLSelectionMixin):
 
         condition_sql = MySQLCondition.build_sql_component(self._conditions)
 
-        indices = ''
-        if len(self._use_indices) > 0:
-            indices += " USE INDEX (" + ",".join(self._use_indices) + ") "
-        if len(self._force_indices) > 0:
-            indices += " FORCE INDEX (" + ",".join(self._force_indices) + ") "
-        if len(self._ignore_indices) > 0:
-            indices += " IGNORE INDEX (" + ",".join(self._force_indices) + ") "
+        if isinstance(self._target, MySQLTableExistence):
+            indices = ''
+            if len(self._use_indices) > 0:
+                indices += " USE INDEX (" + ",".join(self._use_indices) + ") "
+            if len(self._force_indices) > 0:
+                indices += " FORCE INDEX (" + ",".join(self._force_indices) + ") "
+            if len(self._ignore_indices) > 0:
+                indices += " IGNORE INDEX (" + ",".join(self._force_indices) + ") "
+            target += indices
 
-        joins = ' '.join(self._join_metas)
+        # joins = ' '.join(self._join_metas)
 
-        sql = f"SELECT {fields} FROM {table} {indices} {joins} WHERE {condition_sql} "
+        # sql = f"SELECT {fields} FROM {table} {indices} {joins} WHERE {condition_sql} "
+
+        sql = f"SELECT {fields} FROM {target} WHERE {condition_sql} "
 
         if len(self._group_by_fields) > 0:
             sql += "GROUP BY " + ",".join(self._group_by_fields) + " "
