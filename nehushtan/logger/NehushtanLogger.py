@@ -228,11 +228,13 @@ class NehushtanLogger:
                  adapter: NehushtanLoggerAdapter = NehushtanLoggerAdapterWithStdOut(),
                  log_level: NehushtanLogLevel = NehushtanLogLevel.DEBUG,
                  print_higher_than_this_level: NehushtanLogLevel = NehushtanLogLevel.CRITICAL,
+                 default_context: Optional[dict] = None,
                  ):
         self.__topic = topic
         self.__adapter = adapter
         self.__adapter.set_topic(topic)
         self.__log_level = log_level
+        self.__default_context = default_context
 
         # self.print_as_well = print_as_well <-- should use print_higher_than_this_level=NehushtanLogging.NOTSET
         # If all, use NOTSET; if none, use FATAL
@@ -247,6 +249,18 @@ class NehushtanLogger:
         return self.__adapter.transform_exception(e)
 
     def write_one_log(self, level: NehushtanLogLevel, contents: dict):
+        if self.__default_context is not None:
+            context = contents.get('context')
+            if context is None:
+                contents['context'] = self.__default_context
+            else:
+                if isinstance(context, dict):
+                    c = {}
+                    c.update(self.__default_context)
+                    c.update(context)
+                    contents['context'] = c
+                else:
+                    pass
         self.get_adapter().write_one_log(level, contents)
         if level.value > self.__print_higher_than_this_level.value:
             self.__adapter_with_stdout.write_one_log(level, contents)
