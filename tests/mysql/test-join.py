@@ -1,11 +1,8 @@
-from dataclasses import field
-
-from docutils.nodes import target
-
 from nehushtan.mysql.MySQLAnyTable import MySQLAnyTable
-from nehushtan.mysql.MySQLCondition import MySQLCondition, MySQLJoinOnCondition
+from nehushtan.mysql.MySQLCondition import MySQLCondition
+from nehushtan.mysql.MySQLJoinOnCondition import MySQLJoinOnCondition
 from nehushtan.mysql.MySQLKit import MySQLKit
-from nehushtan.mysql.MySQLTableSelection import MySQLJoinedTables
+from nehushtan.mysql.MySQLJoinedTables import MySQLJoinedTables
 
 db = MySQLKit(None)
 
