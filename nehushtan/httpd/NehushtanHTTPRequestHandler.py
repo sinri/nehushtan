@@ -83,10 +83,10 @@ class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
     def prepare_body(self, body_charset=None):
         length = int(self.headers.get('content-length', 0))
         self.raw_body = self.rfile.read(length)
-        print(self.raw_body)
+        # print(self.raw_body)
 
         content_type = self.headers.get('content-type', 'text/plain')
-        print(content_type)
+        # print(content_type)
 
         if body_charset is None:
             found_charset = re.search(r'charset=(.+);?', content_type, re.I)
@@ -95,9 +95,9 @@ class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
             else:
                 body_charset = 'utf-8'
 
-        print(body_charset)
+        # print(body_charset)
         self.raw_body = self.raw_body.decode(body_charset)
-        print(self.raw_body)
+        # print(self.raw_body)
 
         if content_type.startswith('application/x-www-form-urlencoded'):
             parsed_body_dict = parse_qs(self.raw_body)
@@ -117,7 +117,7 @@ class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
         else:
             self.parsed_body_data = None
 
-        print(self.parsed_body_data, self.parsed_body_data.get('a', 'c'))
+        # print(self.parsed_body_data, self.parsed_body_data.get('a', 'c'))
 
     def do_HEAD(self):
         """
