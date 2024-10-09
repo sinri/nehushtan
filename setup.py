@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='nehushtan',
-    version='0.5.13',
+    version='0.5.14',
     packages=find_packages(
         exclude=['tests', 'tests.*']
     ),

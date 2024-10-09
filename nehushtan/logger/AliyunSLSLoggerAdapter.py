@@ -71,8 +71,11 @@ class AliyunSLSLoggerAdapter(NehushtanLoggerAdapter):
         if len(self.__buffer) == 0:
             return
 
+        buffer = self.__buffer
+        self.__buffer = []
+
         log_item_list = []
-        for contents in self.__buffer:
+        for contents in buffer:
             l = []
             for (k, v) in contents.items():
                 if v is None:
