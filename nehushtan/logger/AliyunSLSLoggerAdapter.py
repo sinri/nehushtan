@@ -65,9 +65,9 @@ class AliyunSLSLoggerAdapter(NehushtanLoggerAdapter):
         self.__buffer.append(contents)
 
         if len(self.__buffer) >= self.__buffer_size:
-            self.__flush_buffer()
+            self.flush_buffer()
 
-    def __flush_buffer(self):
+    def flush_buffer(self):
         if len(self.__buffer) == 0:
             return
 
@@ -105,4 +105,4 @@ class AliyunSLSLoggerAdapter(NehushtanLoggerAdapter):
 
     def __del__(self):
         if self.__with_buffer and len(self.__buffer) > 0:
-            self.__flush_buffer()
+            self.flush_buffer()
