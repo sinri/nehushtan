@@ -81,7 +81,7 @@ class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
             self.parsed_cookie_dict[name] = value
 
     def prepare_body(self, body_charset=None):
-        length = int(self.headers.get('content-length', 0))
+        length = int(self.headers.get('content-length', -1))
         self.raw_body = self.rfile.read(length)
         # print(self.raw_body)
 
