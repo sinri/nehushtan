@@ -82,8 +82,15 @@ class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
 
     def prepare_body(self, body_charset=None):
         length = int(self.headers.get('content-length', -1))
-        self.raw_body = self.rfile.read(length)
-        # print(self.raw_body)
+        if length > 0:
+            self.raw_body = self.rfile.read(length)
+        else:
+            while True:
+                x = self.rfile.read(1024)
+                if not x:
+                    break
+                self.raw_body += x
+        print(f'[DEBUG] NehushtanHTTPRequestHandler.prepare_body::self.raw_body: {self.raw_body}')
 
         content_type = self.headers.get('content-type', 'text/plain')
         # print(content_type)
