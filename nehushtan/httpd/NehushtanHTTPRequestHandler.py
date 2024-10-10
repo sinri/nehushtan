@@ -81,16 +81,15 @@ class NehushtanHTTPRequestHandler(BaseHTTPRequestHandler):
             self.parsed_cookie_dict[name] = value
 
     def prepare_body(self, body_charset=None):
-        length = int(self.headers.get('content-length', -1))
-        if length > 0:
-            self.raw_body = self.rfile.read(length)
-        else:
-            while True:
-                x = self.rfile.read(1024)
-                if not x:
-                    break
-                self.raw_body += x
-        print(f'[DEBUG] NehushtanHTTPRequestHandler.prepare_body::self.raw_body: {self.raw_body}')
+        cl = self.headers.get(name='content-length')
+        # print(f'content-length: {cl}')
+        if cl is None:
+            raise Exception('Content Length is missing')
+        length = int(cl)
+        if length < 0:
+            length = 0
+        self.raw_body = self.rfile.read(length)
+        # print(f'[DEBUG] NehushtanHTTPRequestHandler.prepare_body::self.raw_body: {self.raw_body}')
 
         content_type = self.headers.get('content-type', 'text/plain')
         # print(content_type)
